@@ -1,0 +1,394 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		96A4C430136F211E0038239F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4C42F136F211E0038239F /* Foundation.framework */; };
+		96A4C43B136F211E0038239F /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4C43A136F211E0038239F /* UIKit.framework */; };
+		96A4C43C136F211E0038239F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4C42F136F211E0038239F /* Foundation.framework */; };
+		96A4C43E136F211E0038239F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4C43D136F211E0038239F /* CoreGraphics.framework */; };
+		96A4C441136F211E0038239F /* libatmos-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4C42C136F211E0038239F /* libatmos-ios.a */; };
+		96A4C447136F211E0038239F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 96A4C445136F211E0038239F /* InfoPlist.strings */; };
+		96A4C44A136F211E0038239F /* atmos_iosTests.h in Resources */ = {isa = PBXBuildFile; fileRef = 96A4C449136F211E0038239F /* atmos_iosTests.h */; };
+		96A4C44C136F211E0038239F /* atmos_iosTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A4C44B136F211E0038239F /* atmos_iosTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		96A4C43F136F211E0038239F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 96A4C423136F211E0038239F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 96A4C42B136F211E0038239F;
+			remoteInfo = "atmos-ios";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		96A4C42C136F211E0038239F /* libatmos-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libatmos-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		96A4C42F136F211E0038239F /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		96A4C433136F211E0038239F /* atmos-ios-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "atmos-ios-Prefix.pch"; sourceTree = "<group>"; };
+		96A4C439136F211E0038239F /* atmos-iosTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "atmos-iosTests.octest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		96A4C43A136F211E0038239F /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		96A4C43D136F211E0038239F /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		96A4C444136F211E0038239F /* atmos-iosTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "atmos-iosTests-Info.plist"; sourceTree = "<group>"; };
+		96A4C446136F211E0038239F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		96A4C448136F211E0038239F /* atmos-iosTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "atmos-iosTests-Prefix.pch"; sourceTree = "<group>"; };
+		96A4C449136F211E0038239F /* atmos_iosTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = atmos_iosTests.h; sourceTree = "<group>"; };
+		96A4C44B136F211E0038239F /* atmos_iosTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = atmos_iosTests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		96A4C429136F211E0038239F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96A4C430136F211E0038239F /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		96A4C435136F211E0038239F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96A4C43B136F211E0038239F /* UIKit.framework in Frameworks */,
+				96A4C43C136F211E0038239F /* Foundation.framework in Frameworks */,
+				96A4C43E136F211E0038239F /* CoreGraphics.framework in Frameworks */,
+				96A4C441136F211E0038239F /* libatmos-ios.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		96A4C421136F211E0038239F = {
+			isa = PBXGroup;
+			children = (
+				96A4C431136F211E0038239F /* atmos-ios */,
+				96A4C442136F211E0038239F /* atmos-iosTests */,
+				96A4C42E136F211E0038239F /* Frameworks */,
+				96A4C42D136F211E0038239F /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		96A4C42D136F211E0038239F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				96A4C42C136F211E0038239F /* libatmos-ios.a */,
+				96A4C439136F211E0038239F /* atmos-iosTests.octest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		96A4C42E136F211E0038239F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				96A4C42F136F211E0038239F /* Foundation.framework */,
+				96A4C43A136F211E0038239F /* UIKit.framework */,
+				96A4C43D136F211E0038239F /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		96A4C431136F211E0038239F /* atmos-ios */ = {
+			isa = PBXGroup;
+			children = (
+				96A4C432136F211E0038239F /* Supporting Files */,
+			);
+			path = "atmos-ios";
+			sourceTree = "<group>";
+		};
+		96A4C432136F211E0038239F /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				96A4C433136F211E0038239F /* atmos-ios-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		96A4C442136F211E0038239F /* atmos-iosTests */ = {
+			isa = PBXGroup;
+			children = (
+				96A4C449136F211E0038239F /* atmos_iosTests.h */,
+				96A4C44B136F211E0038239F /* atmos_iosTests.m */,
+				96A4C443136F211E0038239F /* Supporting Files */,
+			);
+			path = "atmos-iosTests";
+			sourceTree = "<group>";
+		};
+		96A4C443136F211E0038239F /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				96A4C444136F211E0038239F /* atmos-iosTests-Info.plist */,
+				96A4C445136F211E0038239F /* InfoPlist.strings */,
+				96A4C448136F211E0038239F /* atmos-iosTests-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		96A4C42A136F211E0038239F /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		96A4C42B136F211E0038239F /* atmos-ios */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 96A4C44F136F211E0038239F /* Build configuration list for PBXNativeTarget "atmos-ios" */;
+			buildPhases = (
+				96A4C428136F211E0038239F /* Sources */,
+				96A4C429136F211E0038239F /* Frameworks */,
+				96A4C42A136F211E0038239F /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "atmos-ios";
+			productName = "atmos-ios";
+			productReference = 96A4C42C136F211E0038239F /* libatmos-ios.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		96A4C438136F211E0038239F /* atmos-iosTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 96A4C452136F211E0038239F /* Build configuration list for PBXNativeTarget "atmos-iosTests" */;
+			buildPhases = (
+				96A4C434136F211E0038239F /* Sources */,
+				96A4C435136F211E0038239F /* Frameworks */,
+				96A4C436136F211E0038239F /* Resources */,
+				96A4C437136F211E0038239F /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				96A4C440136F211E0038239F /* PBXTargetDependency */,
+			);
+			name = "atmos-iosTests";
+			productName = "atmos-iosTests";
+			productReference = 96A4C439136F211E0038239F /* atmos-iosTests.octest */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		96A4C423136F211E0038239F /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 96A4C426136F211E0038239F /* Build configuration list for PBXProject "atmos-ios" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 96A4C421136F211E0038239F;
+			productRefGroup = 96A4C42D136F211E0038239F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				96A4C42B136F211E0038239F /* atmos-ios */,
+				96A4C438136F211E0038239F /* atmos-iosTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		96A4C436136F211E0038239F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96A4C447136F211E0038239F /* InfoPlist.strings in Resources */,
+				96A4C44A136F211E0038239F /* atmos_iosTests.h in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		96A4C437136F211E0038239F /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		96A4C428136F211E0038239F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		96A4C434136F211E0038239F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96A4C44C136F211E0038239F /* atmos_iosTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		96A4C440136F211E0038239F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 96A4C42B136F211E0038239F /* atmos-ios */;
+			targetProxy = 96A4C43F136F211E0038239F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		96A4C445136F211E0038239F /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				96A4C446136F211E0038239F /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		96A4C44D136F211E0038239F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		96A4C44E136F211E0038239F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				SDKROOT = iphoneos;
+			};
+			name = Release;
+		};
+		96A4C450136F211E0038239F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DSTROOT = /tmp/atmos_ios.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "atmos-ios/atmos-ios-Prefix.pch";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		96A4C451136F211E0038239F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DSTROOT = /tmp/atmos_ios.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "atmos-ios/atmos-ios-Prefix.pch";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		96A4C453136F211E0038239F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "atmos-iosTests/atmos-iosTests-Prefix.pch";
+				INFOPLIST_FILE = "atmos-iosTests/atmos-iosTests-Info.plist";
+				OTHER_LDFLAGS = (
+					"-framework",
+					SenTestingKit,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Debug;
+		};
+		96A4C454136F211E0038239F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "atmos-iosTests/atmos-iosTests-Prefix.pch";
+				INFOPLIST_FILE = "atmos-iosTests/atmos-iosTests-Info.plist";
+				OTHER_LDFLAGS = (
+					"-framework",
+					SenTestingKit,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		96A4C426136F211E0038239F /* Build configuration list for PBXProject "atmos-ios" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				96A4C44D136F211E0038239F /* Debug */,
+				96A4C44E136F211E0038239F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		96A4C44F136F211E0038239F /* Build configuration list for PBXNativeTarget "atmos-ios" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				96A4C450136F211E0038239F /* Debug */,
+				96A4C451136F211E0038239F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		96A4C452136F211E0038239F /* Build configuration list for PBXNativeTarget "atmos-iosTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				96A4C453136F211E0038239F /* Debug */,
+				96A4C454136F211E0038239F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 96A4C423136F211E0038239F /* Project object */;
+}
