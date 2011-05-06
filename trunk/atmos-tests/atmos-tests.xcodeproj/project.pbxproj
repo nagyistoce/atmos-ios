@@ -1,0 +1,340 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		963C12D51371DCCD008AB91F /* AtmosTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 963C12D41371DCCD008AB91F /* AtmosTests.m */; };
+		967248E61371D0AE00013901 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 967248E51371D0AE00013901 /* UIKit.framework */; };
+		967248E81371D0AE00013901 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 967248E71371D0AE00013901 /* Foundation.framework */; };
+		967248EA1371D0AE00013901 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 967248E91371D0AE00013901 /* CoreGraphics.framework */; };
+		967248F01371D0AE00013901 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 967248EE1371D0AE00013901 /* InfoPlist.strings */; };
+		967248F31371D0AE00013901 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 967248F21371D0AE00013901 /* main.m */; };
+		967248F61371D0AE00013901 /* atmos_testsAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 967248F51371D0AE00013901 /* atmos_testsAppDelegate.m */; };
+		967248FA1371D0AE00013901 /* atmos_testsAppDelegate_iPhone.m in Sources */ = {isa = PBXBuildFile; fileRef = 967248F91371D0AE00013901 /* atmos_testsAppDelegate_iPhone.m */; };
+		967248FD1371D0AE00013901 /* MainWindow_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 967248FB1371D0AE00013901 /* MainWindow_iPhone.xib */; };
+		967249011371D0AE00013901 /* atmos_testsAppDelegate_iPad.m in Sources */ = {isa = PBXBuildFile; fileRef = 967249001371D0AE00013901 /* atmos_testsAppDelegate_iPad.m */; };
+		967249041371D0AE00013901 /* MainWindow_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 967249021371D0AE00013901 /* MainWindow_iPad.xib */; };
+		9672490F1371D0EE00013901 /* GHUnitIOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9672490E1371D0EE00013901 /* GHUnitIOS.framework */; };
+		96DFDFA1137486AA00EDDD3C /* libatmos.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96DFDFA0137486AA00EDDD3C /* libatmos.a */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		963C12D31371DCCD008AB91F /* AtmosTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AtmosTests.h; sourceTree = "<group>"; };
+		963C12D41371DCCD008AB91F /* AtmosTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AtmosTests.m; sourceTree = "<group>"; };
+		967248E11371D0AD00013901 /* atmos-tests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "atmos-tests.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		967248E51371D0AE00013901 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		967248E71371D0AE00013901 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		967248E91371D0AE00013901 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		967248ED1371D0AE00013901 /* atmos-tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "atmos-tests-Info.plist"; sourceTree = "<group>"; };
+		967248EF1371D0AE00013901 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		967248F11371D0AE00013901 /* atmos-tests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "atmos-tests-Prefix.pch"; sourceTree = "<group>"; };
+		967248F21371D0AE00013901 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		967248F41371D0AE00013901 /* atmos_testsAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = atmos_testsAppDelegate.h; sourceTree = "<group>"; };
+		967248F51371D0AE00013901 /* atmos_testsAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = atmos_testsAppDelegate.m; sourceTree = "<group>"; };
+		967248F81371D0AE00013901 /* atmos_testsAppDelegate_iPhone.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = atmos_testsAppDelegate_iPhone.h; path = iPhone/atmos_testsAppDelegate_iPhone.h; sourceTree = "<group>"; };
+		967248F91371D0AE00013901 /* atmos_testsAppDelegate_iPhone.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = atmos_testsAppDelegate_iPhone.m; path = iPhone/atmos_testsAppDelegate_iPhone.m; sourceTree = "<group>"; };
+		967248FC1371D0AE00013901 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = iPhone/en.lproj/MainWindow_iPhone.xib; sourceTree = "<group>"; };
+		967248FF1371D0AE00013901 /* atmos_testsAppDelegate_iPad.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = atmos_testsAppDelegate_iPad.h; path = iPad/atmos_testsAppDelegate_iPad.h; sourceTree = "<group>"; };
+		967249001371D0AE00013901 /* atmos_testsAppDelegate_iPad.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = atmos_testsAppDelegate_iPad.m; path = iPad/atmos_testsAppDelegate_iPad.m; sourceTree = "<group>"; };
+		967249031371D0AE00013901 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = iPad/en.lproj/MainWindow_iPad.xib; sourceTree = "<group>"; };
+		9672490E1371D0EE00013901 /* GHUnitIOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GHUnitIOS.framework; sourceTree = "<group>"; };
+		96DFDFA0137486AA00EDDD3C /* libatmos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libatmos.a; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		967248DE1371D0AD00013901 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96DFDFA1137486AA00EDDD3C /* libatmos.a in Frameworks */,
+				967248E61371D0AE00013901 /* UIKit.framework in Frameworks */,
+				967248E81371D0AE00013901 /* Foundation.framework in Frameworks */,
+				967248EA1371D0AE00013901 /* CoreGraphics.framework in Frameworks */,
+				9672490F1371D0EE00013901 /* GHUnitIOS.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		967248D61371D0AD00013901 = {
+			isa = PBXGroup;
+			children = (
+				96DFDFA0137486AA00EDDD3C /* libatmos.a */,
+				967248EB1371D0AE00013901 /* atmos-tests */,
+				967248E41371D0AE00013901 /* Frameworks */,
+				967248E21371D0AD00013901 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		967248E21371D0AD00013901 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				967248E11371D0AD00013901 /* atmos-tests.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		967248E41371D0AE00013901 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9672490E1371D0EE00013901 /* GHUnitIOS.framework */,
+				967248E51371D0AE00013901 /* UIKit.framework */,
+				967248E71371D0AE00013901 /* Foundation.framework */,
+				967248E91371D0AE00013901 /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		967248EB1371D0AE00013901 /* atmos-tests */ = {
+			isa = PBXGroup;
+			children = (
+				963C12D31371DCCD008AB91F /* AtmosTests.h */,
+				963C12D41371DCCD008AB91F /* AtmosTests.m */,
+				967248F41371D0AE00013901 /* atmos_testsAppDelegate.h */,
+				967248F51371D0AE00013901 /* atmos_testsAppDelegate.m */,
+				967248F71371D0AE00013901 /* iPhone */,
+				967248FE1371D0AE00013901 /* iPad */,
+				967248EC1371D0AE00013901 /* Supporting Files */,
+			);
+			path = "atmos-tests";
+			sourceTree = "<group>";
+		};
+		967248EC1371D0AE00013901 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				967248ED1371D0AE00013901 /* atmos-tests-Info.plist */,
+				967248EE1371D0AE00013901 /* InfoPlist.strings */,
+				967248F11371D0AE00013901 /* atmos-tests-Prefix.pch */,
+				967248F21371D0AE00013901 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		967248F71371D0AE00013901 /* iPhone */ = {
+			isa = PBXGroup;
+			children = (
+				967248F81371D0AE00013901 /* atmos_testsAppDelegate_iPhone.h */,
+				967248F91371D0AE00013901 /* atmos_testsAppDelegate_iPhone.m */,
+				967248FB1371D0AE00013901 /* MainWindow_iPhone.xib */,
+			);
+			name = iPhone;
+			sourceTree = "<group>";
+		};
+		967248FE1371D0AE00013901 /* iPad */ = {
+			isa = PBXGroup;
+			children = (
+				967248FF1371D0AE00013901 /* atmos_testsAppDelegate_iPad.h */,
+				967249001371D0AE00013901 /* atmos_testsAppDelegate_iPad.m */,
+				967249021371D0AE00013901 /* MainWindow_iPad.xib */,
+			);
+			name = iPad;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		967248E01371D0AD00013901 /* atmos-tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 967249071371D0AE00013901 /* Build configuration list for PBXNativeTarget "atmos-tests" */;
+			buildPhases = (
+				967248DD1371D0AD00013901 /* Sources */,
+				967248DE1371D0AD00013901 /* Frameworks */,
+				967248DF1371D0AD00013901 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "atmos-tests";
+			productName = "atmos-tests";
+			productReference = 967248E11371D0AD00013901 /* atmos-tests.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		967248D81371D0AD00013901 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 967248DB1371D0AD00013901 /* Build configuration list for PBXProject "atmos-tests" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 967248D61371D0AD00013901;
+			productRefGroup = 967248E21371D0AD00013901 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				967248E01371D0AD00013901 /* atmos-tests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		967248DF1371D0AD00013901 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				967248F01371D0AE00013901 /* InfoPlist.strings in Resources */,
+				967248FD1371D0AE00013901 /* MainWindow_iPhone.xib in Resources */,
+				967249041371D0AE00013901 /* MainWindow_iPad.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		967248DD1371D0AD00013901 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				967248F31371D0AE00013901 /* main.m in Sources */,
+				967248F61371D0AE00013901 /* atmos_testsAppDelegate.m in Sources */,
+				967248FA1371D0AE00013901 /* atmos_testsAppDelegate_iPhone.m in Sources */,
+				967249011371D0AE00013901 /* atmos_testsAppDelegate_iPad.m in Sources */,
+				963C12D51371DCCD008AB91F /* AtmosTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		967248EE1371D0AE00013901 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				967248EF1371D0AE00013901 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		967248FB1371D0AE00013901 /* MainWindow_iPhone.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				967248FC1371D0AE00013901 /* en */,
+			);
+			name = MainWindow_iPhone.xib;
+			sourceTree = "<group>";
+		};
+		967249021371D0AE00013901 /* MainWindow_iPad.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				967249031371D0AE00013901 /* en */,
+			);
+			name = MainWindow_iPad.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		967249051371D0AE00013901 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		967249061371D0AE00013901 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		967249081371D0AE00013901 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "atmos-tests/atmos-tests-Prefix.pch";
+				HEADER_SEARCH_PATHS = "$(BUILT_PRODUCTS_DIR)/usr/local/include";
+				INFOPLIST_FILE = "atmos-tests/atmos-tests-Info.plist";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-all_load",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		967249091371D0AE00013901 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "atmos-tests/atmos-tests-Prefix.pch";
+				HEADER_SEARCH_PATHS = "$(BUILT_PRODUCTS_DIR)/usr/local/include";
+				INFOPLIST_FILE = "atmos-tests/atmos-tests-Info.plist";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-all_load",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALIDATE_PRODUCT = YES;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		967248DB1371D0AD00013901 /* Build configuration list for PBXProject "atmos-tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				967249051371D0AE00013901 /* Debug */,
+				967249061371D0AE00013901 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		967249071371D0AE00013901 /* Build configuration list for PBXNativeTarget "atmos-tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				967249081371D0AE00013901 /* Debug */,
+				967249091371D0AE00013901 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 967248D81371D0AD00013901 /* Project object */;
+}
