@@ -28,7 +28,7 @@ For example:
     obj.data = [NSData dataWithBytes:[@"Hello World" UTF8String]];
 }}}
 
-= Blocks =
+=== Blocks ===
 Since iOS implements HTTP operations asynchronously, we use Objective-C blocks for callbacks after the operations complete.  When using XCode4, if you simply tab through the method parameters and press the Return key on the block, the appropriate block signature will be automatically generated.  If you're familiar with other languages, blocks are similar to function closures in Javascript.  You can read more about iOS blocks here:
 http://developer.apple.com/library/ios/#featuredarticles/Short_Practical_Guide_Blocks/_index.html%23//apple_ref/doc/uid/TP40009758
 
@@ -52,5 +52,3 @@ The easiest method of using blocks is to simply insert the block body in the fun
 }}}
 
 Note that the createObject and readObject callbacks return BOOL.  You should return YES to continue uploading or downloading.  If you want to cancel the operation, return NO.  Also note that create and read may be called multiple times to provide status updates for longer transfers and you should check isComplete to determine whether the operation has completed.  Operations that only invoke the callback once will not have the isComplete property in the callback argument.
-
-
