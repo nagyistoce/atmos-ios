@@ -7,38 +7,102 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		963C12DF1371E722008AB91F /* UploadProgress.h in Headers */ = {isa = PBXBuildFile; fileRef = 963C12DD1371E721008AB91F /* UploadProgress.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		963C12E01371E722008AB91F /* UploadProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 963C12DE1371E722008AB91F /* UploadProgress.m */; };
+		963C12E31371ED8C008AB91F /* AtmosRange.h in Headers */ = {isa = PBXBuildFile; fileRef = 963C12E11371ED8C008AB91F /* AtmosRange.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		963C12E41371ED8C008AB91F /* AtmosRange.m in Sources */ = {isa = PBXBuildFile; fileRef = 963C12E21371ED8C008AB91F /* AtmosRange.m */; };
+		963C12E713732B21008AB91F /* ListObjectsResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 963C12E513732B21008AB91F /* ListObjectsResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		963C12E813732B21008AB91F /* ListObjectsResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 963C12E613732B21008AB91F /* ListObjectsResult.m */; };
+		963C12EB137397E3008AB91F /* DownloadProgress.h in Headers */ = {isa = PBXBuildFile; fileRef = 963C12E9137397E1008AB91F /* DownloadProgress.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		963C12EC137397E3008AB91F /* DownloadProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 963C12EA137397E2008AB91F /* DownloadProgress.m */; };
+		967CB6C21371A038003C9523 /* AtmosResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 967CB6C01371A038003C9523 /* AtmosResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		967CB6C31371A038003C9523 /* AtmosResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 967CB6C11371A038003C9523 /* AtmosResult.m */; };
+		967CB6C61371A13E003C9523 /* GetListableTagsResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 967CB6C41371A13D003C9523 /* GetListableTagsResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		967CB6C71371A13E003C9523 /* GetListableTagsResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 967CB6C51371A13D003C9523 /* GetListableTagsResult.m */; };
 		96A4C430136F211E0038239F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4C42F136F211E0038239F /* Foundation.framework */; };
-		96A4C43B136F211E0038239F /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4C43A136F211E0038239F /* UIKit.framework */; };
-		96A4C43C136F211E0038239F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4C42F136F211E0038239F /* Foundation.framework */; };
-		96A4C43E136F211E0038239F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4C43D136F211E0038239F /* CoreGraphics.framework */; };
-		96A4C441136F211E0038239F /* libatmos-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4C42C136F211E0038239F /* libatmos-ios.a */; };
-		96A4C447136F211E0038239F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 96A4C445136F211E0038239F /* InfoPlist.strings */; };
-		96A4C44A136F211E0038239F /* atmos_iosTests.h in Resources */ = {isa = PBXBuildFile; fileRef = 96A4C449136F211E0038239F /* atmos_iosTests.h */; };
-		96A4C44C136F211E0038239F /* atmos_iosTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A4C44B136F211E0038239F /* atmos_iosTests.m */; };
+		96A52D1C136F236B00ED175D /* NSData+Additions.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A52CFD136F236B00ED175D /* NSData+Additions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96A52D1D136F236B00ED175D /* NSData+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A52CFE136F236B00ED175D /* NSData+Additions.m */; };
+		96A52D1E136F236B00ED175D /* AtmosBaseOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A52CFF136F236B00ED175D /* AtmosBaseOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96A52D1F136F236B00ED175D /* AtmosBaseOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A52D00136F236B00ED175D /* AtmosBaseOperation.m */; };
+		96A52D20136F236B00ED175D /* AtmosCredentials.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A52D01136F236B00ED175D /* AtmosCredentials.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96A52D21136F236B00ED175D /* AtmosCredentials.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A52D02136F236B00ED175D /* AtmosCredentials.m */; };
+		96A52D22136F236B00ED175D /* AtmosStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A52D03136F236B00ED175D /* AtmosStore.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96A52D23136F236B00ED175D /* AtmosStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A52D04136F236B00ED175D /* AtmosStore.m */; };
+		96A52D24136F236B00ED175D /* AtmosObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A52D05136F236B00ED175D /* AtmosObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96A52D25136F236B00ED175D /* AtmosObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A52D06136F236B00ED175D /* AtmosObject.m */; };
+		96A52D26136F236B00ED175D /* AtmosProgressListenerDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A52D07136F236B00ED175D /* AtmosProgressListenerDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96A52D27136F236B00ED175D /* ListObjectsOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A52D08136F236B00ED175D /* ListObjectsOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96A52D28136F236B00ED175D /* ListObjectsOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A52D09136F236B00ED175D /* ListObjectsOperation.m */; };
+		96A52D29136F236B00ED175D /* DownloadObjectOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A52D0A136F236B00ED175D /* DownloadObjectOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96A52D2A136F236B00ED175D /* DownloadObjectOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A52D0B136F236B00ED175D /* DownloadObjectOperation.m */; };
+		96A52D2B136F236B00ED175D /* GetListableTagsOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A52D0C136F236B00ED175D /* GetListableTagsOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96A52D2C136F236B00ED175D /* GetListableTagsOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A52D0D136F236B00ED175D /* GetListableTagsOperation.m */; };
+		96A52D2D136F236B00ED175D /* AtmosError.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A52D0E136F236B00ED175D /* AtmosError.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96A52D2E136F236B00ED175D /* AtmosError.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A52D0F136F236B00ED175D /* AtmosError.m */; };
+		96A52D2F136F236B00ED175D /* GetMetadataOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A52D10136F236B00ED175D /* GetMetadataOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96A52D30136F236B00ED175D /* GetMetadataOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A52D11136F236B00ED175D /* GetMetadataOperation.m */; };
+		96A52D31136F236B00ED175D /* SetMetadataOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A52D12136F236B00ED175D /* SetMetadataOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96A52D32136F236B00ED175D /* SetMetadataOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A52D13136F236B00ED175D /* SetMetadataOperation.m */; };
+		96A52D33136F236B00ED175D /* ObjectUploadOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A52D14136F236B00ED175D /* ObjectUploadOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96A52D34136F236B00ED175D /* ObjectUploadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A52D15136F236B00ED175D /* ObjectUploadOperation.m */; };
+		96A52D35136F236B00ED175D /* DeleteObjectOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A52D16136F236B00ED175D /* DeleteObjectOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96A52D36136F236B00ED175D /* DeleteObjectOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A52D17136F236B00ED175D /* DeleteObjectOperation.m */; };
+		96A52D37136F236B00ED175D /* ListDirectoryOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A52D18136F236B00ED175D /* ListDirectoryOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96A52D38136F236B00ED175D /* ListDirectoryOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A52D19136F236B00ED175D /* ListDirectoryOperation.m */; };
+		96A52D39136F236B00ED175D /* DeleteMetadataOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A52D1A136F236B00ED175D /* DeleteMetadataOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96A52D3A136F236B00ED175D /* DeleteMetadataOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A52D1B136F236B00ED175D /* DeleteMetadataOperation.m */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		96A4C43F136F211E0038239F /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 96A4C423136F211E0038239F /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 96A4C42B136F211E0038239F;
-			remoteInfo = "atmos-ios";
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXFileReference section */
-		96A4C42C136F211E0038239F /* libatmos-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libatmos-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		963C12DD1371E721008AB91F /* UploadProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UploadProgress.h; sourceTree = "<group>"; };
+		963C12DE1371E722008AB91F /* UploadProgress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UploadProgress.m; sourceTree = "<group>"; };
+		963C12E11371ED8C008AB91F /* AtmosRange.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AtmosRange.h; sourceTree = "<group>"; };
+		963C12E21371ED8C008AB91F /* AtmosRange.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AtmosRange.m; sourceTree = "<group>"; };
+		963C12E513732B21008AB91F /* ListObjectsResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ListObjectsResult.h; sourceTree = "<group>"; };
+		963C12E613732B21008AB91F /* ListObjectsResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ListObjectsResult.m; sourceTree = "<group>"; };
+		963C12E9137397E1008AB91F /* DownloadProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownloadProgress.h; sourceTree = "<group>"; };
+		963C12EA137397E2008AB91F /* DownloadProgress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DownloadProgress.m; sourceTree = "<group>"; };
+		967CB6BE13719147003C9523 /* readme.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = readme.txt; sourceTree = "<group>"; };
+		967CB6C01371A038003C9523 /* AtmosResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AtmosResult.h; sourceTree = "<group>"; };
+		967CB6C11371A038003C9523 /* AtmosResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AtmosResult.m; sourceTree = "<group>"; };
+		967CB6C41371A13D003C9523 /* GetListableTagsResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetListableTagsResult.h; sourceTree = "<group>"; };
+		967CB6C51371A13D003C9523 /* GetListableTagsResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetListableTagsResult.m; sourceTree = "<group>"; };
+		96A4C42C136F211E0038239F /* libatmos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libatmos.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		96A4C42F136F211E0038239F /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		96A4C433136F211E0038239F /* atmos-ios-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "atmos-ios-Prefix.pch"; sourceTree = "<group>"; };
-		96A4C439136F211E0038239F /* atmos-iosTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "atmos-iosTests.octest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		96A4C43A136F211E0038239F /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		96A4C43D136F211E0038239F /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		96A4C444136F211E0038239F /* atmos-iosTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "atmos-iosTests-Info.plist"; sourceTree = "<group>"; };
-		96A4C446136F211E0038239F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		96A4C448136F211E0038239F /* atmos-iosTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "atmos-iosTests-Prefix.pch"; sourceTree = "<group>"; };
-		96A4C449136F211E0038239F /* atmos_iosTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = atmos_iosTests.h; sourceTree = "<group>"; };
-		96A4C44B136F211E0038239F /* atmos_iosTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = atmos_iosTests.m; sourceTree = "<group>"; };
+		96A52CFD136F236B00ED175D /* NSData+Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Additions.h"; sourceTree = "<group>"; };
+		96A52CFE136F236B00ED175D /* NSData+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Additions.m"; sourceTree = "<group>"; };
+		96A52CFF136F236B00ED175D /* AtmosBaseOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AtmosBaseOperation.h; sourceTree = "<group>"; };
+		96A52D00136F236B00ED175D /* AtmosBaseOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AtmosBaseOperation.m; sourceTree = "<group>"; };
+		96A52D01136F236B00ED175D /* AtmosCredentials.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AtmosCredentials.h; sourceTree = "<group>"; };
+		96A52D02136F236B00ED175D /* AtmosCredentials.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AtmosCredentials.m; sourceTree = "<group>"; };
+		96A52D03136F236B00ED175D /* AtmosStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AtmosStore.h; sourceTree = "<group>"; };
+		96A52D04136F236B00ED175D /* AtmosStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AtmosStore.m; sourceTree = "<group>"; };
+		96A52D05136F236B00ED175D /* AtmosObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AtmosObject.h; sourceTree = "<group>"; };
+		96A52D06136F236B00ED175D /* AtmosObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AtmosObject.m; sourceTree = "<group>"; };
+		96A52D07136F236B00ED175D /* AtmosProgressListenerDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AtmosProgressListenerDelegate.h; sourceTree = "<group>"; };
+		96A52D08136F236B00ED175D /* ListObjectsOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ListObjectsOperation.h; sourceTree = "<group>"; };
+		96A52D09136F236B00ED175D /* ListObjectsOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ListObjectsOperation.m; sourceTree = "<group>"; };
+		96A52D0A136F236B00ED175D /* DownloadObjectOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownloadObjectOperation.h; sourceTree = "<group>"; };
+		96A52D0B136F236B00ED175D /* DownloadObjectOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DownloadObjectOperation.m; sourceTree = "<group>"; };
+		96A52D0C136F236B00ED175D /* GetListableTagsOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetListableTagsOperation.h; sourceTree = "<group>"; };
+		96A52D0D136F236B00ED175D /* GetListableTagsOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetListableTagsOperation.m; sourceTree = "<group>"; };
+		96A52D0E136F236B00ED175D /* AtmosError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AtmosError.h; sourceTree = "<group>"; };
+		96A52D0F136F236B00ED175D /* AtmosError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AtmosError.m; sourceTree = "<group>"; };
+		96A52D10136F236B00ED175D /* GetMetadataOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetMetadataOperation.h; sourceTree = "<group>"; };
+		96A52D11136F236B00ED175D /* GetMetadataOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetMetadataOperation.m; sourceTree = "<group>"; };
+		96A52D12136F236B00ED175D /* SetMetadataOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SetMetadataOperation.h; sourceTree = "<group>"; };
+		96A52D13136F236B00ED175D /* SetMetadataOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SetMetadataOperation.m; sourceTree = "<group>"; };
+		96A52D14136F236B00ED175D /* ObjectUploadOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ObjectUploadOperation.h; sourceTree = "<group>"; };
+		96A52D15136F236B00ED175D /* ObjectUploadOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjectUploadOperation.m; sourceTree = "<group>"; };
+		96A52D16136F236B00ED175D /* DeleteObjectOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeleteObjectOperation.h; sourceTree = "<group>"; };
+		96A52D17136F236B00ED175D /* DeleteObjectOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeleteObjectOperation.m; sourceTree = "<group>"; };
+		96A52D18136F236B00ED175D /* ListDirectoryOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ListDirectoryOperation.h; sourceTree = "<group>"; };
+		96A52D19136F236B00ED175D /* ListDirectoryOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ListDirectoryOperation.m; sourceTree = "<group>"; };
+		96A52D1A136F236B00ED175D /* DeleteMetadataOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeleteMetadataOperation.h; sourceTree = "<group>"; };
+		96A52D1B136F236B00ED175D /* DeleteMetadataOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeleteMetadataOperation.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,25 +114,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		96A4C435136F211E0038239F /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				96A4C43B136F211E0038239F /* UIKit.framework in Frameworks */,
-				96A4C43C136F211E0038239F /* Foundation.framework in Frameworks */,
-				96A4C43E136F211E0038239F /* CoreGraphics.framework in Frameworks */,
-				96A4C441136F211E0038239F /* libatmos-ios.a in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		96A4C421136F211E0038239F = {
 			isa = PBXGroup;
 			children = (
+				967CB6BE13719147003C9523 /* readme.txt */,
 				96A4C431136F211E0038239F /* atmos-ios */,
-				96A4C442136F211E0038239F /* atmos-iosTests */,
 				96A4C42E136F211E0038239F /* Frameworks */,
 				96A4C42D136F211E0038239F /* Products */,
 			);
@@ -77,8 +130,7 @@
 		96A4C42D136F211E0038239F /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				96A4C42C136F211E0038239F /* libatmos-ios.a */,
-				96A4C439136F211E0038239F /* atmos-iosTests.octest */,
+				96A4C42C136F211E0038239F /* libatmos.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -96,7 +148,50 @@
 		96A4C431136F211E0038239F /* atmos-ios */ = {
 			isa = PBXGroup;
 			children = (
+				96A52CFD136F236B00ED175D /* NSData+Additions.h */,
+				96A52CFE136F236B00ED175D /* NSData+Additions.m */,
+				96A52CFF136F236B00ED175D /* AtmosBaseOperation.h */,
+				96A52D00136F236B00ED175D /* AtmosBaseOperation.m */,
+				96A52D01136F236B00ED175D /* AtmosCredentials.h */,
+				96A52D02136F236B00ED175D /* AtmosCredentials.m */,
+				96A52D03136F236B00ED175D /* AtmosStore.h */,
+				96A52D04136F236B00ED175D /* AtmosStore.m */,
+				96A52D05136F236B00ED175D /* AtmosObject.h */,
+				96A52D06136F236B00ED175D /* AtmosObject.m */,
+				96A52D07136F236B00ED175D /* AtmosProgressListenerDelegate.h */,
+				96A52D08136F236B00ED175D /* ListObjectsOperation.h */,
+				96A52D09136F236B00ED175D /* ListObjectsOperation.m */,
+				96A52D0A136F236B00ED175D /* DownloadObjectOperation.h */,
+				96A52D0B136F236B00ED175D /* DownloadObjectOperation.m */,
+				96A52D0C136F236B00ED175D /* GetListableTagsOperation.h */,
+				96A52D0D136F236B00ED175D /* GetListableTagsOperation.m */,
+				96A52D0E136F236B00ED175D /* AtmosError.h */,
+				96A52D0F136F236B00ED175D /* AtmosError.m */,
+				96A52D10136F236B00ED175D /* GetMetadataOperation.h */,
+				96A52D11136F236B00ED175D /* GetMetadataOperation.m */,
+				96A52D12136F236B00ED175D /* SetMetadataOperation.h */,
+				96A52D13136F236B00ED175D /* SetMetadataOperation.m */,
+				96A52D14136F236B00ED175D /* ObjectUploadOperation.h */,
+				96A52D15136F236B00ED175D /* ObjectUploadOperation.m */,
+				96A52D16136F236B00ED175D /* DeleteObjectOperation.h */,
+				96A52D17136F236B00ED175D /* DeleteObjectOperation.m */,
+				96A52D18136F236B00ED175D /* ListDirectoryOperation.h */,
+				96A52D19136F236B00ED175D /* ListDirectoryOperation.m */,
+				96A52D1A136F236B00ED175D /* DeleteMetadataOperation.h */,
+				96A52D1B136F236B00ED175D /* DeleteMetadataOperation.m */,
 				96A4C432136F211E0038239F /* Supporting Files */,
+				967CB6C01371A038003C9523 /* AtmosResult.h */,
+				967CB6C11371A038003C9523 /* AtmosResult.m */,
+				967CB6C41371A13D003C9523 /* GetListableTagsResult.h */,
+				967CB6C51371A13D003C9523 /* GetListableTagsResult.m */,
+				963C12DD1371E721008AB91F /* UploadProgress.h */,
+				963C12DE1371E722008AB91F /* UploadProgress.m */,
+				963C12E11371ED8C008AB91F /* AtmosRange.h */,
+				963C12E21371ED8C008AB91F /* AtmosRange.m */,
+				963C12E513732B21008AB91F /* ListObjectsResult.h */,
+				963C12E613732B21008AB91F /* ListObjectsResult.m */,
+				963C12E9137397E1008AB91F /* DownloadProgress.h */,
+				963C12EA137397E2008AB91F /* DownloadProgress.m */,
 			);
 			path = "atmos-ios";
 			sourceTree = "<group>";
@@ -109,26 +204,6 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		96A4C442136F211E0038239F /* atmos-iosTests */ = {
-			isa = PBXGroup;
-			children = (
-				96A4C449136F211E0038239F /* atmos_iosTests.h */,
-				96A4C44B136F211E0038239F /* atmos_iosTests.m */,
-				96A4C443136F211E0038239F /* Supporting Files */,
-			);
-			path = "atmos-iosTests";
-			sourceTree = "<group>";
-		};
-		96A4C443136F211E0038239F /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				96A4C444136F211E0038239F /* atmos-iosTests-Info.plist */,
-				96A4C445136F211E0038239F /* InfoPlist.strings */,
-				96A4C448136F211E0038239F /* atmos-iosTests-Prefix.pch */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -136,6 +211,28 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96A52D1C136F236B00ED175D /* NSData+Additions.h in Headers */,
+				96A52D1E136F236B00ED175D /* AtmosBaseOperation.h in Headers */,
+				96A52D20136F236B00ED175D /* AtmosCredentials.h in Headers */,
+				96A52D22136F236B00ED175D /* AtmosStore.h in Headers */,
+				96A52D24136F236B00ED175D /* AtmosObject.h in Headers */,
+				96A52D26136F236B00ED175D /* AtmosProgressListenerDelegate.h in Headers */,
+				96A52D27136F236B00ED175D /* ListObjectsOperation.h in Headers */,
+				96A52D29136F236B00ED175D /* DownloadObjectOperation.h in Headers */,
+				96A52D2B136F236B00ED175D /* GetListableTagsOperation.h in Headers */,
+				96A52D2D136F236B00ED175D /* AtmosError.h in Headers */,
+				96A52D2F136F236B00ED175D /* GetMetadataOperation.h in Headers */,
+				96A52D31136F236B00ED175D /* SetMetadataOperation.h in Headers */,
+				96A52D33136F236B00ED175D /* ObjectUploadOperation.h in Headers */,
+				96A52D35136F236B00ED175D /* DeleteObjectOperation.h in Headers */,
+				96A52D37136F236B00ED175D /* ListDirectoryOperation.h in Headers */,
+				96A52D39136F236B00ED175D /* DeleteMetadataOperation.h in Headers */,
+				967CB6C21371A038003C9523 /* AtmosResult.h in Headers */,
+				963C12E31371ED8C008AB91F /* AtmosRange.h in Headers */,
+				963C12DF1371E722008AB91F /* UploadProgress.h in Headers */,
+				963C12E713732B21008AB91F /* ListObjectsResult.h in Headers */,
+				963C12EB137397E3008AB91F /* DownloadProgress.h in Headers */,
+				967CB6C61371A13E003C9523 /* GetListableTagsResult.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -156,27 +253,8 @@
 			);
 			name = "atmos-ios";
 			productName = "atmos-ios";
-			productReference = 96A4C42C136F211E0038239F /* libatmos-ios.a */;
+			productReference = 96A4C42C136F211E0038239F /* libatmos.a */;
 			productType = "com.apple.product-type.library.static";
-		};
-		96A4C438136F211E0038239F /* atmos-iosTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 96A4C452136F211E0038239F /* Build configuration list for PBXNativeTarget "atmos-iosTests" */;
-			buildPhases = (
-				96A4C434136F211E0038239F /* Sources */,
-				96A4C435136F211E0038239F /* Frameworks */,
-				96A4C436136F211E0038239F /* Resources */,
-				96A4C437136F211E0038239F /* ShellScript */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				96A4C440136F211E0038239F /* PBXTargetDependency */,
-			);
-			name = "atmos-iosTests";
-			productName = "atmos-iosTests";
-			productReference = 96A4C439136F211E0038239F /* atmos-iosTests.octest */;
-			productType = "com.apple.product-type.bundle";
 		};
 /* End PBXNativeTarget section */
 
@@ -196,75 +274,40 @@
 			projectRoot = "";
 			targets = (
 				96A4C42B136F211E0038239F /* atmos-ios */,
-				96A4C438136F211E0038239F /* atmos-iosTests */,
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXResourcesBuildPhase section */
-		96A4C436136F211E0038239F /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				96A4C447136F211E0038239F /* InfoPlist.strings in Resources */,
-				96A4C44A136F211E0038239F /* atmos_iosTests.h in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		96A4C437136F211E0038239F /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		96A4C428136F211E0038239F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		96A4C434136F211E0038239F /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				96A4C44C136F211E0038239F /* atmos_iosTests.m in Sources */,
+				96A52D1D136F236B00ED175D /* NSData+Additions.m in Sources */,
+				96A52D1F136F236B00ED175D /* AtmosBaseOperation.m in Sources */,
+				96A52D21136F236B00ED175D /* AtmosCredentials.m in Sources */,
+				96A52D23136F236B00ED175D /* AtmosStore.m in Sources */,
+				96A52D25136F236B00ED175D /* AtmosObject.m in Sources */,
+				96A52D28136F236B00ED175D /* ListObjectsOperation.m in Sources */,
+				96A52D2A136F236B00ED175D /* DownloadObjectOperation.m in Sources */,
+				96A52D2C136F236B00ED175D /* GetListableTagsOperation.m in Sources */,
+				96A52D2E136F236B00ED175D /* AtmosError.m in Sources */,
+				96A52D30136F236B00ED175D /* GetMetadataOperation.m in Sources */,
+				96A52D32136F236B00ED175D /* SetMetadataOperation.m in Sources */,
+				96A52D34136F236B00ED175D /* ObjectUploadOperation.m in Sources */,
+				96A52D36136F236B00ED175D /* DeleteObjectOperation.m in Sources */,
+				96A52D38136F236B00ED175D /* ListDirectoryOperation.m in Sources */,
+				96A52D3A136F236B00ED175D /* DeleteMetadataOperation.m in Sources */,
+				967CB6C31371A038003C9523 /* AtmosResult.m in Sources */,
+				967CB6C71371A13E003C9523 /* GetListableTagsResult.m in Sources */,
+				963C12E01371E722008AB91F /* UploadProgress.m in Sources */,
+				963C12E41371ED8C008AB91F /* AtmosRange.m in Sources */,
+				963C12E813732B21008AB91F /* ListObjectsResult.m in Sources */,
+				963C12EC137397E3008AB91F /* DownloadProgress.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		96A4C440136F211E0038239F /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 96A4C42B136F211E0038239F /* atmos-ios */;
-			targetProxy = 96A4C43F136F211E0038239F /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		96A4C445136F211E0038239F /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				96A4C446136F211E0038239F /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		96A4C44D136F211E0038239F /* Debug */ = {
@@ -278,7 +321,7 @@
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -291,7 +334,7 @@
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				SDKROOT = iphoneos;
 			};
 			name = Release;
@@ -304,7 +347,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "atmos-ios/atmos-ios-Prefix.pch";
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = atmos;
 			};
 			name = Debug;
 		};
@@ -316,47 +359,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "atmos-ios/atmos-ios-Prefix.pch";
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
-		96A4C453136F211E0038239F /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "atmos-iosTests/atmos-iosTests-Prefix.pch";
-				INFOPLIST_FILE = "atmos-iosTests/atmos-iosTests-Info.plist";
-				OTHER_LDFLAGS = (
-					"-framework",
-					SenTestingKit,
-				);
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = octest;
-			};
-			name = Debug;
-		};
-		96A4C454136F211E0038239F /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "atmos-iosTests/atmos-iosTests-Prefix.pch";
-				INFOPLIST_FILE = "atmos-iosTests/atmos-iosTests-Info.plist";
-				OTHER_LDFLAGS = (
-					"-framework",
-					SenTestingKit,
-				);
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = octest;
+				PRODUCT_NAME = atmos;
 			};
 			name = Release;
 		};
@@ -379,14 +382,7 @@
 				96A4C451136F211E0038239F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-		};
-		96A4C452136F211E0038239F /* Build configuration list for PBXNativeTarget "atmos-iosTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				96A4C453136F211E0038239F /* Debug */,
-				96A4C454136F211E0038239F /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
