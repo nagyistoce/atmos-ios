@@ -25,7 +25,7 @@ For example:
 {{{
     AtmosObject *obj = [[AtmosObject alloc] init];
     obj.dataMode = kDataModeBytes;
-    obj.data = [NSData dataWithBytes:[@"Hello World" UTF8String] length:11];
+    obj.data = [NSData dataWithBytes:[@"Hello World" UTF8String] length:12];
 }}}
 
 === Blocks ===
