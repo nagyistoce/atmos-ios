@@ -1,10 +1,32 @@
-//
-//  AtmosTests.m
-//  atmos-tests
-//
-//  Created by Jason Cwik on 5/4/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
-//
+/*
+ 
+ Copyright (c) 2011, EMC Corporation
+ 
+ All rights reserved.
+ 
+ Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ 
+ * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ 
+ * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+ 
+ * Neither the name of the EMC Corporation nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+ 
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ 
+ INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ 
+ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ 
+ SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ 
+ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ 
+ WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ 
+ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
+ */
 
 #import <GHUnitIOS/GHUnit.h> 
 #import "AtmosTests.h"
@@ -12,12 +34,13 @@
 #import "NSData+Additions.h"
 
 // Timeout for unit tests
-#define TIMEOUT 10.0
+#define TIMEOUT 60.0
 
 
 @implementation AtmosTests
 
 @synthesize atmosStore,cleanup;
+
 
 - (void)checkResult:(AtmosResult*)result 
 {
@@ -28,6 +51,7 @@
 - (void)setUp
 {
     [super setUp];
+    
     AtmosCredentials *creds = [[AtmosCredentials alloc] init];
     
 //    creds.tokenId = @"ab105326496a4228add95d20306030fd/CONNEAABCF7F31DDF0F7";
@@ -44,9 +68,10 @@
     // Set-up code here.
     atmosStore = [[AtmosStore alloc] init];
     atmosStore.atmosCredentials = creds;
+    [creds release];
     
     // Clear the cleanup
-    self.cleanup = [[NSMutableArray alloc] init];
+    cleanup = [[NSMutableArray alloc] init];
 }
 
 - (void)tearDown
@@ -57,11 +82,16 @@
     
     // Request deletion of any objects created
     for (NSString *oid in self.cleanup) {
-        [atmosStore deleteObject:[[AtmosObject alloc] initWithObjectId:oid]
+        AtmosObject *obj = [[AtmosObject alloc] initWithObjectId:oid];
+        [atmosStore deleteObject:obj
                     withCallback:^(AtmosResult *result) {
                         // Do nothing
                     } withLabel:@""];
+        [obj release];
     }
+    
+    [cleanup release];
+    [atmosStore release];
     
 }
 
@@ -126,11 +156,11 @@
                withCallback:^(ListObjectsResult *result) {
                    [self checkResult:result];
                    
-                   NSLog(@"results contains keys %@", [result.objects.allKeys description] );
+                   NSLog(@"results contains %@", [result.objects description] );
 
                    // Make sure array contains our ID.
                    GHAssertTrue(
-                        [result.objects.allKeys containsObject:atmosObject.atmosId],
+                        [result.objects containsObject:atmosObject],
                                 @"List objects result didn't include %@",
                                 atmosObject.atmosId);
                    
@@ -274,6 +304,111 @@
     [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
     [obj release];
     
+}
+
+- (void)subTestCreateObjectWithContent1:(AtmosObject*)atmosObject
+{
+    // Add new object to cleanup list
+    [cleanup addObject:atmosObject.atmosId];
+    
+    // Read the object back and check contents.
+    atmosObject.data = nil;
+    atmosObject.dataMode = kDataModeBytes;
+    atmosObject.contentType = nil;
+    [atmosStore readObject:atmosObject
+              withCallback:^BOOL(DownloadProgress *progress) {
+                  [self checkResult:progress];
+                  if(progress.isComplete){
+                      GHAssertNotNil(progress.atmosObject.data, 
+                                     @"Expected data to be non-Nil");
+                      GHAssertEqualStrings(@"Hello World",
+                                           [NSString stringWithUTF8String:[progress.atmosObject.data bytes]], 
+                                           @"Expected strings to match");
+                      GHAssertEqualStrings(@"text/foo", 
+                                     progress.atmosObject.contentType, 
+                                     @"Expected MIME types to match");
+                      // Notify async test complete.
+                      [self notify:kGHUnitWaitStatusSuccess 
+                       forSelector:@selector(testCreateObjectWithContent)];
+                  }
+                  return YES;
+                
+              } 
+                 withLabel:@"subTestCreateObjectWithContent1"];
+}
+
+- (void)testCreateObjectWithContent
+{
+    [self prepare];
+    
+    AtmosObject *obj = [[AtmosObject alloc] init];
+    obj.dataMode = kDataModeBytes;
+    obj.data = [NSData dataWithBytes:[@"Hello World" UTF8String] length:12];
+    obj.contentType = @"text/foo";
+    
+    [atmosStore createObject:obj 
+                withCallback:^BOOL(UploadProgress *progress) {
+                    [self checkResult:progress];
+                    
+                    if(progress.isComplete){
+                        GHAssertNotNil(progress.atmosObject,                                  
+                                       @"Expected New ID to be non-Nil");
+                        [self subTestCreateObjectWithContent1:obj];
+                    }
+                    
+                    return YES;
+                } 
+                   withLabel:@"testCreateObjectWithContent"];
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [obj release];
+    
+}
+
+- (void)subTestGetSystemMetadata1:(AtmosObject*)obj
+{
+    // Add new object to cleanup list
+    [cleanup addObject:obj.atmosId];
+    
+    // Read the object back and check contents.
+    [atmosStore getAllSytemMetadataForId:obj.atmosId
+        withCallback:^(AtmosObjectResult *result) {
+            [self checkResult:result];
+            
+            GHAssertEquals(12, 
+            [[result.atmosObject.systemMeta objectForKey:@"size"] integerValue], 
+                           @"Size should be 12");
+            // Notify async test complete.
+            [self notify:kGHUnitWaitStatusSuccess 
+             forSelector:@selector(testGetSystemMetadata)];
+
+        } 
+           withLabel:@"subTestGetSystemMetadata1"];
+}
+
+- (void)testGetSystemMetadata
+{
+    [self prepare];
+    
+    // Create an object with content, verify size
+    AtmosObject *obj = [[AtmosObject alloc] init];
+    obj.dataMode = kDataModeBytes;
+    obj.data = [NSData dataWithBytes:[@"Hello World" UTF8String] length:12];
+    
+    [atmosStore createObject:obj 
+                withCallback:^BOOL(UploadProgress *progress) {
+                    [self checkResult:progress];
+                    
+                    if(progress.isComplete){
+                        GHAssertNotNil(progress.atmosObject,                                  
+                                       @"Expected New ID to be non-Nil");
+                        [self subTestGetSystemMetadata1:obj];
+                    }
+                    
+                    return YES;
+                } 
+                   withLabel:@"testGetSystemMetadata"];
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [obj release];
 }
 
 @end

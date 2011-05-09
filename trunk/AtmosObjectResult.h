@@ -28,13 +28,17 @@
  
  */
 
-#import "atmos_testsAppDelegate_iPad.h"
+#import <Foundation/Foundation.h>
+#import "AtmosResult.h"
+#import "AtmosObject.h"
 
-@implementation atmos_testsAppDelegate_iPad
-
-- (void)dealloc
-{
-	[super dealloc];
+@interface AtmosObjectResult : AtmosResult {
+    AtmosObject *atmosObject;
+    
 }
+-(id) initWithResult:(BOOL)success withError:(AtmosError *)err withLabel:(NSString *)label withObject:(AtmosObject*)obj;
+
+
+@property (retain,readwrite) AtmosObject *atmosObject;
 
 @end

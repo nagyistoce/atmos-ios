@@ -1,10 +1,32 @@
-//
-//  AtmosLocalStore.m
-//  AtmosReader
-//
-//  Created by Aashish Patil on 4/12/10.
-//  Copyright 2010 EMC. All rights reserved.
-//
+/*
+ 
+ Copyright (c) 2011, EMC Corporation
+ 
+ All rights reserved.
+ 
+ Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ 
+ * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ 
+ * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+ 
+ * Neither the name of the EMC Corporation nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+ 
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ 
+ INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ 
+ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ 
+ SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ 
+ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ 
+ WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ 
+ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
+ */
 
 #import "AtmosStore.h"
 
@@ -33,7 +55,12 @@
                      withCallback:(void(^)(ListObjectsResult*)) callback 
                         withLabel:(NSString *) requestLabel;
 
-- (void) getObjectMetadataInternal:(NSString *) atmosId path:(NSString *)objectPath loadSystemMeta:(BOOL) loadsmeta loadUserMeta:(BOOL) loadumeta metaTags:(NSArray *) meta withDelegate:(id<AtmosProgressListenerDelegate>) delegate withLabel:(NSString *) requestLabel;
+- (void) getObjectMetadataInternal:(NSString *) atmosId 
+                              path:(NSString *)objectPath 
+                              mode:(MetadataLoadType)mode
+                          metaTags:(NSArray *) meta 
+                      withCallback:(void(^)(AtmosObjectResult*)) callback 
+                         withLabel:(NSString *) requestLabel;
 
 - (void) uploadObject:(AtmosObject *) atmosObj 
             startByte:(long long) sbyte 
@@ -75,7 +102,7 @@
 	return currentOperations;
 }
 
-- (void) operationFinishedInternal:(id<AtmosProgressListenerDelegate>) operation {
+- (void) operationFinishedInternal:(AtmosBaseOperation *)operation {
 	NSLog(@"operationFinishedInternal called %@ %@",operation, self.currentOperations);
 	[self.currentOperations removeObject:operation];
 	if(self.pendingOperations.count > 0) {
@@ -257,10 +284,14 @@
 } 
 
 #pragma mark GetDirectoryContents
-- (void) getDirectoryContents:(AtmosObject *) directory withToken:(NSString *) emcToken withLimit:(NSInteger) limit withDelegate:(id<AtmosProgressListenerDelegate>) delegate withLabel:(NSString *)requestLabel {
+- (void) getDirectoryContents:(AtmosObject *) directory 
+                    withToken:(NSString *) emcToken 
+                    withLimit:(NSInteger) limit 
+                 withCallback:(void(^)(ListDirectoryResult *result))callback
+                    withLabel:(NSString *)requestLabel {
 	ListDirectoryOperation *oper = [[ListDirectoryOperation alloc] init];
 	oper.atmosCredentials = self.atmosCredentials;
-	oper.progressListener = delegate;
+	oper.callback = callback;
 	oper.atmosStore = self;
 	oper.operationLabel = requestLabel;
 	oper.atmosObj = directory;
@@ -347,84 +378,112 @@
 
 #pragma mark GetObjectMetadata
 //gets all the metadata for the specified object id / object path
-- (void) getAllMetadataForId:(NSString *)atmosId withDelegate:(id<AtmosProgressListenerDelegate>) delegate withLabel:(NSString *) requestLabel {
+- (void) getAllMetadataForId:(NSString *)atmosId 
+                withCallback:(void(^)(AtmosObjectResult *result))callback
+                   withLabel:(NSString *) requestLabel {
 	if(atmosId && atmosId.length == ATMOS_ID_LENGTH) {
-		[self getObjectMetadataInternal:atmosId path:nil loadSystemMeta:YES loadUserMeta:YES metaTags:nil withDelegate:delegate withLabel:requestLabel];
+		[self getObjectMetadataInternal:atmosId path:nil mode:kMetaLoadAll metaTags:nil withCallback:callback withLabel:requestLabel];
 	}	
 }
 
-- (void) getAllMetadataForPath:(NSString *)objectPath withDelegate:(id<AtmosProgressListenerDelegate>) delegate withLabel:(NSString *) requestLabel {
+- (void) getAllMetadataForPath:(NSString *)objectPath 
+                  withCallback:(void(^)(AtmosObjectResult *result))callback
+                     withLabel:(NSString *) requestLabel {
 	if(objectPath && objectPath.length > 0) {
-		[self getObjectMetadataInternal:nil path:objectPath loadSystemMeta:YES loadUserMeta:YES metaTags:nil withDelegate:delegate withLabel:requestLabel];
+		[self getObjectMetadataInternal:nil path:objectPath mode:kMetaLoadAll metaTags:nil withCallback:callback withLabel:requestLabel];
 	}
 	
 }
 
 
 //gets the system metadata for the specified id / path. To retrieve only specific metadata, specify the metadata names as a NSString array
-- (void) getAllSytemMetadataForId:(NSString *) atmosId withDelegate:(id<AtmosProgressListenerDelegate>) delegate withLabel:(NSString *) requestLabel {
+- (void) getAllSytemMetadataForId:(NSString *) atmosId 
+                     withCallback:(void(^)(AtmosObjectResult *result))callback
+                        withLabel:(NSString *) requestLabel {
 	if(atmosId && (atmosId.length == ATMOS_ID_LENGTH)) {
-		[self getObjectMetadataInternal:atmosId path:nil loadSystemMeta:YES loadUserMeta:NO metaTags:nil withDelegate:delegate withLabel:requestLabel];
+		[self getObjectMetadataInternal:atmosId path:nil mode:kMetaLoadSystem metaTags:nil withCallback:callback withLabel:requestLabel];
 	}
 }
 
-- (void) getAllSytemMetadataForPath:(NSString *) objectPath withDelegate:(id<AtmosProgressListenerDelegate>) delegate withLabel:(NSString *) requestLabel {
+- (void) getAllSytemMetadataForPath:(NSString *) objectPath 
+                       withCallback:(void(^)(AtmosObjectResult *result))callback
+                          withLabel:(NSString *) requestLabel {
 	if(objectPath && objectPath.length > 0) {
-		[self getObjectMetadataInternal:nil path:objectPath loadSystemMeta:YES loadUserMeta:NO metaTags:nil withDelegate:delegate withLabel:requestLabel];
+		[self getObjectMetadataInternal:nil path:objectPath mode:kMetaLoadSystem metaTags:nil withCallback:callback withLabel:requestLabel];
 	}
 }
 
 
-- (void) getSystemMetadataForId:(NSString *) atmosId metadata:(NSArray *) mdata withDelegate:(id<AtmosProgressListenerDelegate>) delegate withLabel:(NSString *) requestLabel {
+- (void) getSystemMetadataForId:(NSString *) atmosId 
+                       metadata:(NSArray *) mdata 
+                   withCallback:(void(^)(AtmosObjectResult *result))callback
+                      withLabel:(NSString *) requestLabel {
 	if(atmosId && (atmosId.length == ATMOS_ID_LENGTH)) {
-		[self getObjectMetadataInternal:atmosId path:nil loadSystemMeta:YES loadUserMeta:NO metaTags:mdata withDelegate:delegate withLabel:requestLabel];
+		[self getObjectMetadataInternal:atmosId path:nil mode:kMetaLoadSystem metaTags:mdata withCallback:callback withLabel:requestLabel];
 	}
 }
 
-- (void) getSystemMetadataForPath:(NSString *) objectPath metadata:(NSArray *) mdata withDelegate:(id<AtmosProgressListenerDelegate>) delegate withLabel:(NSString *) requestLabel {
+- (void) getSystemMetadataForPath:(NSString *) objectPath 
+                         metadata:(NSArray *) mdata 
+                     withCallback:(void(^)(AtmosObjectResult *result))callback
+                        withLabel:(NSString *) requestLabel {
 	if(objectPath && objectPath.length > 0) {
-		[self getObjectMetadataInternal:nil path:objectPath loadSystemMeta:YES loadUserMeta:NO metaTags:mdata withDelegate:delegate withLabel:requestLabel];
+		[self getObjectMetadataInternal:nil path:objectPath mode:kMetaLoadSystem metaTags:mdata withCallback:callback withLabel:requestLabel];
 	}
 }
 
 //gets the user metadata for the specified id / path. To retrieve only specific metadata, specify the metadata names as a NSString aray
-- (void) getAllUserMetadataForId:(NSString *) atmosId withDelegate:(id<AtmosProgressListenerDelegate>) delegate withLabel:(NSString *) requestLabel {
+- (void) getAllUserMetadataForId:(NSString *) atmosId 
+                    withCallback:(void(^)(AtmosObjectResult *result))callback
+                       withLabel:(NSString *) requestLabel {
 	if(atmosId && (atmosId.length == ATMOS_ID_LENGTH)) {
-		[self getObjectMetadataInternal:atmosId path:nil loadSystemMeta:NO loadUserMeta:YES metaTags:nil withDelegate:delegate withLabel:requestLabel];
+		[self getObjectMetadataInternal:atmosId path:nil mode:kMetaLoadUser metaTags:nil withCallback:callback withLabel:requestLabel];
 
 	}
 }
-- (void) getAllUserMetadataForPath:(NSString *) objectPath withDelegate:(id<AtmosProgressListenerDelegate>) delegate withLabel:(NSString *) requestLabel {
+- (void) getAllUserMetadataForPath:(NSString *) objectPath 
+                      withCallback:(void(^)(AtmosObjectResult *result))callback
+                         withLabel:(NSString *) requestLabel {
 	if(objectPath && (objectPath.length > 0)) {
-		[self getObjectMetadataInternal:nil path:objectPath loadSystemMeta:NO loadUserMeta:YES metaTags:nil withDelegate:delegate withLabel:requestLabel];
+		[self getObjectMetadataInternal:nil path:objectPath mode:kMetaLoadUser metaTags:nil withCallback:callback withLabel:requestLabel];
 	}
 }
 
 
-- (void) getUserMetadataForId:(NSString *) atmosId metadata:(NSArray *) mdata withDelegate:(id<AtmosProgressListenerDelegate>) delegate withLabel:(NSString *) requestLabel {
+- (void) getUserMetadataForId:(NSString *) atmosId 
+                     metadata:(NSArray *) mdata 
+                 withCallback:(void(^)(AtmosObjectResult *result))callback
+                    withLabel:(NSString *) requestLabel {
 	if(atmosId && (atmosId.length == ATMOS_ID_LENGTH)) {
-		[self getObjectMetadataInternal:atmosId path:nil loadSystemMeta:NO loadUserMeta:YES metaTags:mdata withDelegate:delegate withLabel:requestLabel];
+		[self getObjectMetadataInternal:atmosId path:nil mode:kMetaLoadUser metaTags:mdata withCallback:callback withLabel:requestLabel];
 	}
 }
 
-- (void) getUserMetadataForPath:(NSString *) objectPath metadata:(NSArray *) mdata withDelegate:(id<AtmosProgressListenerDelegate>) delegate withLabel:(NSString *) requestLabel {
+- (void) getUserMetadataForPath:(NSString *) objectPath 
+                       metadata:(NSArray *) mdata 
+                   withCallback:(void(^)(AtmosObjectResult *result))callback
+                      withLabel:(NSString *) requestLabel {
 	if(objectPath && objectPath.length > 0) {
-		[self getObjectMetadataInternal:nil path:objectPath loadSystemMeta:NO loadUserMeta:YES metaTags:mdata withDelegate:delegate withLabel:requestLabel];
+		[self getObjectMetadataInternal:nil path:objectPath mode:kMetaLoadUser metaTags:mdata withCallback:callback withLabel:requestLabel];
 	}
 }
 
 
-- (void) getObjectMetadataInternal:(NSString *) atmosId path:(NSString *)objectPath loadSystemMeta:(BOOL) loadsmeta loadUserMeta:(BOOL) loadumeta metaTags:(NSArray *) meta withDelegate:(id<AtmosProgressListenerDelegate>) delegate withLabel:(NSString *) requestLabel {
+- (void) getObjectMetadataInternal:(NSString *) atmosId 
+                              path:(NSString *)objectPath 
+                              mode:(MetadataLoadType)mode
+                          metaTags:(NSArray*)meta
+                      withCallback:(void(^)(AtmosObjectResult *result))callback
+                         withLabel:(NSString *) requestLabel {
 	
 	GetMetadataOperation *oper = [[GetMetadataOperation alloc] init];
 	oper.atmosCredentials = self.atmosCredentials;
 	oper.atmosStore = self;
 	oper.atmosId = atmosId;
 	oper.objectPath = objectPath;
-	oper.loadSysMeta = loadsmeta;
-	oper.loadUserMeta = loadumeta;
+	oper.metaLoadType = mode;
 	oper.requestTags = [NSMutableArray arrayWithArray:meta];
-	oper.progressListener = delegate;
+	oper.callback = callback;
 	oper.operationLabel = requestLabel;
 	
 	[self scheduleOperation:oper];
@@ -433,13 +492,15 @@
 }
 
 #pragma mark SetObjectMetadata
-- (void) setObjectMetadata:(AtmosObject *) atmosObject withDelegate:(id<AtmosProgressListenerDelegate>) delegate withLabel:(NSString *) requestLabel {
+- (void) setObjectMetadata:(AtmosObject *) atmosObject 
+              withCallback:(void(^)(AtmosResult *result))callback
+                 withLabel:(NSString *) requestLabel {
 	
 	SetMetadataOperation *oper = [[SetMetadataOperation alloc] init];
 	oper.atmosStore = self;
 	oper.atmosCredentials = self.atmosCredentials;
 	oper.curObj = atmosObject;
-	oper.progressListener = delegate;
+	oper.callback = callback;
 	oper.operationLabel = requestLabel;
 	
 	[self scheduleOperation:oper];
@@ -447,12 +508,14 @@
 }
 
 #pragma mark DeleteMetadata
-- (void) deleteObjectMetadata:(AtmosObject *) atmosObject withDelegate:(id<AtmosProgressListenerDelegate>) delegate withLabel:(NSString *) requestLabel {
+- (void) deleteObjectMetadata:(AtmosObject *) atmosObject 
+                 withCallback:(void(^)(AtmosResult *result))callback
+                    withLabel:(NSString *) requestLabel {
 	DeleteMetadataOperation *oper = [[DeleteMetadataOperation alloc] init];
 	oper.atmosStore = self;
 	oper.atmosCredentials = self.atmosCredentials;
 	oper.atmosObj = atmosObject;
-	oper.progressListener = delegate;
+	oper.callback = callback;
 	oper.operationLabel = requestLabel;
 	
 	[self scheduleOperation:oper];
@@ -464,6 +527,9 @@
 - (void) dealloc {
 	[currentOperations release];
 	[pendingOperations release];
+    
+    self.atmosCredentials = nil;
+    
 	[super dealloc];
 }
 

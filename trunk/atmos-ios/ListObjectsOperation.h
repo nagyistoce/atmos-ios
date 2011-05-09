@@ -29,15 +29,6 @@
  */
 
 
-
-//
-//  EsuGetObjectsOperation.h
-//  TestEsu
-//
-//  Created by aashish patil on 9/7/09.
-//  Copyright 2009 EMC Corporation. All rights reserved.
-//
-
 #import <Foundation/Foundation.h>
 
 #import "AtmosBaseOperation.h"
@@ -74,7 +65,7 @@
 @property (nonatomic,retain) NSString *currentPropValue;
 @property (nonatomic,assign) BOOL listable;
 @property (nonatomic,retain) NSMutableString *currentValue;
-@property (nonatomic,retain) AtmosObject *currentObject;
+//@property (nonatomic,retain) AtmosObject *currentObject;
 @property (nonatomic,retain) ListObjectsResult *result;
 
 

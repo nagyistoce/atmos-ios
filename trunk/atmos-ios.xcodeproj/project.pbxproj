@@ -19,6 +19,10 @@
 		967CB6C31371A038003C9523 /* AtmosResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 967CB6C11371A038003C9523 /* AtmosResult.m */; };
 		967CB6C61371A13E003C9523 /* GetListableTagsResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 967CB6C41371A13D003C9523 /* GetListableTagsResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		967CB6C71371A13E003C9523 /* GetListableTagsResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 967CB6C51371A13D003C9523 /* GetListableTagsResult.m */; };
+		969903E4137882E50063DE0F /* AtmosObjectResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 969903E2137882E40063DE0F /* AtmosObjectResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		969903E5137882E50063DE0F /* AtmosObjectResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 969903E3137882E40063DE0F /* AtmosObjectResult.m */; };
+		969903E913788D5A0063DE0F /* ListDirectoryResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 969903E713788D5A0063DE0F /* ListDirectoryResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		969903EA13788D5A0063DE0F /* ListDirectoryResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 969903E813788D5A0063DE0F /* ListDirectoryResult.m */; };
 		96A4C430136F211E0038239F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4C42F136F211E0038239F /* Foundation.framework */; };
 		96A52D1C136F236B00ED175D /* NSData+Additions.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A52CFD136F236B00ED175D /* NSData+Additions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96A52D1D136F236B00ED175D /* NSData+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A52CFE136F236B00ED175D /* NSData+Additions.m */; };
@@ -30,7 +34,6 @@
 		96A52D23136F236B00ED175D /* AtmosStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A52D04136F236B00ED175D /* AtmosStore.m */; };
 		96A52D24136F236B00ED175D /* AtmosObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A52D05136F236B00ED175D /* AtmosObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96A52D25136F236B00ED175D /* AtmosObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A52D06136F236B00ED175D /* AtmosObject.m */; };
-		96A52D26136F236B00ED175D /* AtmosProgressListenerDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A52D07136F236B00ED175D /* AtmosProgressListenerDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96A52D27136F236B00ED175D /* ListObjectsOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A52D08136F236B00ED175D /* ListObjectsOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96A52D28136F236B00ED175D /* ListObjectsOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 96A52D09136F236B00ED175D /* ListObjectsOperation.m */; };
 		96A52D29136F236B00ED175D /* DownloadObjectOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 96A52D0A136F236B00ED175D /* DownloadObjectOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -67,6 +70,10 @@
 		967CB6C11371A038003C9523 /* AtmosResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AtmosResult.m; sourceTree = "<group>"; };
 		967CB6C41371A13D003C9523 /* GetListableTagsResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetListableTagsResult.h; sourceTree = "<group>"; };
 		967CB6C51371A13D003C9523 /* GetListableTagsResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetListableTagsResult.m; sourceTree = "<group>"; };
+		969903E2137882E40063DE0F /* AtmosObjectResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AtmosObjectResult.h; path = ../AtmosObjectResult.h; sourceTree = "<group>"; };
+		969903E3137882E40063DE0F /* AtmosObjectResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AtmosObjectResult.m; path = ../AtmosObjectResult.m; sourceTree = "<group>"; };
+		969903E713788D5A0063DE0F /* ListDirectoryResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ListDirectoryResult.h; sourceTree = "<group>"; };
+		969903E813788D5A0063DE0F /* ListDirectoryResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ListDirectoryResult.m; sourceTree = "<group>"; };
 		96A4C42C136F211E0038239F /* libatmos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libatmos.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		96A4C42F136F211E0038239F /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		96A4C433136F211E0038239F /* atmos-ios-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "atmos-ios-Prefix.pch"; sourceTree = "<group>"; };
@@ -82,7 +89,6 @@
 		96A52D04136F236B00ED175D /* AtmosStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AtmosStore.m; sourceTree = "<group>"; };
 		96A52D05136F236B00ED175D /* AtmosObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AtmosObject.h; sourceTree = "<group>"; };
 		96A52D06136F236B00ED175D /* AtmosObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AtmosObject.m; sourceTree = "<group>"; };
-		96A52D07136F236B00ED175D /* AtmosProgressListenerDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AtmosProgressListenerDelegate.h; sourceTree = "<group>"; };
 		96A52D08136F236B00ED175D /* ListObjectsOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ListObjectsOperation.h; sourceTree = "<group>"; };
 		96A52D09136F236B00ED175D /* ListObjectsOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ListObjectsOperation.m; sourceTree = "<group>"; };
 		96A52D0A136F236B00ED175D /* DownloadObjectOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownloadObjectOperation.h; sourceTree = "<group>"; };
@@ -148,6 +154,8 @@
 		96A4C431136F211E0038239F /* atmos-ios */ = {
 			isa = PBXGroup;
 			children = (
+				969903E2137882E40063DE0F /* AtmosObjectResult.h */,
+				969903E3137882E40063DE0F /* AtmosObjectResult.m */,
 				96A52CFD136F236B00ED175D /* NSData+Additions.h */,
 				96A52CFE136F236B00ED175D /* NSData+Additions.m */,
 				96A52CFF136F236B00ED175D /* AtmosBaseOperation.h */,
@@ -158,7 +166,6 @@
 				96A52D04136F236B00ED175D /* AtmosStore.m */,
 				96A52D05136F236B00ED175D /* AtmosObject.h */,
 				96A52D06136F236B00ED175D /* AtmosObject.m */,
-				96A52D07136F236B00ED175D /* AtmosProgressListenerDelegate.h */,
 				96A52D08136F236B00ED175D /* ListObjectsOperation.h */,
 				96A52D09136F236B00ED175D /* ListObjectsOperation.m */,
 				96A52D0A136F236B00ED175D /* DownloadObjectOperation.h */,
@@ -192,6 +199,8 @@
 				963C12E613732B21008AB91F /* ListObjectsResult.m */,
 				963C12E9137397E1008AB91F /* DownloadProgress.h */,
 				963C12EA137397E2008AB91F /* DownloadProgress.m */,
+				969903E713788D5A0063DE0F /* ListDirectoryResult.h */,
+				969903E813788D5A0063DE0F /* ListDirectoryResult.m */,
 			);
 			path = "atmos-ios";
 			sourceTree = "<group>";
@@ -216,7 +225,6 @@
 				96A52D20136F236B00ED175D /* AtmosCredentials.h in Headers */,
 				96A52D22136F236B00ED175D /* AtmosStore.h in Headers */,
 				96A52D24136F236B00ED175D /* AtmosObject.h in Headers */,
-				96A52D26136F236B00ED175D /* AtmosProgressListenerDelegate.h in Headers */,
 				96A52D27136F236B00ED175D /* ListObjectsOperation.h in Headers */,
 				96A52D29136F236B00ED175D /* DownloadObjectOperation.h in Headers */,
 				96A52D2B136F236B00ED175D /* GetListableTagsOperation.h in Headers */,
@@ -233,6 +241,8 @@
 				963C12E713732B21008AB91F /* ListObjectsResult.h in Headers */,
 				963C12EB137397E3008AB91F /* DownloadProgress.h in Headers */,
 				967CB6C61371A13E003C9523 /* GetListableTagsResult.h in Headers */,
+				969903E4137882E50063DE0F /* AtmosObjectResult.h in Headers */,
+				969903E913788D5A0063DE0F /* ListDirectoryResult.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -304,6 +314,8 @@
 				963C12E41371ED8C008AB91F /* AtmosRange.m in Sources */,
 				963C12E813732B21008AB91F /* ListObjectsResult.m in Sources */,
 				963C12EC137397E3008AB91F /* DownloadProgress.m in Sources */,
+				969903E5137882E50063DE0F /* AtmosObjectResult.m in Sources */,
+				969903EA13788D5A0063DE0F /* ListDirectoryResult.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

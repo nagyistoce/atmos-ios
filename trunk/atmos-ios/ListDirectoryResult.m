@@ -28,13 +28,17 @@
  
  */
 
-#import "atmos_testsAppDelegate_iPad.h"
+#import "ListDirectoryResult.h"
 
-@implementation atmos_testsAppDelegate_iPad
 
-- (void)dealloc
+@implementation ListDirectoryResult
+
+@synthesize parent;
+
+-(void) dealloc
 {
-	[super dealloc];
+    self.parent = nil;
+    [super dealloc];
 }
 
 @end

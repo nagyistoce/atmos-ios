@@ -1,10 +1,33 @@
-//
-//  ObjectUploadOperation.m
-//  AtmosCocoaBinding
-//
-//  Created by Aashish Patil on 9/14/10.
-//  Copyright 2010 EMC. All rights reserved.
-//
+/*
+ 
+ Copyright (c) 2011, EMC Corporation
+ 
+ All rights reserved.
+ 
+ Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ 
+ * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ 
+ * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+ 
+ * Neither the name of the EMC Corporation nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+ 
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ 
+ INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ 
+ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ 
+ SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ 
+ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ 
+ WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ 
+ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
+ */
+
 
 #import "ObjectUploadOperation.h"
 
@@ -51,7 +74,7 @@
                 UploadProgress *event = [[UploadProgress alloc] init];
                 event.bytesUploaded = 0;
                 event.totalBytes = 0;
-                event.label = self.operationLabel;
+                event.requestLabel = self.operationLabel;
                 event.isComplete = YES;
                 event.wasSuccessful = NO;
                 event.error = err;
@@ -86,7 +109,9 @@
     } else if(self.atmosObj.dataMode == kDataModeBytes) {
         if(!self.atmosObj.data) {
             //creating a contentless object with only metadata
-            self.atmosObj.data = [[NSData alloc] initWithBytes:"" length:0];
+            NSData *empty = [[NSData alloc] initWithBytes:"" length:0];
+            self.atmosObj.data = empty;
+            [empty release];
         }
         self.totalTransferSize = self.atmosObj.data.length;
         self.numBlocks = 1;
@@ -158,6 +183,10 @@
 		NSString *clen = [NSString stringWithFormat:@"%d",nlen];
 		[req setValue:clen forHTTPHeaderField:@"Content-Length"];
 	}
+    
+    if(atmosObj.contentType) {
+        [req setValue:atmosObj.contentType forHTTPHeaderField:@"Content-Type"];
+    }
 	
 	[self setMetadataOnRequest:req];
 	[req setHTTPMethod:hmethod];
@@ -167,7 +196,7 @@
 	NSLog(@"req headers %@",[req allHTTPHeaderFields]);
 	
 	
-	[NSURLConnection connectionWithRequest:req delegate:self];
+	self.connection = [NSURLConnection connectionWithRequest:req delegate:self];
 }
 
 #pragma mark NSURLConnection delegate
@@ -213,7 +242,7 @@
     UploadProgress *event = [[UploadProgress alloc] init];
     event.bytesUploaded = 0;
     event.totalBytes = 0;
-    event.label = self.operationLabel;
+    event.requestLabel = self.operationLabel;
     event.isComplete = YES;
     event.wasSuccessful = NO;
     event.error = err;
@@ -222,7 +251,6 @@
     [err release];
     [event release];
 
-	//[connection release];
 	[self.fileHandle closeFile];
 	[self.atmosStore operationFinishedInternal:self];
 }
@@ -238,7 +266,7 @@
         UploadProgress *event = [[UploadProgress alloc] init];
         event.bytesUploaded = 0;
         event.totalBytes = 0;
-        event.label = self.operationLabel;
+        event.requestLabel = self.operationLabel;
         event.isComplete = YES;
         event.wasSuccessful = NO;
         event.error = aerr;
@@ -246,6 +274,7 @@
         
         [aerr release];
         [event release];
+        [errStr release];
 		[self.atmosStore operationFinishedInternal:self];
 	} else {
 		//success
@@ -267,7 +296,7 @@
             event.atmosObject = self.atmosObj;
             event.bytesUploaded = self.totalBytesTransferred;
             event.totalBytes = self.totalTransferSize;
-            event.label = self.operationLabel;
+            event.requestLabel = self.operationLabel;
             event.isComplete = YES;
             event.wasSuccessful = YES;
             event.error = nil;
@@ -278,7 +307,6 @@
 			[self.fileHandle closeFile];
 		}
 	}
-	//[connection release];
 	
 }
 

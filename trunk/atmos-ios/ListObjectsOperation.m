@@ -39,7 +39,7 @@
 
 @implementation ListObjectsOperation
 
-@synthesize currentId,currentObject,currentElement,currentAtmosProp,currentValue,currentPropValue,listable, result;
+@synthesize currentId,currentElement,currentAtmosProp,currentValue,currentPropValue,listable, result;
 @synthesize loadMetadata, systemMetadata, userMetadata, callback;
 
 - (id)init
@@ -123,7 +123,6 @@
 	NSString *str = [[NSString alloc] initWithData:self.webData encoding:NSASCIIStringEncoding];
 	NSLog(@"connectionFinishedLoading %@",str);
     [str release];
-	[con release];
 	[self parseXMLData];
 }
 	
@@ -133,10 +132,7 @@
 	NSLog(@"didstart doc");
     if(result.objects != nil) {
 		[result.objects removeAllObjects];
-		[result.objects release];
 	}
-	
-	self.result.objects = [[NSMutableDictionary alloc] init];
 }
 
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict
@@ -171,16 +167,18 @@
     }
 	
 	if([elementName isEqualToString:@"Object"]) {
-		if(self.currentObject != nil) {
+		if(currentObject != nil) {
 			[result.objects 
-             setObject:self.currentObject 
-             forKey:self.currentObject.atmosId];
+             addObject:currentObject];
 			//NSLog(@"Just added items %@",self.currentObject);
+            
+            [currentObject release];
+            currentObject = nil;
 		}
 	}
 	else if([elementName isEqualToString:@"ObjectID"]) {
 		//NSLog(@"Got object id %@",self.currentValue);
-		self.currentObject.atmosId = [self.currentValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+		currentObject.atmosId = [self.currentValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 	}
 	else if([elementName isEqualToString:@"SystemMetadataList"]) {
 		isSystemMetadata = NO;
@@ -200,11 +198,11 @@
 		self.listable = [[self.currentValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] boolValue];
 	} else if([elementName isEqualToString:@"Metadata"]) {
 		if(self.listable && isUserMetadata) {
-			[self.currentObject.userListableMeta setObject:self.currentPropValue forKey:self.currentAtmosProp];
+			[currentObject.userListableMeta setObject:self.currentPropValue forKey:self.currentAtmosProp];
 		} else if(!self.listable && isUserMetadata) {
-			[self.currentObject.userRegularMeta setObject:self.currentPropValue forKey:self.currentAtmosProp];
+			[currentObject.userRegularMeta setObject:self.currentPropValue forKey:self.currentAtmosProp];
 		} else if(isSystemMetadata) {
-			[self.currentObject.systemMeta setObject:self.currentPropValue forKey:self.currentAtmosProp];
+			[currentObject.systemMeta setObject:self.currentPropValue forKey:self.currentAtmosProp];
 		}
 	}
 	
@@ -242,8 +240,16 @@
 }
 
 - (void) dealloc {
-	[result release];
-    [connection release];
+    NSLog(@"ListObjectsOperation dealloc");
+	self.currentId = nil;
+    self.currentElement = nil;
+    self.currentAtmosProp = nil;
+    self.currentPropValue = nil;
+    self.currentValue = nil;
+    self.result = nil;
+    self.systemMetadata = nil;
+    self.userMetadata = nil;
+    
 	[super dealloc];
 }
 
