@@ -28,13 +28,15 @@
  
  */
 
-#import "atmos_testsAppDelegate_iPad.h"
+#import <Foundation/Foundation.h>
+#import "ListObjectsResult.h"
+#import "AtmosObject.h"
 
-@implementation atmos_testsAppDelegate_iPad
 
-- (void)dealloc
-{
-	[super dealloc];
+@interface ListDirectoryResult : ListObjectsResult {
+    AtmosObject *parent;
 }
+
+@property (nonatomic,retain) AtmosObject *parent;
 
 @end

@@ -1,10 +1,33 @@
-//
-//  ListDirectoryOperation.m
-//  AtmosCocoaBinding
-//
-//  Created by Aashish Patil on 9/21/10.
-//  Copyright 2010 EMC. All rights reserved.
-//
+/*
+ 
+ Copyright (c) 2011, EMC Corporation
+ 
+ All rights reserved.
+ 
+ Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ 
+ * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ 
+ * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+ 
+ * Neither the name of the EMC Corporation nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+ 
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ 
+ INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ 
+ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ 
+ SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ 
+ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ 
+ WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ 
+ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
+ */
+
 
 #import "ListDirectoryOperation.h"
 
@@ -17,6 +40,7 @@
 @implementation ListDirectoryOperation
 
 @synthesize atmosObj,currentValue, emcToken, emcLimit, atmosObjects, currentElement, currentObject;
+@synthesize callback;
 
 - (void) startAtmosOperation {
 	if(self.atmosObj) {
@@ -46,6 +70,7 @@
 - (void) parseXMLData {
 	if(xmlParser != nil) {
 		[xmlParser release];
+        xmlParser = nil;
 	} 
 	
 	xmlParser = [[NSXMLParser alloc] initWithData:self.webData];
@@ -79,8 +104,9 @@
 {
 	NSLog(@"didFailWithError %@",[error localizedDescription]);
 	AtmosError *err = [[AtmosError alloc] initWithCode:-1 message:[error localizedDescription]];
-	[self.progressListener finishedLoadingDirectory:self.atmosObj contents:nil token:self.emcToken forLabel:self.operationLabel withError:err];
-	
+    
+    self.callback([ListDirectoryResult failureWithError:err withLabel:self.operationLabel]);
+    	
 	[err release];
 	[self.atmosStore operationFinishedInternal:self];
 }
@@ -89,6 +115,7 @@
 {
 	NSString *str = [[NSString alloc] initWithData:self.webData encoding:NSASCIIStringEncoding];
 	NSLog(@"connectionFinishedLoading %@",str);
+    [str release];
 	[self parseXMLData];
 }
 
@@ -98,10 +125,8 @@
 	NSLog(@"didstart doc");
     if(atmosObjects != nil) {
 		[atmosObjects removeAllObjects];
-		[atmosObjects release];
 	}
 	
-	self.atmosObjects = [[NSMutableArray alloc] init];
 }
 
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict
@@ -114,7 +139,9 @@
 	//NSLog(@"didstartelement %@",elementName);
 	//begin processing new atmos object
 	if([elementName isEqualToString:@"DirectoryEntry"]) { 
-		currentObject = [[AtmosObject alloc] init];
+        AtmosObject *obj = [[AtmosObject alloc] init];
+		currentObject = obj;
+        [obj release];
 		NSLog(@"started new object");
 	} 	
 	self.currentElement = elementName;
@@ -175,7 +202,17 @@
 	if(!strTok)
 		strTok = [[self.httpResponse allHeaderFields] objectForKey:@"X-EMC-TOKEN"];
 	self.emcToken = strTok;
-	[self.progressListener finishedLoadingDirectory:self.atmosObj contents:atmosObjects token:self.emcToken forLabel:self.operationLabel withError:nil];
+    
+    ListDirectoryResult *result = [[ListDirectoryResult alloc] init];
+    result.requestLabel = self.operationLabel;
+    result.token = self.emcToken;
+    result.parent = self.atmosObj;
+    result.objects = self.atmosObjects;
+    result.wasSuccessful = YES;
+    result.error = nil;
+    self.callback(result);
+    [result release];
+    
 	[self.atmosStore operationFinishedInternal:self];
 }
 
@@ -183,7 +220,9 @@
 	if(parseError) {
 		NSLog(@"Parse Error %@",parseError);
 		AtmosError *aerr = [[AtmosError alloc] initWithCode:parseError.code message:[parseError localizedDescription]] ;
-		[self.progressListener finishedLoadingDirectory:self.atmosObj contents:nil token:nil forLabel:self.operationLabel withError:aerr];
+        
+        self.callback([ListDirectoryResult failureWithError:aerr withLabel:self.operationLabel]);
+        
 		[self.atmosStore operationFinishedInternal:self];
 		[aerr release];
 	}

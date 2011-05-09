@@ -28,16 +28,6 @@
  
  */
 
-
-
-//
-//  EsuHelper.m
-//  TestEsu
-//
-//  Created by aashish patil on 7/12/09.
-//  Copyright 2009 EMC Corporation. All rights reserved.
-//
-
 #import "AtmosBaseOperation.h"
 
 @implementation AtmosBaseOperation
@@ -46,7 +36,7 @@
 
 @synthesize atmosCredentials = _atmosCredentials;
 @synthesize atmosResource = _atmosResource;
-@synthesize progressListener,atmosStore;
+@synthesize atmosStore;
 @synthesize appData;
 @synthesize requestTags;
 @synthesize httpResponse;
@@ -349,8 +339,19 @@
 
 #pragma mark Memory mgmt
 - (void) dealloc {
-	[webData release];
-	[requestTags release];
+    self.baseUrl = nil;
+    self.webData = nil;
+    self.listableMeta = nil;
+    self.regularMeta = nil;
+    self.requestTags = nil;
+    self.responseHeaders = nil;
+    self.atmosResource = nil;
+    self.appData = nil;
+    self.atmosStore = nil;
+    self.operationLabel = nil;
+    self.connection = nil;
+    self.httpResponse = nil;
+
 	[super dealloc];
 }
 

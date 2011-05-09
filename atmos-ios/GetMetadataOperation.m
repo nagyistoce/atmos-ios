@@ -1,10 +1,32 @@
-//
-//  GetMetadataOperation.m
-//  AtmosCocoaBinding
-//
-//  Created by Aashish Patil on 9/11/10.
-//  Copyright 2010 EMC. All rights reserved.
-//
+/*
+ 
+ Copyright (c) 2011, EMC Corporation
+ 
+ All rights reserved.
+ 
+ Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ 
+ * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ 
+ * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+ 
+ * Neither the name of the EMC Corporation nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+ 
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ 
+ INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ 
+ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ 
+ SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ 
+ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ 
+ WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ 
+ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
+ */
 
 #import "GetMetadataOperation.h"
 
@@ -16,47 +38,53 @@
 
 @implementation GetMetadataOperation
 
-@synthesize atmosId, objectPath, sysMetaConn, userMetaConn,atmosObj, loadUserMeta, loadSysMeta;
+@synthesize atmosId, objectPath, atmosObj, metaLoadType, callback;
 
 - (void) startAtmosOperation {
 	
-	maxConnections = 0;
-	numConnections = 0;
 	AtmosObject *aobj = [[AtmosObject alloc] init];
 	self.atmosObj = aobj;
 	[aobj release];
-	//first user meta
-	if(self.loadUserMeta) {
-		if(self.atmosId) {
-			self.atmosResource = [NSString stringWithFormat:@"/rest/objects/%@?metadata/user",self.atmosId];
-		} else if(self.objectPath) {
-			self.atmosResource = [NSString stringWithFormat:@"/rest/namespace%@?metadata/user",self.objectPath];
-		}
-		
-		NSMutableURLRequest *req = [self setupBaseRequestForResource:self.atmosResource];
-		[self setFilterTagsOnRequest:req];
-		[self signRequest:req];
-		NSLog(@"setup request %@",req);
-		self.userMetaConn = [NSURLConnection connectionWithRequest:req delegate:self];
-		maxConnections++;
-	}
-	
-	if(self.loadSysMeta) {
-		if(self.atmosId) {
-			self.atmosResource = [NSString stringWithFormat:@"/rest/objects/%@?metadata/system",self.atmosId];
-		} else if(self.objectPath) {
-			self.atmosResource = [NSString stringWithFormat:@"/rest/namespace%@?metadata/system",self.objectPath];
-		}
-		
-		NSMutableURLRequest *req = [self setupBaseRequestForResource:self.atmosResource];
-		[self setFilterTagsOnRequest:req];
-		[self signRequest:req];
-		NSLog(@"setup request %@",req);
-		self.sysMetaConn = [NSURLConnection connectionWithRequest:req delegate:self];
-		maxConnections++;
-	}
-	
-	
+    
+    NSMutableURLRequest *req;
+    
+    switch (metaLoadType) {
+        case kMetaLoadAll:
+            // All metadata is fetched via a HEAD call to the object
+            if(self.atmosId) {
+                self.atmosResource = [NSString stringWithFormat:@"/rest/objects/%@",self.atmosId];
+            } else if(self.objectPath) {
+                self.atmosResource = [NSString stringWithFormat:@"/rest/namespace%@",self.objectPath];
+            }
+            req = [self setupBaseRequestForResource:self.atmosResource];
+            [req setHTTPMethod:@"HEAD"];
+            break;
+            
+        case kMetaLoadUser:
+            if(self.atmosId) {
+                self.atmosResource = [NSString stringWithFormat:@"/rest/objects/%@?metadata/user",self.atmosId];
+            } else if(self.objectPath) {
+                self.atmosResource = [NSString stringWithFormat:@"/rest/namespace%@?metadata/user",self.objectPath];
+            }
+            
+            req = [self setupBaseRequestForResource:self.atmosResource];
+            break;
+        case kMetaLoadSystem:
+            if(self.atmosId) {
+                self.atmosResource = [NSString stringWithFormat:@"/rest/objects/%@?metadata/system",self.atmosId];
+            } else if(self.objectPath) {
+                self.atmosResource = [NSString stringWithFormat:@"/rest/namespace%@?metadata/system",self.objectPath];
+            }
+            
+            req = [self setupBaseRequestForResource:self.atmosResource];
+            break;
+    }
+    
+    [self setFilterTagsOnRequest:req];
+    [self signRequest:req];
+    NSLog(@"setup request %@",req);
+    self.connection = [NSURLConnection connectionWithRequest:req delegate:self];
+
 }
 
 - (void) setMetadata:(NSString *) metaStr onDictionary:(NSMutableDictionary *)dict {
@@ -92,8 +120,12 @@
 		//some atmos error
 		NSString *errStr = [[NSString alloc] initWithData:self.webData encoding:NSASCIIStringEncoding];
 		AtmosError *aerr = [self extractAtmosError:errStr];
-		[self.progressListener finishedLoadingMetadata:nil forLabel:self.operationLabel withError:aerr];
-		
+        
+        self.callback([AtmosObjectResult failureWithError:aerr withLabel:self.operationLabel]);
+        
+        [aerr release];
+        [errStr release];
+        		
 	} else {
 		
 		if(self.objectPath) {
@@ -103,37 +135,30 @@
 		}
 			
 		NSLog(@"response header fields %@",[self.httpResponse allHeaderFields]);
-		NSString *sysMetaStr = [[self.httpResponse allHeaderFields] objectForKey:@"x-emc-meta"];
-		if(sysMetaStr == nil || sysMetaStr.length == 0)
-			sysMetaStr = [[self.httpResponse allHeaderFields] objectForKey:@"X-Emc-Meta"];
-		if(sysMetaStr == nil || sysMetaStr.length == 0)
-			sysMetaStr = [[self.httpResponse allHeaderFields] objectForKey:@"X-EMC-META"];
+        
+        switch(metaLoadType) {
+            case kMetaLoadAll:
+                [self extractEMCMetaFromResponse:self.httpResponse
+                                        toObject:self.atmosObj];
+                
+                [self setMetadata:[[self.httpResponse allHeaderFields] objectForKey:@"X-Emc-Meta"] onDictionary:self.atmosObj.userRegularMeta];
+                
+                break;
+            case kMetaLoadSystem:
+                [self setMetadata:[[self.httpResponse allHeaderFields] objectForKey:@"X-Emc-Meta"] onDictionary:self.atmosObj.systemMeta];
+                break;
+            case kMetaLoadUser:
+                [self setMetadata:[[self.httpResponse allHeaderFields] objectForKey:@"X-Emc-Meta"] onDictionary:self.atmosObj.userRegularMeta];
+                [self setMetadata:[[self.httpResponse allHeaderFields] objectForKey:@"X-Emc-Listable-Meta"] onDictionary:self.atmosObj.userListableMeta];
+                break;
+                
+        }
+        
+        AtmosObjectResult *result = [[AtmosObjectResult alloc] initWithResult:YES withError:nil withLabel:self.operationLabel withObject:self.atmosObj];
+        self.callback(result);
+        [result release];
 		
-		if(sysMetaStr && sysMetaStr.length > 0) {
-			if(con == self.sysMetaConn) 
-				[self setMetadata:sysMetaStr onDictionary:self.atmosObj.systemMeta];
-			else if(con == self.userMetaConn) 
-				[self setMetadata:sysMetaStr onDictionary:self.atmosObj.userRegularMeta];
-				
-		}
-		
-		if(con == self.userMetaConn) {
-			NSString *listableMetaStr = [[self.httpResponse allHeaderFields] objectForKey:@"x-emc-listable-meta"];
-			if(listableMetaStr == nil || listableMetaStr.length == 0)
-				listableMetaStr = [[self.httpResponse allHeaderFields] objectForKey:@"X-Emc-Listable-Meta"];
-			if(listableMetaStr == nil || listableMetaStr.length == 0)
-				listableMetaStr = [[self.httpResponse allHeaderFields] objectForKey:@"X-EMC-LISTABLE-META"];
 			
-			if(listableMetaStr && listableMetaStr.length > 0) {
-				[self setMetadata:listableMetaStr onDictionary:self.atmosObj.userListableMeta];
-			}
-		}
-		
-	}
-	
-	numConnections++;
-	if(numConnections == maxConnections) {
-		[self.progressListener finishedLoadingMetadata:self.atmosObj forLabel:self.operationLabel withError:nil];
 		[self.atmosStore operationFinishedInternal:self];
 	}
 		

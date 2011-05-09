@@ -29,24 +29,15 @@
  */
 
 
-
-//
-//  EsuObject.m
-//  TestEsu
-//
-//  Created by aashish patil on 7/12/09.
-//  Copyright 2009 EMC Corporation. All rights reserved.
-//
-
 #import "AtmosObject.h"
 
-static NSDateFormatter *tsFmter;
-static NSDateFormatter *friendlyDateFmter;
-static NSSet *systemMetaNames;
+static NSDateFormatter *tsFmter = nil;
+static NSDateFormatter *friendlyDateFmter = nil;
+static NSSet *systemMetaNames = nil;
 
 @implementation AtmosObject
 
-@synthesize atmosId, objectPath, userRegularMeta, userListableMeta, systemMeta, requestTags;
+@synthesize atmosId, objectPath, userRegularMeta, userListableMeta, systemMeta, requestTags, contentType;
 @synthesize filepath,data;
 @synthesize dataMode = kDataModeFile;
 @synthesize directory;
@@ -82,6 +73,8 @@ static NSSet *systemMetaNames;
 + (BOOL) isSystemMetadata:(NSString *) metaName {
 	if(systemMetaNames == nil) {
 		systemMetaNames = [NSSet setWithObjects:@"atime",@"ctime",@"gid",@"itime",@"mtime",@"nlink",@"objectid",@"objname",@"policyname",@"size",@"type",@"uid",nil];
+        // Increment ref count so it doesn't get autoreleased
+        [systemMetaNames retain];
 	}
 	return [systemMetaNames containsObject:metaName];
 }
@@ -90,6 +83,8 @@ static NSSet *systemMetaNames;
 	if(tsFmter == nil) {
 		tsFmter = [[NSDateFormatter alloc] init];
 		[tsFmter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+        // Increment ref count so it doesn't get autorelased
+        [tsFmter retain];
 	}
 	
 	return [tsFmter dateFromString:tsStr];	
@@ -99,6 +94,7 @@ static NSSet *systemMetaNames;
 	if(tsFmter == nil) {
 		tsFmter = [[NSDateFormatter alloc] init];
 		[tsFmter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+        [tsFmter retain];
 	}
 	return [tsFmter stringFromDate:dtObj];
 }
@@ -122,6 +118,7 @@ static NSSet *systemMetaNames;
 	if(friendlyDateFmter == nil) {
 		friendlyDateFmter = [[NSDateFormatter alloc] init];
 		[friendlyDateFmter setDateFormat:@"MMM dd"];
+        [friendlyDateFmter retain];
 	}
 	
 	NSTimeInterval diff = [dtObj timeIntervalSinceNow];
@@ -176,14 +173,18 @@ static NSSet *systemMetaNames;
 }
 
 - (void) dealloc {
-	if(requestTags)
-		[requestTags release];
-	if(userRegularMeta)
-		[userRegularMeta release];
-	if(userListableMeta)
-		[userListableMeta release];
-	if(systemMeta) 
-		[systemMeta release];
+    
+    // Release properties marked retain.
+    self.atmosId = nil;
+    self.objectPath = nil;
+    self.systemMeta = nil;
+    self.userListableMeta = nil;
+    self.userRegularMeta = nil;
+    self.requestTags = nil;
+    self.filepath = nil;
+    self.data = nil;
+    self.contentType = nil;
+    
 	[super dealloc];
 }
 @end

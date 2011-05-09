@@ -29,20 +29,10 @@
  */
 
 
-
-//
-//  EsuHelper.h
-//  TestEsu
-//
-//  Created by aashish patil on 7/12/09.
-//  Copyright 2009 EMC Corporation. All rights reserved.
-//
-
 #import <Foundation/Foundation.h>
 #import "NSData+Additions.h"
 #import "CommonCrypto/CommonHMAC.h"
 #import "AtmosCredentials.h"
-#import "AtmosProgressListenerDelegate.h"
 #import "AtmosError.h"
 #import "AtmosStore.h"
 
@@ -66,8 +56,6 @@
 	BOOL operFinished;
 	
 	NSDictionary *responseHeaders;
-	
-	id<AtmosProgressListenerDelegate> progressListener;
 	
 	AtmosStore *atmosStore; //the atmos store object on which this operation was called
 	
@@ -108,14 +96,12 @@
 @property (nonatomic,retain) AtmosCredentials *atmosCredentials;
 @property (nonatomic, retain) NSString *atmosResource;
 
-@property (nonatomic,retain) id<AtmosProgressListenerDelegate> progressListener;
 @property (nonatomic,retain) id appData;
 @property (nonatomic,retain) AtmosStore *atmosStore;
 @property (nonatomic,retain) NSString *operationLabel;
 @property (retain) NSURLConnection *connection;
 
 @property (nonatomic,retain) NSHTTPURLResponse *httpResponse;
-//@property (nonatomic,retain) NSURLConnection *connection;
 
 @end
 

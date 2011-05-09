@@ -28,13 +28,27 @@
  
  */
 
-#import "atmos_testsAppDelegate_iPad.h"
 
-@implementation atmos_testsAppDelegate_iPad
+#import "AtmosObjectResult.h"
 
-- (void)dealloc
+
+@implementation AtmosObjectResult
+
+@synthesize atmosObject;
+
+-(void) dealloc
 {
-	[super dealloc];
+    self.atmosObject = nil;
+    [super dealloc];
+}
+
+-(id) initWithResult:(BOOL)success withError:(AtmosError *)err withLabel:(NSString *)label withObject:(AtmosObject *)obj
+{
+    self = [super initWithResult:success withError:err withLabel:label];
+    if(self){
+        self.atmosObject = obj;
+    }
+    return self;
 }
 
 @end
