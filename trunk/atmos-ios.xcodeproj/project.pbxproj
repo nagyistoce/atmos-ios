@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		96213BDB1379C65300DA6CC6 /* GetServerOffsetOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 96213BD91379C65300DA6CC6 /* GetServerOffsetOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96213BDC1379C65300DA6CC6 /* GetServerOffsetOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 96213BDA1379C65300DA6CC6 /* GetServerOffsetOperation.m */; };
+		96213BE01379C6B900DA6CC6 /* GetServerOffsetResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 96213BDE1379C6B900DA6CC6 /* GetServerOffsetResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96213BE11379C6B900DA6CC6 /* GetServerOffsetResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 96213BDF1379C6B900DA6CC6 /* GetServerOffsetResult.m */; };
 		963C12DF1371E722008AB91F /* UploadProgress.h in Headers */ = {isa = PBXBuildFile; fileRef = 963C12DD1371E721008AB91F /* UploadProgress.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		963C12E01371E722008AB91F /* UploadProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 963C12DE1371E722008AB91F /* UploadProgress.m */; };
 		963C12E31371ED8C008AB91F /* AtmosRange.h in Headers */ = {isa = PBXBuildFile; fileRef = 963C12E11371ED8C008AB91F /* AtmosRange.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -57,6 +61,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		96213BD91379C65300DA6CC6 /* GetServerOffsetOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetServerOffsetOperation.h; sourceTree = "<group>"; };
+		96213BDA1379C65300DA6CC6 /* GetServerOffsetOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetServerOffsetOperation.m; sourceTree = "<group>"; };
+		96213BDE1379C6B900DA6CC6 /* GetServerOffsetResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetServerOffsetResult.h; sourceTree = "<group>"; };
+		96213BDF1379C6B900DA6CC6 /* GetServerOffsetResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetServerOffsetResult.m; sourceTree = "<group>"; };
 		963C12DD1371E721008AB91F /* UploadProgress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UploadProgress.h; sourceTree = "<group>"; };
 		963C12DE1371E722008AB91F /* UploadProgress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UploadProgress.m; sourceTree = "<group>"; };
 		963C12E11371ED8C008AB91F /* AtmosRange.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AtmosRange.h; sourceTree = "<group>"; };
@@ -201,6 +209,10 @@
 				963C12EA137397E2008AB91F /* DownloadProgress.m */,
 				969903E713788D5A0063DE0F /* ListDirectoryResult.h */,
 				969903E813788D5A0063DE0F /* ListDirectoryResult.m */,
+				96213BD91379C65300DA6CC6 /* GetServerOffsetOperation.h */,
+				96213BDA1379C65300DA6CC6 /* GetServerOffsetOperation.m */,
+				96213BDE1379C6B900DA6CC6 /* GetServerOffsetResult.h */,
+				96213BDF1379C6B900DA6CC6 /* GetServerOffsetResult.m */,
 			);
 			path = "atmos-ios";
 			sourceTree = "<group>";
@@ -242,6 +254,8 @@
 				963C12EB137397E3008AB91F /* DownloadProgress.h in Headers */,
 				967CB6C61371A13E003C9523 /* GetListableTagsResult.h in Headers */,
 				969903E4137882E50063DE0F /* AtmosObjectResult.h in Headers */,
+				96213BDB1379C65300DA6CC6 /* GetServerOffsetOperation.h in Headers */,
+				96213BE01379C6B900DA6CC6 /* GetServerOffsetResult.h in Headers */,
 				969903E913788D5A0063DE0F /* ListDirectoryResult.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -316,6 +330,8 @@
 				963C12EC137397E3008AB91F /* DownloadProgress.m in Sources */,
 				969903E5137882E50063DE0F /* AtmosObjectResult.m in Sources */,
 				969903EA13788D5A0063DE0F /* ListDirectoryResult.m in Sources */,
+				96213BDC1379C65300DA6CC6 /* GetServerOffsetOperation.m in Sources */,
+				96213BE11379C6B900DA6CC6 /* GetServerOffsetResult.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

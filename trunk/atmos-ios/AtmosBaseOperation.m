@@ -70,7 +70,10 @@
 	[fmter setDateFormat:@"EEE, d MMM yyyy HH:mm:ss z"];
 	fmter.timeZone = tz;
 	NSDate *now = [[NSDate alloc] init];
-	NSString *fmtDate = [fmter stringFromDate:now];
+    
+    NSDate *adjdate = [now dateByAddingTimeInterval:atmosStore.timeOffset];
+    
+	NSString *fmtDate = [fmter stringFromDate:adjdate];
 	fmtDate = [fmtDate stringByReplacingOccurrencesOfString:@"+00:00" withString:@""];
 	//NSLog(@"Formatted date %@",fmtDate);
 	[req addValue:fmtDate forHTTPHeaderField:@"Date"];

@@ -38,6 +38,7 @@
 #import "DownloadProgress.h"
 #import "AtmosObjectResult.h"
 #import "ListDirectoryResult.h"
+#import "GetServerOffsetResult.h"
 
 #define ATMOS_DEFAULT_BUF_SIZE 4194304 //4MB is the buffer Atmos uses on the server
 
@@ -49,6 +50,7 @@
 	@private
 	NSMutableSet *currentOperations;
 	NSMutableArray *pendingOperations;
+    NSTimeInterval timeOffset;
 	
 	@public
 	AtmosCredentials *atmosCredentials;
@@ -210,10 +212,14 @@
                  withCallback:(void(^)(AtmosResult *result))callback
                     withLabel:(NSString *) requestLabel;
 
+- (void) getServerOffset:(void(^)(GetServerOffsetResult *result))callback
+               withLabel:(NSString *)requestLabel;
+
+
 @property (nonatomic,retain) AtmosCredentials *atmosCredentials;
 @property (nonatomic,retain) NSMutableSet *currentOperations;
 @property (nonatomic,retain) NSMutableArray *pendingOperations;
 @property (nonatomic,assign) NSInteger maxConcurrentOperations;
-
+@property (nonatomic) NSTimeInterval timeOffset;
 
 @end
