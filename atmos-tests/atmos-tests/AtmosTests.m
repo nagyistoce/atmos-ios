@@ -411,4 +411,37 @@
     [obj release];
 }
 
+- (void) subTestGetServerOffset1
+{
+    // Make sure we can still get listable tags without error
+    // after setting time offset
+    [atmosStore getListableTags:nil 
+                   withCallback:^(GetListableTagsResult *tags) {
+                       [self checkResult:tags];
+                       
+                       // Notify async test complete.
+                       [self notify:kGHUnitWaitStatusSuccess 
+                        forSelector:@selector(testGetServerOffset)];
+                   } 
+                      withLabel:@"subTestGetServerOffset1"];
+    
+    
+}
+
+- (void) testGetServerOffset
+{
+    [self prepare];
+    
+    [atmosStore getServerOffset:^(GetServerOffsetResult *result) {
+        [self checkResult:result];
+        GHTestLog(@"Server offset: %lf seconds", result.offset);
+        atmosStore.timeOffset = result.offset;
+        [self subTestGetServerOffset1];
+    } withLabel:@"testGetServerOffset"];
+    
+    
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    
+}
+
 @end

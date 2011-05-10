@@ -39,6 +39,7 @@
 #import "DeleteObjectOperation.h"
 #import "ListDirectoryOperation.h"
 #import "DeleteMetadataOperation.h"
+#import "GetServerOffsetOperation.h"
 
 @interface AtmosStore (Private)
 
@@ -80,13 +81,14 @@
 
 @implementation AtmosStore
 
-@synthesize atmosCredentials, currentOperations, pendingOperations, maxConcurrentOperations;
+@synthesize atmosCredentials, currentOperations, pendingOperations, maxConcurrentOperations, timeOffset;
 
 
 - (id) init {
 	self = [super init];
 	if(self) {
 		self.maxConcurrentOperations = 10;
+        self.timeOffset = 0.0;
 	}
 	return self;
 }
@@ -520,6 +522,19 @@
 	
 	[self scheduleOperation:oper];
 	[oper release];
+}
+
+- (void) getServerOffset:(void(^)(GetServerOffsetResult *result))callback
+               withLabel:(NSString *)requestLabel;
+{
+    GetServerOffsetOperation *oper = [[GetServerOffsetOperation alloc] init];
+    
+	oper.atmosStore = self;
+	oper.atmosCredentials = self.atmosCredentials;
+	oper.callback = callback;
+    
+    [self scheduleOperation:oper];
+    [oper release];
 }
 
 #pragma mark MemoryManagement
