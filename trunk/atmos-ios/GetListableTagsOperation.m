@@ -80,6 +80,9 @@
     
     self->callback(result);
     
+    [result release];
+    [err release];
+    
 	[self.atmosStore operationFinishedInternal:self];
 }
 
@@ -94,6 +97,9 @@
         result.error = aerr;
         
         self->callback(result);
+        
+        [result release];
+        [errStr release];
 	} else {
 		NSLog(@"response header fields %@",[self.httpResponse allHeaderFields]);
 		NSString *tagsStr = [[self.httpResponse allHeaderFields] objectForKey:@"x-emc-listable-tags"];
@@ -108,6 +114,9 @@
         result.tags = tags;
         
         self->callback(result);
+        
+        [result release];
+        
 	}
 	[self.atmosStore operationFinishedInternal:self];
 	

@@ -42,6 +42,13 @@
 @synthesize startByte,endByte,bufferSize,numBlocks,currentBlock,uploadMode,
     atmosObj,fileHandle, totalTransferSize, totalBytesTransferred, callback;
 
+- (void) dealloc {
+    self.atmosObj = nil;
+    self.fileHandle = nil;
+    self.callback = nil;
+    
+    [super dealloc];
+}
 
 - (void) startAtmosOperation {
     
@@ -225,6 +232,7 @@
 		[self.fileHandle closeFile];
 		[self.atmosStore operationFinishedInternal:self];
 	}
+    [event release];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
@@ -272,7 +280,6 @@
         event.error = aerr;
         self->callback(event);
         
-        [aerr release];
         [event release];
         [errStr release];
 		[self.atmosStore operationFinishedInternal:self];

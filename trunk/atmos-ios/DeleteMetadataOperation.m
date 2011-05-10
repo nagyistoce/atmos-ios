@@ -105,7 +105,7 @@
         
         self.callback([AtmosResult failureWithError:aerr withLabel:self.operationLabel]);
         
-        [aerr release];
+        [errStr release];
         		
 	} else {
         self.callback([AtmosResult successWithLabel:self.operationLabel]);
