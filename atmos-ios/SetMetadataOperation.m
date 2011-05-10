@@ -107,7 +107,8 @@
 		AtmosError *aerr = [self extractAtmosError:errStr];
         
         self.callback([AtmosResult failureWithError:aerr withLabel:self.operationLabel]);
-        		
+        
+		[errStr release];
 	} else {
         self.callback([AtmosResult successWithLabel:self.operationLabel]);
 	}

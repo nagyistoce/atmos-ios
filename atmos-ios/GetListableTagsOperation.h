@@ -37,6 +37,6 @@
 	void (^callback)(GetListableTagsResult *tags);
 }
 
-@property (assign,readwrite) void (^callback)(GetListableTagsResult *tags);
+@property (copy,readwrite) void (^callback)(GetListableTagsResult *tags);
 
 @end

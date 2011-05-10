@@ -123,7 +123,6 @@
         
         self.callback([AtmosObjectResult failureWithError:aerr withLabel:self.operationLabel]);
         
-        [aerr release];
         [errStr release];
         		
 	} else {
