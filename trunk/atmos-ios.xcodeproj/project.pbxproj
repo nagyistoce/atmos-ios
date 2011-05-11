@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		75B4BEDD137B304100449FCC /* AtmosObjectResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 75B4BEDB137B304100449FCC /* AtmosObjectResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		75B4BEDE137B304100449FCC /* AtmosObjectResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 75B4BEDC137B304100449FCC /* AtmosObjectResult.m */; };
 		96213BDB1379C65300DA6CC6 /* GetServerOffsetOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 96213BD91379C65300DA6CC6 /* GetServerOffsetOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96213BDC1379C65300DA6CC6 /* GetServerOffsetOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 96213BDA1379C65300DA6CC6 /* GetServerOffsetOperation.m */; };
 		96213BE01379C6B900DA6CC6 /* GetServerOffsetResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 96213BDE1379C6B900DA6CC6 /* GetServerOffsetResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -23,8 +25,6 @@
 		967CB6C31371A038003C9523 /* AtmosResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 967CB6C11371A038003C9523 /* AtmosResult.m */; };
 		967CB6C61371A13E003C9523 /* GetListableTagsResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 967CB6C41371A13D003C9523 /* GetListableTagsResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		967CB6C71371A13E003C9523 /* GetListableTagsResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 967CB6C51371A13D003C9523 /* GetListableTagsResult.m */; };
-		969903E4137882E50063DE0F /* AtmosObjectResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 969903E2137882E40063DE0F /* AtmosObjectResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		969903E5137882E50063DE0F /* AtmosObjectResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 969903E3137882E40063DE0F /* AtmosObjectResult.m */; };
 		969903E913788D5A0063DE0F /* ListDirectoryResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 969903E713788D5A0063DE0F /* ListDirectoryResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		969903EA13788D5A0063DE0F /* ListDirectoryResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 969903E813788D5A0063DE0F /* ListDirectoryResult.m */; };
 		96A4C430136F211E0038239F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4C42F136F211E0038239F /* Foundation.framework */; };
@@ -61,6 +61,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		75B4BEDB137B304100449FCC /* AtmosObjectResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AtmosObjectResult.h; sourceTree = "<group>"; };
+		75B4BEDC137B304100449FCC /* AtmosObjectResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AtmosObjectResult.m; sourceTree = "<group>"; };
 		96213BD91379C65300DA6CC6 /* GetServerOffsetOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetServerOffsetOperation.h; sourceTree = "<group>"; };
 		96213BDA1379C65300DA6CC6 /* GetServerOffsetOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetServerOffsetOperation.m; sourceTree = "<group>"; };
 		96213BDE1379C6B900DA6CC6 /* GetServerOffsetResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetServerOffsetResult.h; sourceTree = "<group>"; };
@@ -78,8 +80,6 @@
 		967CB6C11371A038003C9523 /* AtmosResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AtmosResult.m; sourceTree = "<group>"; };
 		967CB6C41371A13D003C9523 /* GetListableTagsResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetListableTagsResult.h; sourceTree = "<group>"; };
 		967CB6C51371A13D003C9523 /* GetListableTagsResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetListableTagsResult.m; sourceTree = "<group>"; };
-		969903E2137882E40063DE0F /* AtmosObjectResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AtmosObjectResult.h; path = ../AtmosObjectResult.h; sourceTree = "<group>"; };
-		969903E3137882E40063DE0F /* AtmosObjectResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AtmosObjectResult.m; path = ../AtmosObjectResult.m; sourceTree = "<group>"; };
 		969903E713788D5A0063DE0F /* ListDirectoryResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ListDirectoryResult.h; sourceTree = "<group>"; };
 		969903E813788D5A0063DE0F /* ListDirectoryResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ListDirectoryResult.m; sourceTree = "<group>"; };
 		96A4C42C136F211E0038239F /* libatmos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libatmos.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -162,8 +162,8 @@
 		96A4C431136F211E0038239F /* atmos-ios */ = {
 			isa = PBXGroup;
 			children = (
-				969903E2137882E40063DE0F /* AtmosObjectResult.h */,
-				969903E3137882E40063DE0F /* AtmosObjectResult.m */,
+				75B4BEDB137B304100449FCC /* AtmosObjectResult.h */,
+				75B4BEDC137B304100449FCC /* AtmosObjectResult.m */,
 				96A52CFD136F236B00ED175D /* NSData+Additions.h */,
 				96A52CFE136F236B00ED175D /* NSData+Additions.m */,
 				96A52CFF136F236B00ED175D /* AtmosBaseOperation.h */,
@@ -253,9 +253,9 @@
 				963C12E713732B21008AB91F /* ListObjectsResult.h in Headers */,
 				963C12EB137397E3008AB91F /* DownloadProgress.h in Headers */,
 				967CB6C61371A13E003C9523 /* GetListableTagsResult.h in Headers */,
-				969903E4137882E50063DE0F /* AtmosObjectResult.h in Headers */,
 				96213BDB1379C65300DA6CC6 /* GetServerOffsetOperation.h in Headers */,
 				96213BE01379C6B900DA6CC6 /* GetServerOffsetResult.h in Headers */,
+				75B4BEDD137B304100449FCC /* AtmosObjectResult.h in Headers */,
 				969903E913788D5A0063DE0F /* ListDirectoryResult.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -328,10 +328,10 @@
 				963C12E41371ED8C008AB91F /* AtmosRange.m in Sources */,
 				963C12E813732B21008AB91F /* ListObjectsResult.m in Sources */,
 				963C12EC137397E3008AB91F /* DownloadProgress.m in Sources */,
-				969903E5137882E50063DE0F /* AtmosObjectResult.m in Sources */,
 				969903EA13788D5A0063DE0F /* ListDirectoryResult.m in Sources */,
 				96213BDC1379C65300DA6CC6 /* GetServerOffsetOperation.m in Sources */,
 				96213BE11379C6B900DA6CC6 /* GetServerOffsetResult.m in Sources */,
+				75B4BEDE137B304100449FCC /* AtmosObjectResult.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
