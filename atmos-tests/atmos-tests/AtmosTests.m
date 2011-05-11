@@ -61,7 +61,7 @@
 //    creds.portNumber = 80;
     creds.tokenId=@"jason";
     creds.sharedSecret=@"1/HpFFAEcbXGXnOaX4Ob3zyYXE8=";
-    creds.accessPoint=@"192.168.246.152";
+    creds.accessPoint=@"192.168.235.129";
     creds.httpProtocol=@"http";
     creds.portNumber=80;
     
@@ -443,5 +443,67 @@
     [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
     
 }
+
+- (void) subTestSetUserMetadata2:(AtmosObject*)atmosObject
+{
+    // Read the object back and check metadata
+    [atmosStore getAllMetadataForId:atmosObject.atmosId 
+                       withCallback:^(AtmosObjectResult *result) {
+        [self checkResult:result];
+        
+        GHAssertEqualStrings(@"newvalue", 
+                             [result.atmosObject.userRegularMeta 
+                              objectForKey:@"listable"], 
+                             @"Metadata value was not correct");
+                           
+       GHAssertNil([result.atmosObject.userListableMeta objectForKey:@"listable"], @"metadata with name listable should not be in listable dictionary");
+                           
+       // Notify async test complete.
+       [self notify:kGHUnitWaitStatusSuccess 
+        forSelector:@selector(testSetUserMetadata)];
+    } withLabel:@"subTestSetUserMetadata2"];
+    
+}
+
+- (void) subTestSetUserMetadata1:(AtmosObject*)atmosObject
+{
+    // Add to cleanup
+    [cleanup addObject:atmosObject.atmosId];
+    
+    // Update the metadata, change the value and make it non-listable.
+    atmosObject.userListableMeta = [NSMutableDictionary dictionary];
+    atmosObject.userRegularMeta = [NSMutableDictionary dictionaryWithObjectsAndKeys:@"newvalue",@"listable", nil];
+    [atmosStore setObjectMetadata:atmosObject withCallback:^(AtmosResult *result) {
+        [self checkResult:result];
+        
+        [self subTestSetUserMetadata2:atmosObject];
+    } withLabel:@"subTestListObjects1"];
+    
+}
+
+- (void) testSetUserMetadata
+{
+    [self prepare];
+    
+    // Create an object with some metadata
+    AtmosObject *obj = [[AtmosObject alloc] init];
+    obj.userListableMeta = [NSMutableDictionary dictionaryWithObjectsAndKeys:@"",@"listable", nil];
+    [atmosStore createObject:obj withCallback:^BOOL(UploadProgress *progress) {
+        // Check
+        [self checkResult:progress];
+        
+        if(progress.isComplete) {
+            [self subTestSetUserMetadata1:progress.atmosObject];
+        }
+        
+        return YES;
+    } withLabel:@"subTestSetUserMetadata1"];
+    
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [obj release];
+    
+}
+
+
 
 @end
