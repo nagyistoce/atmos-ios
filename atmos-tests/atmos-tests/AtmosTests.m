@@ -487,7 +487,8 @@
     
     // Create an object with some metadata
     AtmosObject *obj = [[AtmosObject alloc] init];
-    obj.userListableMeta = [NSMutableDictionary dictionaryWithObjectsAndKeys:@"",@"listable", nil];
+    obj.userListableMeta = [NSMutableDictionary 
+                            dictionaryWithObjectsAndKeys:@"",@"listable", nil];
     [atmosStore createObject:obj withCallback:^BOOL(UploadProgress *progress) {
         // Check
         [self checkResult:progress];
@@ -502,6 +503,78 @@
     [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
     [obj release];
     
+}
+
+
+- (void) subTestDeleteObjectMetadata2:(AtmosObject*)atmosObject
+{
+    // Read back the metadata and verify that key1 is gone.
+    [atmosStore getAllMetadataForId:atmosObject.atmosId withCallback:^(AtmosObjectResult *result) {
+        [self checkResult:result];
+        
+        GHAssertNil([result.atmosObject.userRegularMeta objectForKey:@"key1"], @"Key1 should have been nil");
+        GHAssertEqualStrings([result.atmosObject.userRegularMeta objectForKey:@"key2"], @"value2" , @"key2 should have been value2");
+        
+        // Notify async test complete.
+        [self notify:kGHUnitWaitStatusSuccess 
+         forSelector:@selector(testDeleteObjectMetadata)];
+        
+    } withLabel:@"subTestDeleteObjectMetadata2"];
+}
+
+- (void) subTestDeleteObjectMetadata1:(AtmosObject*)atmosObject
+{
+    // Add the ID to cleanup
+    [cleanup addObject:atmosObject.atmosId];
+    
+    // Delete one of the metadata values
+    AtmosObject *delObj = [[AtmosObject alloc] init];
+    delObj.atmosId = atmosObject.atmosId;
+    delObj.requestTags = [NSMutableSet setWithObject:@"key1"];
+    [atmosStore deleteObjectMetadata:delObj withCallback:^(AtmosResult *result) {
+        [self checkResult:result];
+        [self subTestDeleteObjectMetadata2:atmosObject];
+    } withLabel:@""];
+    [delObj release];
+}
+
+- (void) testDeleteObjectMetadata
+{
+    [self prepare];
+    
+    // Create an object with some metadata
+    AtmosObject *obj = [[AtmosObject alloc] init];
+    obj.userRegularMeta = [NSMutableDictionary 
+                           dictionaryWithObjectsAndKeys:@"value1",@"key1", 
+                           @"value2",@"key2", nil];
+    [atmosStore createObject:obj withCallback:^BOOL(UploadProgress *progress) {
+        // Check
+        [self checkResult:progress];
+        
+        if(progress.isComplete) {
+            [self subTestDeleteObjectMetadata1:progress.atmosObject];
+        }
+        
+        return YES;
+    } withLabel:@"testDeleteObjectMetadata"];
+    
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [obj release];
+
+}
+
+- (void) testUpdateObject
+{
+    
+}
+
+- (void) testReadObjectRange
+{
+    
+}
+
+- (void) testUpdateObjectRange
+{
 }
 
 

@@ -46,9 +46,9 @@
 	
 	if(self.atmosObj) {
 		if(self.atmosObj.atmosId) {
-			self.atmosResource = [NSString stringWithFormat:@"/rest/objects/%@",self.atmosObj.atmosId];
+			self.atmosResource = [NSString stringWithFormat:@"/rest/objects/%@?metadata/user",self.atmosObj.atmosId];
 		} else if(self.atmosObj.objectPath) {
-			self.atmosResource = [NSString stringWithFormat:@"/rest/namespace%@",self.atmosObj.objectPath];
+			self.atmosResource = [NSString stringWithFormat:@"/rest/namespace%@?metadata/user",self.atmosObj.objectPath];
 		} else {
 			return;
 		}
