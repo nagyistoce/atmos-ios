@@ -1134,4 +1134,162 @@ char innerChars[] = FN_CHARS " "; // No leading or trailing spaces
     
 }
 
+
+- (void)subTestUnicodePathname1:(AtmosObject*)atmosObject
+{
+    // Add new object to cleanup list
+    [cleanup addObject:atmosObject.atmosId];
+    
+    // Read the object back and check contents.
+    AtmosObject *obj2 = [[AtmosObject alloc] init];
+    obj2.data = nil;
+    obj2.dataMode = kDataModeBytes;
+    obj2.contentType = nil;
+    obj2.objectPath = atmosObject.objectPath;
+    [atmosStore readObject:obj2
+              withCallback:^BOOL(DownloadProgress *progress) {
+                  @try {
+                      [self checkResult:progress];
+                      if(progress.isComplete){
+                          GHAssertNotNil(progress.atmosObject.data, 
+                                         @"Expected data to be non-Nil");
+                          GHAssertEqualStrings(@"Hello World",
+                                               [NSString stringWithUTF8String:[progress.atmosObject.data bytes]], 
+                                               @"Expected strings to match");
+                          GHAssertEqualStrings(@"text/foo", 
+                                               progress.atmosObject.contentType, 
+                                               @"Expected MIME types to match");
+                      }
+                  }
+                  @catch (NSException *exception) {
+                      self.failure = exception;
+                      [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testUnicodePathname)];
+                      return NO;
+                  }
+                  // Notify async test complete.
+                  [self notify:kGHUnitWaitStatusSuccess 
+                   forSelector:@selector(testUnicodePathname)];
+                  return YES;
+                  
+              } 
+                 withLabel:@"subTestUnicodePathname1"];
+    [obj2 release];
+}
+
+
+- (void) testUnicodePathname
+{
+    [self prepare];
+    
+    AtmosObject *obj = [[AtmosObject alloc] init];
+    obj.dataMode = kDataModeBytes;
+    obj.data = [NSData dataWithBytes:[@"Hello World" UTF8String] length:12];
+    obj.contentType = @"text/foo";
+    obj.objectPath = [NSString stringWithFormat:@"/%@/спасибо.txt",
+                      [self generateFilename:8 includeExtension:false]];
+    GHTestLog(@"Object Path: %@",obj.objectPath);
+    [atmosStore createObject:obj 
+                withCallback:^BOOL(UploadProgress *progress) {
+                    @try {
+                        [self checkResult:progress];
+                        
+                        if(progress.isComplete){
+                            GHAssertNotNil(progress.atmosObject,                                  
+                                           @"Expected New ID to be non-Nil");
+                            [self subTestUnicodePathname1:obj];
+                        }
+                    }
+                    @catch (NSException *exception) {
+                        self.failure = exception;
+                        [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testUnicodePathname)];
+                        return NO;
+                    }
+                    
+                    return YES;
+                } 
+                   withLabel:@"testUnicodePathname"];
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [obj release];
+    [self checkFailure];
+    
+}
+
+- (void) subTestDeleteObjectOnPath2:(AtmosObject*)atmosObject
+{
+    // Try to get object metadata... it should fail.
+    [atmosStore getSystemMetadataForPath:atmosObject.objectPath metadata:nil withCallback:^(AtmosObjectResult *result) {
+        @try {
+            GHAssertFalse(result.wasSuccessful, @"Expected load after delete to fail!");
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testDeleteObjectOnPath)];
+        }
+        // Notify async test complete
+        [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testDeleteObjectOnPath)];
+    } withLabel:@"subTestDeleteObjectOnPath2"];
+}
+
+- (void) subTestDeleteObjectOnPath1:(AtmosObject*)atmosObject
+{
+    // Delete the object
+    AtmosObject *obj2 = [[AtmosObject alloc] init];
+    obj2.objectPath = atmosObject.objectPath;
+    
+    [atmosStore deleteObject:obj2 withCallback:^(AtmosResult *result) {
+        @try {
+            [self checkResult:result];
+            
+            [self subTestDeleteObjectOnPath2:atmosObject];
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testDeleteObjectOnPath)];
+        }
+        
+    } withLabel:@"subTestDeleteObjectOnPath1"];
+    
+    [obj2 release];
+}
+
+- (void) testDeleteObjectOnPath
+{
+    [self prepare];
+    
+    AtmosObject *obj = [[AtmosObject alloc] init];
+    obj.dataMode = kDataModeBytes;
+    obj.data = [NSData dataWithBytes:[@"Hello World" UTF8String] length:12];
+    obj.contentType = @"text/foo";
+    obj.objectPath = [NSString stringWithFormat:@"/%@/%@",
+                      [self generateFilename:8 includeExtension:false],
+                      [self generateFilename:8 includeExtension:true]];
+    GHTestLog(@"Object Path: %@",obj.objectPath);
+    [atmosStore createObject:obj 
+                withCallback:^BOOL(UploadProgress *progress) {
+                    @try {
+                        [self checkResult:progress];
+                        
+                        if(progress.isComplete){
+                            GHAssertNotNil(progress.atmosObject,                                  
+                                           @"Expected New ID to be non-Nil");
+                            [self subTestDeleteObjectOnPath1:obj];
+                        }
+                    }
+                    @catch (NSException *exception) {
+                        self.failure = exception;
+                        [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testDeleteObjectOnPath)];
+                        return NO;
+                    }
+                    
+                    return YES;
+                } 
+                   withLabel:@"testDeleteObjectOnPath"];
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [obj release];
+    [self checkFailure];
+    
+}
+
+
+
 @end
