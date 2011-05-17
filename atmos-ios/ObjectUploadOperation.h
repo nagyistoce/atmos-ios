@@ -69,7 +69,7 @@
 @property (nonatomic,assign) unsigned long long totalBytesTransferred;
 @property (nonatomic,retain) NSFileHandle *fileHandle;
 @property (nonatomic,assign) NSInteger uploadMode;
-@property (assign,readwrite) BOOL (^callback)(UploadProgress *progress);
+@property (copy,readwrite) BOOL (^callback)(UploadProgress *progress);
 
 
 @end

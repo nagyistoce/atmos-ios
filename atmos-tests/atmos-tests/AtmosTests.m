@@ -44,6 +44,9 @@
 
 - (void)checkResult:(AtmosResult*)result 
 {
+    if(!result.wasSuccessful) {
+        GHTestLog(@"request failed: %@", result.error.errorMessage);
+    }
     GHAssertTrue(result.wasSuccessful, @"Request failed");
     GHAssertNil(result.error, @"Result error should be Nil on success");
 }
@@ -54,14 +57,14 @@
     
     AtmosCredentials *creds = [[AtmosCredentials alloc] init];
     
-//    creds.tokenId = @"ab105326496a4228add95d20306030fd/CONNEAABCF7F31DDF0F7";
-//    creds.sharedSecret = @"ra15Bu1Gk2AX5QV1K7iC9scG/OM=";
-//    creds.accessPoint = @"192.168.246.152";
-//    creds.httpProtocol = @"http";
-//    creds.portNumber = 80;
+    //    creds.tokenId = @"ab105326496a4228add95d20306030fd/CONNEAABCF7F31DDF0F7";
+    //    creds.sharedSecret = @"ra15Bu1Gk2AX5QV1K7iC9scG/OM=";
+    //    creds.accessPoint = @"192.168.246.152";
+    //    creds.httpProtocol = @"http";
+    //    creds.portNumber = 80;
     creds.tokenId=@"jason";
     creds.sharedSecret=@"1/HpFFAEcbXGXnOaX4Ob3zyYXE8=";
-    creds.accessPoint=@"192.168.235.129";
+    creds.accessPoint=@"192.168.246.152";
     creds.httpProtocol=@"http";
     creds.portNumber=80;
     
@@ -101,20 +104,27 @@
     // This helps in cases where the action is synchronous and the
     // action occurs before the wait is actually called.
     [self prepare];
-
+    
     atmosStore.atmosCredentials.sharedSecret = @"AAAAAAAAAAAAAAAAAAAAAAAAAA=";
     [atmosStore getListableTags:nil
                    withCallback:^(GetListableTagsResult* result)
      {
-         GHAssertFalse(result.wasSuccessful, 
-                       @"Method should have failed");
-         GHAssertNotNil(result.error, 
-                        @"Result should contain error");
-         GHAssertTrue(result.error.errorCode == 1032, 
-                      @"Expected error code 1032, got %d",
-                      result.error.errorCode);
+         @try {
+             GHAssertFalse(result.wasSuccessful, 
+                           @"Method should have failed");
+             GHAssertNotNil(result.error, 
+                            @"Result should contain error");
+             GHAssertTrue(result.error.errorCode == 1032, 
+                          @"Expected error code 1032, got %d",
+                          result.error.errorCode);
+         }
+         @catch (NSException *exception) {
+             [self notify:kGHUnitWaitStatusFailure forSelector:@selector(testGetListableTags)];
+             return;
+         }
+         
          [self notify:kGHUnitWaitStatusSuccess 
-            forSelector:@selector(testSignatureFailure)];
+          forSelector:@selector(testSignatureFailure)];
      }
                       withLabel:@"testSignatureFailure"];
     
@@ -128,14 +138,20 @@
     // This helps in cases where the action is synchronous and the
     // action occurs before the wait is actually called.
     [self prepare];
-
+    
     [atmosStore getListableTags:nil 
                    withCallback:^(GetListableTagsResult* result){
-                       [self checkResult:result];
-                       GHAssertNotNil(result.tags, @"Tags should be non-nil");
-                       GHAssertTrue([result.tags count]>0, 
-                                    @"Tags count should be at least one, was %d", 
-                                    [result.tags count]);
+                       @try {
+                           [self checkResult:result];
+                           GHAssertNotNil(result.tags, @"Tags should be non-nil");
+                           GHAssertTrue([result.tags count]>0, 
+                                        @"Tags count should be at least one, was %d", 
+                                        [result.tags count]);
+                       }
+                       @catch (NSException *exception) {
+                           [self notify:kGHUnitWaitStatusFailure forSelector:@selector(testGetListableTags)];
+                           return;
+                       }
                        
                        [self notify:kGHUnitWaitStatusSuccess 
                         forSelector:@selector(testGetListableTags)];
@@ -154,15 +170,22 @@
     
     [atmosStore listObjects:@"listable" 
                withCallback:^(ListObjectsResult *result) {
-                   [self checkResult:result];
-                   
-                   NSLog(@"results contains %@", [result.objects description] );
-
-                   // Make sure array contains our ID.
-                   GHAssertTrue(
-                        [result.objects containsObject:atmosObject],
-                                @"List objects result didn't include %@",
-                                atmosObject.atmosId);
+                   @try {
+                       [self checkResult:result];
+                       
+                       NSLog(@"results contains %@", [result.objects description] );
+                       
+                       // Make sure array contains our ID.
+                       GHAssertTrue(
+                                    [result.objects containsObject:atmosObject],
+                                    @"List objects result didn't include %@",
+                                    atmosObject.atmosId);
+                       
+                   }
+                   @catch (NSException *exception) {
+                       [self notify:kGHUnitWaitStatusFailure forSelector:@selector(testListObjects)];
+                       return;
+                   }
                    
                    // Notify async test complete.
                    [self notify:kGHUnitWaitStatusSuccess 
@@ -179,41 +202,49 @@
     obj.userListableMeta = [[NSMutableDictionary alloc] 
                             initWithObjectsAndKeys:@"",@"listable", nil];
     [atmosStore createObject:obj withCallback:^BOOL(UploadProgress *progress) {
-        // Check
-        [self checkResult:progress];
-        
-        if(progress.isComplete) {
-            [self subTestListObjects1:progress.atmosObject];
+        @try {
+            // Check
+            [self checkResult:progress];
+            
+            if(progress.isComplete) {
+                [self subTestListObjects1:progress.atmosObject];
+            }
+        }
+        @catch (NSException *exception) {
+            [self notify:kGHUnitWaitStatusFailure forSelector:@selector(testListObjects)];
+            return NO;
         }
         
         return YES;
     } withLabel:@"testCreateListableObject1"];
-
+    
     [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
     [obj release];
-
+    
 }
 
 -(void)subTestCreateEmptyObject1:(AtmosObject*) atmosObject
 {
     GHTestLog(@"Created AtmosObject %@", atmosObject.atmosId);
     [cleanup addObject:atmosObject.atmosId];
-
+    
     // Read it back
     [atmosStore readObject:atmosObject 
               withCallback:^BOOL(DownloadProgress *progress) {
-                  [self checkResult:progress];
-                  
-                  if(progress.isComplete) {
-//                      NSLog( @"Loaded data %@", 
-//                            [NSString stringWithUTF8String:progress.atmosObject.data.bytes]);
-                            
-                      // Check results
-                      GHAssertTrue(0 == progress.atmosObject.data.length, 
-                                     @"Expected data to be empty, was %@",
-                                   progress.atmosObject.data.length);
-                      [self notify:kGHUnitWaitStatusSuccess 
-                       forSelector:@selector(testCreateEmptyObject)];
+                  @try {
+                      [self checkResult:progress];
+                      if(progress.isComplete) {
+                          // Check results
+                          GHAssertTrue(0 == progress.atmosObject.data.length, 
+                                       @"Expected data to be empty, was %@",
+                                       progress.atmosObject.data.length);
+                          [self notify:kGHUnitWaitStatusSuccess 
+                           forSelector:@selector(testCreateEmptyObject)];
+                      }
+                  }
+                  @catch (NSException *exception) {
+                      [self notify:kGHUnitWaitStatusFailure forSelector:@selector(testCreateEmptyObject)];
+                      return NO;
                   }
                   return YES;
               } 
@@ -228,22 +259,28 @@
     obj.dataMode = kDataModeBytes;
     [atmosStore createObject:obj 
                 withCallback:^BOOL(UploadProgress *progress) {
-                    [self checkResult:progress];
-                    
-                    if(progress.isComplete) {
-                        // Read back the created object.  Tweak the data
-                        // before readback to ensure it gets rewritten 
-                        // properly.
-                        progress.atmosObject.data = 
+                    @try {
+                        [self checkResult:progress];
+                        
+                        if(progress.isComplete) {
+                            // Read back the created object.  Tweak the data
+                            // before readback to ensure it gets rewritten 
+                            // properly.
+                            progress.atmosObject.data = 
                             [NSData dataWithBase64EncodedString:@"SGVsbG8gV29ybGQh"]; // Hello World!
-                        [self subTestCreateEmptyObject1:progress.atmosObject];
+                            [self subTestCreateEmptyObject1:progress.atmosObject];
+                        }
+                    }
+                    @catch (NSException *exception) {
+                        [self notify:kGHUnitWaitStatusFailure forSelector:@selector(testCreateEmptyObject)];
+                        return NO;
                     }
                     return YES;
                 } 
                    withLabel:@"testCreateEmptyObject"];
     [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
     [obj release];
-
+    
 }
 
 - (void)subTestDeleteObject2:(AtmosObject*)atmosObject
@@ -252,23 +289,29 @@
     // on readObject
     [atmosStore readObject:atmosObject
               withCallback:^BOOL(DownloadProgress *progress) {
-                  if(progress.isComplete) {
-                      // Make sure request failed with object not found
-                      GHAssertFalse(progress.wasSuccessful, 
-                                    @"Reading deleted object should have failed.");
-                      GHAssertNotNil(progress.error, 
-                                     @"Result should contain error");
-                      GHAssertTrue(progress.error.errorCode == 1003,
-                                   @"Expected error code 1003");
-                  
-                      // Notify async test complete.
-                      [self notify:kGHUnitWaitStatusSuccess 
-                       forSelector:@selector(testDeleteObject)];
+                  @try {
+                      if(progress.isComplete) {
+                          // Make sure request failed with object not found
+                          GHAssertFalse(progress.wasSuccessful, 
+                                        @"Reading deleted object should have failed.");
+                          GHAssertNotNil(progress.error, 
+                                         @"Result should contain error");
+                          GHAssertTrue(progress.error.errorCode == 1003,
+                                       @"Expected error code 1003");
+                          
+                          // Notify async test complete.
+                          [self notify:kGHUnitWaitStatusSuccess 
+                           forSelector:@selector(testDeleteObject)];
+                      }
+                  }
+                  @catch (NSException *exception) {
+                      [self notify:kGHUnitWaitStatusFailure forSelector:@selector(testDeleteObject)];
+                      return NO;
                   }
                   return YES;
-                                
+                  
               }
-              withLabel:@"subTestDeleteObject2"];
+                 withLabel:@"subTestDeleteObject2"];
     
     
 }
@@ -277,11 +320,16 @@
 {
     // We have the object, now delete it
     [atmosStore deleteObject:atmosObject
-                 withCallback:^(AtmosResult *result) {
-                     [self checkResult:result];
-                     [self subTestDeleteObject2:atmosObject];
-                 } 
-                    withLabel:@"subTestDeleteObject1"];
+                withCallback:^(AtmosResult *result) {
+                    @try {
+                        [self checkResult:result];
+                        [self subTestDeleteObject2:atmosObject];
+                    }
+                    @catch (NSException *exception) {
+                        [self notify:kGHUnitWaitStatusFailure forSelector:@selector(testDeleteObject)];
+                    }
+                } 
+                   withLabel:@"subTestDeleteObject1"];
 }
 
 - (void)testDeleteObject
@@ -293,10 +341,16 @@
     obj.dataMode = kDataModeBytes;
     [atmosStore createObject:obj 
                 withCallback:^BOOL(UploadProgress *progress) {
-                    [self checkResult:progress];
-                    
-                    if(progress.isComplete) {
-                        [self subTestDeleteObject1:progress.atmosObject];
+                    @try {
+                        [self checkResult:progress];
+                        
+                        if(progress.isComplete) {
+                            [self subTestDeleteObject1:progress.atmosObject];
+                        }
+                    }
+                    @catch (NSException *exception) {
+                        [self notify:kGHUnitWaitStatusFailure forSelector:@selector(testDeleteObject)];
+                        return NO;
                     }
                     return YES;
                 } 
@@ -317,22 +371,28 @@
     atmosObject.contentType = nil;
     [atmosStore readObject:atmosObject
               withCallback:^BOOL(DownloadProgress *progress) {
-                  [self checkResult:progress];
-                  if(progress.isComplete){
-                      GHAssertNotNil(progress.atmosObject.data, 
-                                     @"Expected data to be non-Nil");
-                      GHAssertEqualStrings(@"Hello World",
-                                           [NSString stringWithUTF8String:[progress.atmosObject.data bytes]], 
-                                           @"Expected strings to match");
-                      GHAssertEqualStrings(@"text/foo", 
-                                     progress.atmosObject.contentType, 
-                                     @"Expected MIME types to match");
-                      // Notify async test complete.
-                      [self notify:kGHUnitWaitStatusSuccess 
-                       forSelector:@selector(testCreateObjectWithContent)];
+                  @try {
+                      [self checkResult:progress];
+                      if(progress.isComplete){
+                          GHAssertNotNil(progress.atmosObject.data, 
+                                         @"Expected data to be non-Nil");
+                          GHAssertEqualStrings(@"Hello World",
+                                               [NSString stringWithUTF8String:[progress.atmosObject.data bytes]], 
+                                               @"Expected strings to match");
+                          GHAssertEqualStrings(@"text/foo", 
+                                               progress.atmosObject.contentType, 
+                                               @"Expected MIME types to match");
+                      }
                   }
+                  @catch (NSException *exception) {
+                      [self notify:kGHUnitWaitStatusFailure forSelector:@selector(testCreateObjectWithContent)];
+                      return NO;
+                  }
+                  // Notify async test complete.
+                  [self notify:kGHUnitWaitStatusSuccess 
+                   forSelector:@selector(testCreateObjectWithContent)];
                   return YES;
-                
+                  
               } 
                  withLabel:@"subTestCreateObjectWithContent1"];
 }
@@ -348,12 +408,18 @@
     
     [atmosStore createObject:obj 
                 withCallback:^BOOL(UploadProgress *progress) {
-                    [self checkResult:progress];
-                    
-                    if(progress.isComplete){
-                        GHAssertNotNil(progress.atmosObject,                                  
-                                       @"Expected New ID to be non-Nil");
-                        [self subTestCreateObjectWithContent1:obj];
+                    @try {
+                        [self checkResult:progress];
+                        
+                        if(progress.isComplete){
+                            GHAssertNotNil(progress.atmosObject,                                  
+                                           @"Expected New ID to be non-Nil");
+                            [self subTestCreateObjectWithContent1:obj];
+                        }
+                    }
+                    @catch (NSException *exception) {
+                        [self notify:kGHUnitWaitStatusFailure forSelector:@selector(testCreateObjectWithContent)];
+                        return NO;
                     }
                     
                     return YES;
@@ -371,18 +437,24 @@
     
     // Read the object back and check contents.
     [atmosStore getAllSytemMetadataForId:obj.atmosId
-        withCallback:^(AtmosObjectResult *result) {
-            [self checkResult:result];
-            
-            GHAssertEquals(12, 
-            [[result.atmosObject.systemMeta objectForKey:@"size"] integerValue], 
-                           @"Size should be 12");
-            // Notify async test complete.
-            [self notify:kGHUnitWaitStatusSuccess 
-             forSelector:@selector(testGetSystemMetadata)];
-
-        } 
-           withLabel:@"subTestGetSystemMetadata1"];
+                            withCallback:^(AtmosObjectResult *result) {
+                                @try {
+                                    [self checkResult:result];
+                                    
+                                    GHAssertEquals(12, 
+                                                   [[result.atmosObject.systemMeta objectForKey:@"size"] integerValue], 
+                                                   @"Size should be 12");
+                                }
+                                @catch (NSException *exception) {
+                                    [self notify:kGHUnitWaitStatusFailure forSelector:@selector(testGetSystemMetadata)];
+                                    return;
+                                }
+                                // Notify async test complete.
+                                [self notify:kGHUnitWaitStatusSuccess 
+                                 forSelector:@selector(testGetSystemMetadata)];
+                                
+                            } 
+                               withLabel:@"subTestGetSystemMetadata1"];
 }
 
 - (void)testGetSystemMetadata
@@ -396,12 +468,18 @@
     
     [atmosStore createObject:obj 
                 withCallback:^BOOL(UploadProgress *progress) {
-                    [self checkResult:progress];
-                    
-                    if(progress.isComplete){
-                        GHAssertNotNil(progress.atmosObject,                                  
-                                       @"Expected New ID to be non-Nil");
-                        [self subTestGetSystemMetadata1:obj];
+                    @try {
+                        [self checkResult:progress];
+                        
+                        if(progress.isComplete){
+                            GHAssertNotNil(progress.atmosObject,                                  
+                                           @"Expected New ID to be non-Nil");
+                            [self subTestGetSystemMetadata1:obj];
+                        }
+                    }
+                    @catch (NSException *exception) {
+                        [self notify:kGHUnitWaitStatusFailure forSelector:@selector(testGetSystemMetadata)];
+                        return NO;
                     }
                     
                     return YES;
@@ -417,7 +495,13 @@
     // after setting time offset
     [atmosStore getListableTags:nil 
                    withCallback:^(GetListableTagsResult *tags) {
-                       [self checkResult:tags];
+                       @try {
+                           [self checkResult:tags];
+                       }
+                       @catch (NSException *exception) {
+                           [self notify:kGHUnitWaitStatusFailure forSelector:@selector(testGetServerOffset)];
+                           return;
+                       }
                        
                        // Notify async test complete.
                        [self notify:kGHUnitWaitStatusSuccess 
@@ -433,10 +517,16 @@
     [self prepare];
     
     [atmosStore getServerOffset:^(GetServerOffsetResult *result) {
-        [self checkResult:result];
-        GHTestLog(@"Server offset: %lf seconds", result.offset);
-        atmosStore.timeOffset = result.offset;
-        [self subTestGetServerOffset1];
+        @try {
+            [self checkResult:result];
+            GHTestLog(@"Server offset: %lf seconds", result.offset);
+            atmosStore.timeOffset = result.offset;
+            [self subTestGetServerOffset1];
+        }
+        @catch (NSException *exception) {
+            [self notify:kGHUnitWaitStatusFailure forSelector:@selector(testGetServerOffset)];
+            return;
+        }
     } withLabel:@"testGetServerOffset"];
     
     
@@ -449,19 +539,25 @@
     // Read the object back and check metadata
     [atmosStore getAllMetadataForId:atmosObject.atmosId 
                        withCallback:^(AtmosObjectResult *result) {
-        [self checkResult:result];
-        
-        GHAssertEqualStrings(@"newvalue", 
-                             [result.atmosObject.userRegularMeta 
-                              objectForKey:@"listable"], 
-                             @"Metadata value was not correct");
+                           @try {
+                               [self checkResult:result];
+                               GHAssertEqualStrings(@"newvalue", 
+                                                    [result.atmosObject.userRegularMeta 
+                                                     objectForKey:@"listable"], 
+                                                    @"Metadata value was not correct");
+                               
+                               GHAssertNil([result.atmosObject.userListableMeta objectForKey:@"listable"], @"metadata with name listable should not be in listable dictionary");
+                           }
+                           @catch (NSException *exception) {
+                               [self notify:kGHUnitWaitStatusFailure forSelector:@selector(testSetUserMetadata)];
+                               return;
+                           }
                            
-       GHAssertNil([result.atmosObject.userListableMeta objectForKey:@"listable"], @"metadata with name listable should not be in listable dictionary");
                            
-       // Notify async test complete.
-       [self notify:kGHUnitWaitStatusSuccess 
-        forSelector:@selector(testSetUserMetadata)];
-    } withLabel:@"subTestSetUserMetadata2"];
+                           // Notify async test complete.
+                           [self notify:kGHUnitWaitStatusSuccess 
+                            forSelector:@selector(testSetUserMetadata)];
+                       } withLabel:@"subTestSetUserMetadata2"];
     
 }
 
@@ -474,9 +570,15 @@
     atmosObject.userListableMeta = [NSMutableDictionary dictionary];
     atmosObject.userRegularMeta = [NSMutableDictionary dictionaryWithObjectsAndKeys:@"newvalue",@"listable", nil];
     [atmosStore setObjectMetadata:atmosObject withCallback:^(AtmosResult *result) {
-        [self checkResult:result];
-        
-        [self subTestSetUserMetadata2:atmosObject];
+        @try {
+            [self checkResult:result];
+            
+            [self subTestSetUserMetadata2:atmosObject];
+        }
+        @catch (NSException *exception) {
+            [self notify:kGHUnitWaitStatusFailure forSelector:@selector(testSetUserMetadata)];
+            return;
+        }
     } withLabel:@"subTestListObjects1"];
     
 }
@@ -490,11 +592,17 @@
     obj.userListableMeta = [NSMutableDictionary 
                             dictionaryWithObjectsAndKeys:@"",@"listable", nil];
     [atmosStore createObject:obj withCallback:^BOOL(UploadProgress *progress) {
-        // Check
-        [self checkResult:progress];
-        
-        if(progress.isComplete) {
-            [self subTestSetUserMetadata1:progress.atmosObject];
+        @try {
+            // Check
+            [self checkResult:progress];
+            
+            if(progress.isComplete) {
+                [self subTestSetUserMetadata1:progress.atmosObject];
+            }
+        }
+        @catch (NSException *exception) {
+            [self notify:kGHUnitWaitStatusFailure forSelector:@selector(testSetUserMetadata)];
+            return NO;
         }
         
         return YES;
@@ -510,10 +618,16 @@
 {
     // Read back the metadata and verify that key1 is gone.
     [atmosStore getAllMetadataForId:atmosObject.atmosId withCallback:^(AtmosObjectResult *result) {
-        [self checkResult:result];
-        
-        GHAssertNil([result.atmosObject.userRegularMeta objectForKey:@"key1"], @"Key1 should have been nil");
-        GHAssertEqualStrings([result.atmosObject.userRegularMeta objectForKey:@"key2"], @"value2" , @"key2 should have been value2");
+        @try {
+            [self checkResult:result];
+            
+            GHAssertNil([result.atmosObject.userRegularMeta objectForKey:@"key1"], @"Key1 should have been nil");
+            GHAssertEqualStrings([result.atmosObject.userRegularMeta objectForKey:@"key2"], @"value2" , @"key2 should have been value2");
+        }
+        @catch (NSException *exception) {
+            [self notify:kGHUnitWaitStatusFailure forSelector:@selector(testDeleteObjectMetadata)];
+            return;
+        }
         
         // Notify async test complete.
         [self notify:kGHUnitWaitStatusSuccess 
@@ -532,9 +646,15 @@
     delObj.atmosId = atmosObject.atmosId;
     delObj.requestTags = [NSMutableSet setWithObject:@"key1"];
     [atmosStore deleteObjectMetadata:delObj withCallback:^(AtmosResult *result) {
-        [self checkResult:result];
-        [self subTestDeleteObjectMetadata2:atmosObject];
-    } withLabel:@""];
+        @try {
+            [self checkResult:result];
+            [self subTestDeleteObjectMetadata2:atmosObject];
+        }
+        @catch (NSException *exception) {
+            [self notify:kGHUnitWaitStatusFailure forSelector:@selector(testDeleteObjectMetadata)];
+            return;
+        }
+    } withLabel:@"subTestDeleteObjectMetadata1"];
     [delObj release];
 }
 
@@ -548,11 +668,17 @@
                            dictionaryWithObjectsAndKeys:@"value1",@"key1", 
                            @"value2",@"key2", nil];
     [atmosStore createObject:obj withCallback:^BOOL(UploadProgress *progress) {
-        // Check
-        [self checkResult:progress];
-        
-        if(progress.isComplete) {
-            [self subTestDeleteObjectMetadata1:progress.atmosObject];
+        @try {
+            // Check
+            [self checkResult:progress];
+            
+            if(progress.isComplete) {
+                [self subTestDeleteObjectMetadata1:progress.atmosObject];
+            }
+        }
+        @catch (NSException *exception) {
+            [self notify:kGHUnitWaitStatusFailure forSelector:@selector(testDeleteObjectMetadata)];
+            return NO;
         }
         
         return YES;
@@ -560,11 +686,122 @@
     
     [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
     [obj release];
+    
+}
 
+- (void) subTestUpdateObject3:(AtmosObject*)atmosObject
+{
+    // Check results
+    GHAssertNotNil(atmosObject.data, 
+                   @"Expected data to be non-Nil");
+    GHAssertEqualStrings(@"Hello Me!",
+                         [NSString stringWithUTF8String:[atmosObject.data bytes]], 
+                         @"Expected strings to match");
+    GHAssertEqualStrings([atmosObject.userRegularMeta objectForKey:@"key1"], 
+                         @"newvalue", @"Expected key1 to be updated");
+    GHAssertEqualStrings([atmosObject.userRegularMeta objectForKey:@"key2"], 
+                         @"value2", @"Expected key2 to be unmodified");
+    
+    // Notify async test complete.
+    [self notify:kGHUnitWaitStatusSuccess 
+     forSelector:@selector(testUpdateObject)];
+}
+
+- (void) subTestUpdateObject2:(AtmosObject*)atmosObject 
+{
+    AtmosObject *obj3 = [[AtmosObject alloc] init];
+    obj3.dataMode = kDataModeBytes;
+    obj3.atmosId = atmosObject.atmosId;
+    [obj3 retain];
+    [atmosStore readObject:obj3 withCallback:^BOOL(DownloadProgress *progress) {
+        @try {
+            [self checkResult:progress];
+            if(progress.isComplete){
+                [obj3 release];
+                [self subTestUpdateObject3:progress.atmosObject];
+            }
+        }
+        @catch (NSException *exception) {
+            [self notify:kGHUnitWaitStatusFailure forSelector:@selector(testUpdateObject)];
+            return NO;
+        }
+        
+        
+        return YES;
+    } withLabel:@"subTestUpdateObject2"];
+    
+    [obj3 release];
+}
+
+- (void) subTestUpdateObject1:(AtmosObject*)atmosObject
+{
+    // Queue object for cleanup
+    [cleanup addObject:atmosObject.atmosId];
+    
+    // Update the object and change some stuff
+    AtmosObject *obj2 = [[AtmosObject alloc] init];
+    obj2.atmosId = atmosObject.atmosId;
+    obj2.dataMode = kDataModeBytes;
+    obj2.data = [NSData dataWithBytes:[@"Hello Me!" UTF8String] length:10];
+    obj2.userRegularMeta = [NSMutableDictionary 
+                            dictionaryWithObjectsAndKeys:@"newvalue",@"key1", nil];
+    [obj2 retain];
+    
+    [atmosStore updateObject:obj2 withCallback:^BOOL(UploadProgress *progress) {
+        @try {
+            [self checkResult:progress];
+            if(progress.isComplete){
+                if(progress.wasSuccessful) {
+                    [obj2 release];
+                    // Check results
+                    [self subTestUpdateObject2:progress.atmosObject];
+                }
+            } 
+        }
+        @catch (NSException *exception) {
+            [self notify:kGHUnitWaitStatusFailure forSelector:@selector(testUpdateObject)];
+            return NO;
+        }
+        return YES;
+        
+    } withLabel:@"subTestUpdateObject1"];
+    
+    [obj2 release];
 }
 
 - (void) testUpdateObject
 {
+    [self prepare];
+    
+    // Create an object with content
+    AtmosObject *obj = [[AtmosObject alloc] init];
+    obj.dataMode = kDataModeBytes;
+    obj.data = [NSData dataWithBytes:[@"Hello World" UTF8String] length:12];
+    obj.userRegularMeta = [NSMutableDictionary 
+                           dictionaryWithObjectsAndKeys:@"value1",@"key1", 
+                           @"value2",@"key2", nil];
+    
+    [atmosStore createObject:obj 
+                withCallback:^BOOL(UploadProgress *progress) {
+                    @try {
+                        [self checkResult:progress];
+                        
+                        if(progress.isComplete){
+                            GHAssertNotNil(progress.atmosObject,                                  
+                                           @"Expected New ID to be non-Nil");
+                            [self subTestUpdateObject1:progress.atmosObject];
+                        }
+                    }
+                    @catch (NSException *exception) {
+                        [self notify:kGHUnitWaitStatusFailure forSelector:@selector(testUpdateObject)];
+                        return NO;
+                    }
+                    
+                    return YES;
+                } 
+                   withLabel:@"testUpdateObject"];
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [obj release];
     
 }
 
