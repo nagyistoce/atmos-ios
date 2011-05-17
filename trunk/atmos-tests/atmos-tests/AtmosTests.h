@@ -45,5 +45,6 @@
 
 -(void) checkResult:(AtmosResult*)result;
 -(void) checkFailure;
+-(NSString*) generateFilename:(int)length includeExtension:(BOOL)includeExtension;
 
 @end
