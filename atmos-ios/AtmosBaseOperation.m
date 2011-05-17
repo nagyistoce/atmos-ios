@@ -53,7 +53,7 @@
 	
 	//NSLog(@"setupBaseURL %@ %@",self.baseUrl,
 	NSString *urlStr = [NSString stringWithFormat:@"%@%@",self.baseUrl,resource];
-	urlStr = [urlStr stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding];
+	urlStr = [urlStr stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 	//NSLog(@"urlStr %@",urlStr);
 	NSURL *url = [NSURL URLWithString:urlStr];
 	//NSLog(@"url %@",url);
