@@ -925,8 +925,108 @@
     [self checkFailure];
 }
 
+- (void) subTestUpdateObjectRange2:(AtmosObject*)atmosObject
+{
+    // Read back data
+    AtmosObject *obj2 = [[AtmosObject alloc] initWithObjectId:atmosObject.atmosId];
+    obj2.dataMode = kDataModeBytes;
+    
+    [atmosStore readObject:obj2 withCallback:^BOOL(DownloadProgress *progress) {
+        @try {
+            [self checkResult:progress];
+            if(progress.isComplete) {
+                // Check string
+                GHAssertNotNil(progress.atmosObject.data, @"Object data should be non-nil");
+                GHAssertTrue(progress.atmosObject.data.length==12, @"Data length wrong.  Expected 12 got %lu", progress.atmosObject.data.length);
+                NSString *str = [NSString stringWithCString:[progress.atmosObject.data bytes] encoding:NSUTF8StringEncoding];
+                GHAssertEqualStrings(str, @"Hello Atmos", @"String content wrong");
+                // Notify async test complete.
+                [self notify:kGHUnitWaitStatusSuccess 
+                 forSelector:@selector(testUpdateObjectRange)];
+            }
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testUpdateObjectRange)];
+            return NO;
+        }
+        
+        return YES;
+    } withLabel:@"subTestUpdateObjectRange2"];
+    
+    [obj2 release];
+    
+}
+
+- (void) subTestUpdateObjectRange1:(AtmosObject*)atmosObject
+{
+    // Enqueue object ID for cleanup
+    [cleanup addObject:atmosObject.atmosId];
+
+    // Update a section of the object
+    AtmosObject *obj2 = [[AtmosObject alloc] initWithObjectId:atmosObject.atmosId];
+    obj2.dataMode = kDataModeBytes;
+    AtmosRange *range = [[AtmosRange alloc] init];
+    range.location = 6;
+    range.length = 5;
+    obj2.data = [NSData dataWithBytes:[@"Atmos" UTF8String] length:5];
+
+    [atmosStore updateObjectRange:obj2 range:range withCallback:^BOOL(UploadProgress *progress) {
+        @try {
+            [self checkResult:progress];
+            
+            if(progress.isComplete){
+                [self subTestUpdateObjectRange2:progress.atmosObject];
+            }
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testUpdateObjectRange)];
+            return NO;
+        }
+        
+        return YES;
+    } withLabel:@"subTestUpdateObjectRange1"];
+    
+    [obj2 release];
+    [range release];
+}
+
 - (void) testUpdateObjectRange
 {
+    [self prepare];
+    
+    // Create an object with content
+    AtmosObject *obj = [[AtmosObject alloc] init];
+    obj.dataMode = kDataModeBytes;
+    obj.data = [NSData dataWithBytes:[@"Hello World" UTF8String] length:12];
+    obj.userRegularMeta = [NSMutableDictionary 
+                           dictionaryWithObjectsAndKeys:@"value1",@"key1", 
+                           @"value2",@"key2", nil];
+    
+    [atmosStore createObject:obj 
+                withCallback:^BOOL(UploadProgress *progress) {
+                    @try {
+                        [self checkResult:progress];
+                        
+                        if(progress.isComplete){
+                            GHAssertNotNil(progress.atmosObject,                                  
+                                           @"Expected New ID to be non-Nil");
+                            [self subTestUpdateObjectRange1:progress.atmosObject];
+                        }
+                    }
+                    @catch (NSException *exception) {
+                        self.failure = exception;
+                        [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testUpdateObjectRange)];
+                        return NO;
+                    }
+                    
+                    return YES;
+                } 
+                   withLabel:@"testUpdateObject"];
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [obj release];
+    [self checkFailure];
 }
 
 
