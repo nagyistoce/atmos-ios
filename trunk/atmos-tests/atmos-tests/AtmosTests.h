@@ -36,11 +36,14 @@
 @private
     AtmosStore *atmosStore;
     NSMutableArray *cleanup;
+    NSException *failure;
 }
 
 @property(retain,readwrite) AtmosStore *atmosStore;
 @property(retain,readwrite) NSMutableArray *cleanup;
+@property(retain,readwrite) NSException *failure;
 
 -(void) checkResult:(AtmosResult*)result;
+-(void) checkFailure;
 
 @end

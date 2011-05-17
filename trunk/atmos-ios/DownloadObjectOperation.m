@@ -116,7 +116,7 @@
             [progress release];
 			return;
 		} else {
-			NSString *rangeStr = [NSString stringWithFormat:@"Bytes=%d-%d",startByte,endByte];
+			NSString *rangeStr = [NSString stringWithFormat:@"Bytes=%lld-%lld",startByte,endByte];
 			[req setValue:rangeStr forHTTPHeaderField:@"Range"]; 
 		}
 	}
