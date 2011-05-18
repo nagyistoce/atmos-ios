@@ -19,7 +19,7 @@ when you install XCode.
 To build the documentation, use the headerdoc2html and gatherheaderdoc utils.
 For example, to build the documentation to the 'doc' directory:
 
-MacbookPro:atmos-ios jason$ mkdir doc
+MacBookPro:atmos-ios jason$ mkdir doc
 
 MacBookPro:atmos-ios jason$ headerdoc2html -o doc atmos-ios
 

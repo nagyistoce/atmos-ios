@@ -1445,6 +1445,223 @@ withDirectory:(NSString *)dir
     
 }
 
+- (void) subTestRenameObject2:(AtmosObject*) atmosObject
+{
+    
+    AtmosObject *obj = [[AtmosObject alloc] init];
+    obj.objectPath = atmosObject.objectPath;
+    obj.dataMode = kDataModeBytes;
 
+    // Read the object back from its new location
+    [atmosStore readObject:obj withCallback:^BOOL(DownloadProgress *progress) {
+        @try {
+            [self checkResult:progress];
+            if(progress.isComplete) {
+                GHAssertNotNil(progress.atmosObject.data, 
+                               @"Expected data to be non-Nil");
+                GHAssertEqualStrings(@"Hello World",
+                                     [NSString stringWithUTF8String:[progress.atmosObject.data bytes]], 
+                                     @"Expected strings to match");
+                GHAssertEqualStrings([progress.atmosObject.userRegularMeta valueForKey:@"key1"], @"value1", @"Value for key1 did not match");
+                GHAssertEqualStrings([progress.atmosObject.userRegularMeta valueForKey:@"key2"], @"value2", @"Value for key2 did not match");
+                
+                // Notify async test complete.
+                [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testRenameObject)];                
+            }
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testRenameObject)];
+            return NO;
+        }
+        return YES;
+    } withLabel:@"subTestRenameObject2"];
+    [obj release];
+}
+
+- (void) subTestRenameObject1:(AtmosObject*) atmosObject
+{
+    // Add the object to the cleanup queue
+    [self.cleanup addObject:atmosObject.atmosId];
+    
+    // Rename the object
+    AtmosObject *dest = [[AtmosObject alloc] init];
+    dest.objectPath = [NSString stringWithFormat:@"/%@/%@", [self generateFilename:8 includeExtension:NO], [self generateFilename:8 includeExtension:YES]];
+    [atmosStore rename:atmosObject to:dest force:NO withCallback:^(AtmosResult *result) {
+        @try {
+            [self checkResult:result];
+            
+            [self subTestRenameObject2:dest];
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testRenameObject)];
+        }
+    } withLabel:@"subTestRenameObject1"];
+    
+    [dest release];
+}
+
+- (void) testRenameObject
+{
+    [self prepare];
+    
+    // Create an object with metadata
+    NSString *dir = [NSString stringWithFormat:@"/%@/", [self generateFilename:8 includeExtension:NO]];
+    
+    AtmosObject *obj = [[AtmosObject alloc] init];
+    obj.objectPath = [NSString stringWithFormat:@"%@%@", dir, [self generateFilename:8 includeExtension:YES]];
+    obj.dataMode = kDataModeBytes;
+    obj.data = [NSData dataWithBytes:[@"Hello World" UTF8String] length:12];
+    obj.userRegularMeta = [NSMutableDictionary 
+                           dictionaryWithObjectsAndKeys:@"value1",@"key1", 
+                           @"value2",@"key2", nil];
+    
+    [atmosStore createObject:obj 
+                withCallback:^BOOL(UploadProgress *progress) {
+                    @try {
+                        [self checkResult:progress];
+                        
+                        if(progress.isComplete){
+                            GHAssertNotNil(progress.atmosObject,                                  
+                                           @"Expected New ID to be non-Nil");
+                            [self subTestRenameObject1:progress.atmosObject];
+                        }
+                    }
+                    @catch (NSException *exception) {
+                        self.failure = exception;
+                        [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testRenameObject)];
+                        return NO;
+                    }
+                    
+                    return YES;
+                } 
+                   withLabel:@"testRenameObject"];
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [obj release];
+    [self checkFailure];
+
+}
+
+- (void) subTestRenameObjectForce3:(AtmosObject*)obj2
+{
+    // Read the object back and make sure we have obj1's content
+    AtmosObject *obj3 = [[AtmosObject alloc] init];
+    obj3.objectPath = obj2.objectPath;
+    obj3.dataMode = kDataModeBytes;
+    [atmosStore readObject:obj3 withCallback:^BOOL(DownloadProgress *progress) {
+        @try {
+            [self checkResult:progress];
+            if(progress.isComplete) {
+                GHAssertNotNil(progress.atmosObject.data, 
+                               @"Expected data to be non-Nil");
+                GHAssertEqualStrings(@"Hello World",
+                                     [NSString stringWithUTF8String:[progress.atmosObject.data bytes]], 
+                                     @"Expected strings to match");
+                // Notify async test complete
+                [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testRenameObjectForce)];
+            }
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testRenameObjectForce)];
+            return NO;
+        }
+        return YES;
+    } withLabel:@"subTestRenameObjectForce3"];
+    
+    [obj3 release];
+}
+
+- (void) subTestRenameObjectForce2:(AtmosObject*)obj1 overwrite:(AtmosObject*)obj2
+{
+    [cleanup addObject:obj2.atmosId];
+    
+    // Perform the overwrite
+    [atmosStore rename:obj1 to:obj2 force:YES withCallback:^(AtmosResult *result) {
+        @try {
+            [self checkResult:result];
+            
+            //
+            // Pause 5 seconds.  Overwrites are not synchronous!
+            //
+            sleep(5);
+            
+            [self subTestRenameObjectForce3:obj2];
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testRenameObjectForce)];
+        }
+    } withLabel:@"subTestRenameObjectForce2"];
+}
+
+- (void) subTestRenameObjectForce1:(AtmosObject*)obj1
+{
+    [cleanup addObject:obj1.atmosId];
+    
+    // Create another object.  This one will be overwritten.
+    AtmosObject *obj2 = [[AtmosObject alloc] init];
+    obj2.objectPath = [NSString stringWithFormat:@"/%@/%@", [self generateFilename:8 includeExtension:NO], [self generateFilename:8 includeExtension:YES]];
+    obj2.dataMode = kDataModeBytes;
+    obj2.data = [NSData dataWithBytes:[@"Something Else" UTF8String] length:12];
+    [atmosStore createObject:obj2 
+                withCallback:^BOOL(UploadProgress *progress) {
+                    @try {
+                        [self checkResult:progress];
+                        
+                        if(progress.isComplete){
+                            GHAssertNotNil(progress.atmosObject,                                  
+                                           @"Expected New ID to be non-Nil");
+                            [self subTestRenameObjectForce2:obj1 overwrite:obj2];
+                        }
+                    }
+                    @catch (NSException *exception) {
+                        self.failure = exception;
+                        [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testRenameObjectForce)];
+                        return NO;
+                    }
+                    
+                    return YES;
+                } 
+                   withLabel:@"subTestRenameObjectForce1"];
+    [obj2 release];
+    
+}
+
+- (void) testRenameObjectForce
+{
+    [self prepare];
+    
+    // Create an object with metadata
+    AtmosObject *obj = [[AtmosObject alloc] init];
+    obj.objectPath = [NSString stringWithFormat:@"/%@/%@", [self generateFilename:8 includeExtension:NO], [self generateFilename:8 includeExtension:YES]];
+    obj.dataMode = kDataModeBytes;
+    obj.data = [NSData dataWithBytes:[@"Hello World" UTF8String] length:12];
+    [atmosStore createObject:obj 
+                withCallback:^BOOL(UploadProgress *progress) {
+                    @try {
+                        [self checkResult:progress];
+                        
+                        if(progress.isComplete){
+                            GHAssertNotNil(progress.atmosObject,                                  
+                                           @"Expected New ID to be non-Nil");
+                            [self subTestRenameObjectForce1:progress.atmosObject];
+                        }
+                    }
+                    @catch (NSException *exception) {
+                        self.failure = exception;
+                        [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testRenameObjectForce)];
+                        return NO;
+                    }
+                    
+                    return YES;
+                } 
+                   withLabel:@"testRenameObjectForce"];
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [obj release];
+    [self checkFailure];
+    
+}
 
 @end

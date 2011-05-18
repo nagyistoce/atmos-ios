@@ -75,19 +75,17 @@
          withCallback:(BOOL(^)(UploadProgress *progress))callback 
             withLabel:(NSString *)requestLabel;
 
-/*
- Updates the content of the specified AtmosObject in the cloud. 
- Either the object path or Atmos object id must be specified
- The local filepath which represents the new content to be updated must be specified
- Any metadata to be updated can be included in the AtmosObject structure.  
- 
-*/
+/*!
+ * Updates the content of the specified AtmosObject in the cloud.
+ */
 - (void) updateObject:(AtmosObject *) atmosObj          
          withCallback:(BOOL(^)(UploadProgress *progress))callback 
             withLabel:(NSString *)requestLabel;
 
-/*
- Same as above except this updates a specified range of the cloud object from the same range in the local file
+/*!
+ * Same as updateObject except this updates a specified range of the cloud 
+ * object from the same range in the local file or with the contents of 
+ * the AtmosObject's data buffer.
  */
 - (void) updateObjectRange:(AtmosObject *)atmosObj 
                      range:(AtmosRange *)objRange          
@@ -95,22 +93,41 @@
                  withLabel:(NSString *)requestLabel;
 
 #pragma mark GetObject 
-/*
- Gets / downloads object from atmos to the local path provided.
- AtmosObject
- caller must specify objectid or objectpath
- The returned object contains all the metadat of the object
- 
+/*!
+ * Reads / downloads object from Atmos
+ * @discussion if the AtmosObject's dataMode property is set to kDataModeBytes,
+ * the object's content will be stored in the object's data property.  If the
+ * dataMode property is set to kDataModeFile, the contents of the object will
+ * be written to the local path provided.
  */
 - (void) readObject:(AtmosObject *) atmosObj 
        withCallback:(BOOL(^)(DownloadProgress *progress))callback 
           withLabel:(NSString *)requestLabel;
 
+/*!
+ * Reads / Downloads an object from Atmos
+ * @discussion Same as readObject, except that only the specified range of the
+ * object is downloaded. Useful for downloading a large object in chunks so
+ * you can read in parallel and/or implement resume logic on chunk boundaries.
+ *
+ * If using kDataModeFile, you might be more interested in 
+ * readObjectRange:range:fileOffset:withCallback:withLabel 
+ */
 - (void) readObjectRange:(AtmosObject *)atmosObj 
                    range:(AtmosRange *)objRange 
             withCallback:(BOOL(^)(DownloadProgress *progress))callback 
                withLabel:(NSString *)requestLabel;
 
+/*!
+ * Reads / Downloads an object from Atmos
+ * @discussion Same as readObject, except that only the specified range of the
+ * object is downloaded. Useful for downloading a large object in chunks so
+ * you can read in parallel and/or implement resume logic on chunk boundaries.
+ * The file will be opened and seeked to fOffset.
+ *
+ * If using kDataModeBytes, you might be more interested in 
+ * readObjectRange:range:withCallback:withLabel 
+ */
 - (void) readObjectRange:(AtmosObject *)atmosObj 
                    range:(AtmosRange *)objRange 
               fileOffset:(long long) fOffset 
@@ -118,11 +135,25 @@
                withLabel:(NSString *)requestLabel;
 
 #pragma mark DeleteObject
+/*!
+ * Deletes an object from Atmos.
+ */
 - (void) deleteObject:(AtmosObject *) atmosObj 
          withCallback:(void(^)(AtmosResult *result))callback
             withLabel:(NSString *)requestLabel;
 
-#pragma mark GetDirectoryContents
+#pragma mark ListDirectory
+/*!
+ * Lists the contents of a directory
+ * @param directory the directory to list.  The objectPath property must be set
+ * on the object.
+ * @param emcToken when listing a large directory, check the 
+ * ListDirectoryResult's token field. If the value is non-nil, call the method
+ * until the value is nil and concatenate the results of each call.
+ * @param limit the maximum number of results to return. Set to 0 to request
+ * all results. Note that Atmos may enforce a limit (generally 5000) even if 
+ * this is set to zero.
+ */
 - (void) listDirectory:(AtmosObject *) directory 
              withToken:(NSString *) emcToken 
              withLimit:(NSInteger) limit 
@@ -229,7 +260,14 @@
 - (void) getServerOffset:(void(^)(GetServerOffsetResult *result))callback
                withLabel:(NSString *)requestLabel;
 
+#pragma mark RenameObject
+- (void) rename:(AtmosObject*) source 
+             to:(AtmosObject*) destination 
+          force:(BOOL) force
+   withCallback:(void(^)(AtmosResult *result)) callback
+      withLabel:(NSString*) requestLabel;
 
+#pragma mark Properties
 @property (nonatomic,retain) AtmosCredentials *atmosCredentials;
 @property (nonatomic,retain) NSMutableSet *currentOperations;
 @property (nonatomic,retain) NSMutableArray *pendingOperations;
