@@ -40,6 +40,7 @@
 #import "ListDirectoryOperation.h"
 #import "DeleteMetadataOperation.h"
 #import "GetServerOffsetOperation.h"
+#import "RenameObjectOperation.h"
 
 @interface AtmosStore (Private)
 
@@ -564,10 +565,32 @@
 	oper.atmosStore = self;
 	oper.atmosCredentials = self.atmosCredentials;
 	oper.callback = callback;
+    oper.operationLabel = requestLabel;
     
     [self scheduleOperation:oper];
     [oper release];
 }
+
+#pragma mark RenameObject
+- (void) rename:(AtmosObject*) source 
+             to:(AtmosObject*) destination
+          force:(BOOL) force
+   withCallback:(void(^)(AtmosResult *result)) callback
+      withLabel:(NSString*) requestLabel {
+    RenameObjectOperation *oper = [[RenameObjectOperation alloc] init];
+    
+    oper.atmosStore = self;
+    oper.atmosCredentials = self.atmosCredentials;
+    oper.callback = callback;
+    oper.source = source;
+    oper.destination = destination;
+    oper.force = force;
+    oper.operationLabel = requestLabel;
+          
+    [self scheduleOperation:oper];
+    [oper release];
+}
+
 
 #pragma mark MemoryManagement
 

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		750DA83513844B530078D0CC /* RenameObjectOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 750DA83313844B530078D0CC /* RenameObjectOperation.h */; };
+		750DA83613844B530078D0CC /* RenameObjectOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 750DA83413844B530078D0CC /* RenameObjectOperation.m */; };
 		75B4BEDD137B304100449FCC /* AtmosObjectResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 75B4BEDB137B304100449FCC /* AtmosObjectResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		75B4BEDE137B304100449FCC /* AtmosObjectResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 75B4BEDC137B304100449FCC /* AtmosObjectResult.m */; };
 		96213BDB1379C65300DA6CC6 /* GetServerOffsetOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 96213BD91379C65300DA6CC6 /* GetServerOffsetOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -61,6 +63,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		750DA83313844B530078D0CC /* RenameObjectOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RenameObjectOperation.h; sourceTree = "<group>"; };
+		750DA83413844B530078D0CC /* RenameObjectOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RenameObjectOperation.m; sourceTree = "<group>"; };
 		75B4BEDB137B304100449FCC /* AtmosObjectResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AtmosObjectResult.h; sourceTree = "<group>"; };
 		75B4BEDC137B304100449FCC /* AtmosObjectResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AtmosObjectResult.m; sourceTree = "<group>"; };
 		96213BD91379C65300DA6CC6 /* GetServerOffsetOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetServerOffsetOperation.h; sourceTree = "<group>"; };
@@ -213,6 +217,8 @@
 				96213BDA1379C65300DA6CC6 /* GetServerOffsetOperation.m */,
 				96213BDE1379C6B900DA6CC6 /* GetServerOffsetResult.h */,
 				96213BDF1379C6B900DA6CC6 /* GetServerOffsetResult.m */,
+				750DA83313844B530078D0CC /* RenameObjectOperation.h */,
+				750DA83413844B530078D0CC /* RenameObjectOperation.m */,
 			);
 			path = "atmos-ios";
 			sourceTree = "<group>";
@@ -257,6 +263,7 @@
 				96213BE01379C6B900DA6CC6 /* GetServerOffsetResult.h in Headers */,
 				75B4BEDD137B304100449FCC /* AtmosObjectResult.h in Headers */,
 				969903E913788D5A0063DE0F /* ListDirectoryResult.h in Headers */,
+				750DA83513844B530078D0CC /* RenameObjectOperation.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -332,6 +339,7 @@
 				96213BDC1379C65300DA6CC6 /* GetServerOffsetOperation.m in Sources */,
 				96213BE11379C6B900DA6CC6 /* GetServerOffsetResult.m in Sources */,
 				75B4BEDE137B304100449FCC /* AtmosObjectResult.m in Sources */,
+				750DA83613844B530078D0CC /* RenameObjectOperation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

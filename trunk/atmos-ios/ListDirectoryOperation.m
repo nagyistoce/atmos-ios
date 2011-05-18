@@ -179,10 +179,23 @@
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)con
 {
-	NSString *str = [[NSString alloc] initWithData:self.webData encoding:NSASCIIStringEncoding];
-	NSLog(@"connectionFinishedLoading %@",str);
-    [str release];
-	[self parseXMLData];
+	if([self.httpResponse statusCode] >= 400) {
+		NSString *errStr = [[NSString alloc] initWithData:self.webData encoding:NSASCIIStringEncoding];
+		AtmosError *aerr = [self extractAtmosError:errStr];
+        ListDirectoryResult *result = [[ListDirectoryResult alloc]init];
+        result.wasSuccessful = NO;
+        result.error = aerr;
+        
+        self->callback(result);
+        
+        [result release];
+        [errStr release];
+	} else {
+        NSString *str = [[NSString alloc] initWithData:self.webData encoding:NSASCIIStringEncoding];
+        NSLog(@"connectionFinishedLoading %@",str);
+        [str release];
+        [self parseXMLData];
+    }
 }
 
 #pragma mark NSXMLParser delegate

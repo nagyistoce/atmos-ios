@@ -120,10 +120,25 @@
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)con
 {
-	NSString *str = [[NSString alloc] initWithData:self.webData encoding:NSASCIIStringEncoding];
-	NSLog(@"connectionFinishedLoading %@",str);
-    [str release];
-	[self parseXMLData];
+	if([self.httpResponse statusCode] >= 400) {
+		NSString *errStr = [[NSString alloc] initWithData:self.webData encoding:NSASCIIStringEncoding];
+		AtmosError *aerr = [self extractAtmosError:errStr];
+        ListObjectsResult *res = [[ListObjectsResult alloc]init];
+        res.wasSuccessful = NO;
+        res.error = aerr;
+        
+        self->callback(res);
+        
+        [res release];
+        [errStr release];
+	} else {
+        // Check for token
+        self.result.token = [self.httpResponse.allHeaderFields valueForKey:@"x-emc-token"];
+        NSString *str = [[NSString alloc] initWithData:self.webData encoding:NSASCIIStringEncoding];
+        NSLog(@"connectionFinishedLoading %@",str);
+        [str release];
+        [self parseXMLData];
+    }
 }
 	
 #pragma mark NSXMLParser delegate
