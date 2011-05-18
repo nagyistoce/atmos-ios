@@ -54,8 +54,16 @@
 	//NSLog(@"setupBaseURL %@ %@",self.baseUrl,
 	NSString *urlStr = [NSString stringWithFormat:@"%@%@",self.baseUrl,resource];
 	urlStr = [urlStr stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    if(!urlStr) {
+        [NSException raise:@"Illegal Argument" format:@"Could not escape URL: %@%@", self.baseUrl, resource];
+    }
 	//NSLog(@"urlStr %@",urlStr);
 	NSURL *url = [NSURL URLWithString:urlStr];
+    
+    if(!url) {
+        [NSException raise:@"URL Parse Error" format:@"Could not parse URL: %@", urlStr];
+    }
+    
 	//NSLog(@"url %@",url);
 	NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:url];
 	

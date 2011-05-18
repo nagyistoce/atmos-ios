@@ -158,15 +158,15 @@ static NSSet *systemMetaNames = nil;
 
 - (BOOL) isEqual:(id)object 
 {
-    return ((AtmosObject*)object).atmosId == self.atmosId || ((AtmosObject*)object).objectPath == self.objectPath;
+    return [((AtmosObject*)object).atmosId isEqualToString:self.atmosId] || [((AtmosObject*)object).objectPath isEqualToString:self.objectPath];
 }
 
 - (NSUInteger) hash
 {
-    if( self.atmosId ){
-        return self.atmosId.hash;
-    } else if( self.objectPath.hash ) {
+    if( self.objectPath ) {
         return self.objectPath.hash;
+    } else if( self.atmosId ){
+        return self.atmosId.hash;
     } else {
         return 0;
     }
