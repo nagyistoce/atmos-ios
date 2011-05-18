@@ -286,7 +286,7 @@
 } 
 
 #pragma mark GetDirectoryContents
-- (void) getDirectoryContents:(AtmosObject *) directory 
+- (void) listDirectory:(AtmosObject *) directory 
                     withToken:(NSString *) emcToken 
                     withLimit:(NSInteger) limit 
                  withCallback:(void(^)(ListDirectoryResult *result))callback
@@ -303,6 +303,38 @@
 	[self scheduleOperation:oper];
 }
 
+- (void) listDirectoryWithAllMetadata:(AtmosObject *) directory 
+                            withToken:(NSString *) emcToken 
+                            withLimit:(NSInteger) limit 
+                         withCallback:(void(^)(ListDirectoryResult *result))callback
+                            withLabel:(NSString *)requestLabel 
+{
+    [self listDirectoryWithMetadata:directory systemMetadata:nil userMetadata:nil withToken:emcToken withLimit:limit withCallback:callback withLabel:requestLabel];
+}
+
+- (void) listDirectoryWithMetadata:(AtmosObject *) directory 
+                    systemMetadata:(NSArray *) sdata 
+                      userMetadata:(NSArray *) udata 
+                         withToken:(NSString *) emcToken 
+                         withLimit:(NSInteger) limit
+                      withCallback:(void(^)(ListDirectoryResult *result))callback
+                         withLabel:(NSString *)requestLabel
+{
+    ListDirectoryOperation *oper = [[ListDirectoryOperation alloc] init];
+	oper.atmosCredentials = self.atmosCredentials;
+	oper.callback = callback;
+	oper.atmosStore = self;
+	oper.operationLabel = requestLabel;
+	oper.atmosObj = directory;
+	oper.emcToken = emcToken;
+	oper.emcLimit = limit;
+    oper.includeMetadata = YES;
+    oper.includeUserTags = udata;
+    oper.includeSystemTags = sdata;
+	
+	[self scheduleOperation:oper];
+
+}
 
 #pragma mark ListObjects
 //gets all objects tagged with a specific tag. only object ids are returned

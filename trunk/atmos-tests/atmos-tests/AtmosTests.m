@@ -51,9 +51,9 @@ char innerChars[] = FN_CHARS " "; // No leading or trailing spaces
     
     for(int i=0; i<length; i++) {
         if(i == 0 || i == (length-1)) {
-            [fname appendFormat:@"%c", outerChars[rand()%strlen(outerChars)]];
+            [fname appendFormat:@"%c", outerChars[random()%strlen(outerChars)]];
         } else {
-            [fname appendFormat:@"%c", innerChars[rand()%strlen(innerChars)]];
+            [fname appendFormat:@"%c", innerChars[random()%strlen(innerChars)]];
         }
     }
     
@@ -109,6 +109,9 @@ char innerChars[] = FN_CHARS " "; // No leading or trailing spaces
     cleanup = [[NSMutableArray alloc] init];
     
     failure = nil;
+    
+    // Seed the random number generator for creating filenames
+    srandomdev();
 }
 
 - (void)tearDown
@@ -129,6 +132,7 @@ char innerChars[] = FN_CHARS " "; // No leading or trailing spaces
     
     [cleanup release];
     [atmosStore release];
+    failure = nil;
     
 }
 
@@ -1284,6 +1288,157 @@ char innerChars[] = FN_CHARS " "; // No leading or trailing spaces
                     return YES;
                 } 
                    withLabel:@"testDeleteObjectOnPath"];
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [obj release];
+    [self checkFailure];
+    
+}
+
+- (void) subTestListDirectoryWithMetadata1:(AtmosObject*)atmosObject
+withDirectory:(NSString *)dir
+{
+    // Queue object for cleanup
+    [cleanup addObject:atmosObject.atmosId];
+    
+    // Read back the directory
+    AtmosObject *dirObj = [[AtmosObject alloc] init];
+    dirObj.objectPath = dir;
+    
+    [atmosStore listDirectoryWithAllMetadata:dirObj withToken:nil withLimit:0 withCallback:^(ListDirectoryResult *result) {
+        @try {
+            NSLog(@"listDirectoryWithAllMetadata callback");
+            [self checkResult:result];
+            
+            // Find our object
+            NSUInteger entIndex = [result.objects indexOfObject:atmosObject];
+            GHAssertFalse(entIndex == NSNotFound, @"Object %@ not found in directory %@", atmosObject.objectPath,
+                              dir);
+            AtmosObject *dirEnt = [result.objects objectAtIndex:entIndex];
+            GHAssertNotNil(dirEnt, @"Directory entry nil for index %@", entIndex);
+            GHAssertTrue([[dirEnt.systemMeta valueForKey:@"size"] integerValue] == 12, @"Size metadata did not match");
+            GHAssertEqualStrings([dirEnt.userRegularMeta valueForKey:@"key1"], @"value1", @"Value for key1 did not match");
+            GHAssertEqualStrings([dirEnt.userRegularMeta valueForKey:@"key2"], @"value2", @"Value for key2 did not match");
+                                
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testListDirectoryWithMetadata)];
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testListDirectoryWithMetadata)];
+        }
+    } withLabel:@"subTestListDirectoryWithMetadata1"];
+    [dirObj release];
+}
+
+- (void) testListDirectoryWithMetadata
+{
+    [self prepare];
+    
+    // Create an object with metadata
+    NSString *dir = [NSString stringWithFormat:@"/%@/", [self generateFilename:8 includeExtension:NO]];
+    
+    AtmosObject *obj = [[AtmosObject alloc] init];
+    obj.objectPath = [NSString stringWithFormat:@"%@%@", dir, [self generateFilename:8 includeExtension:YES]];
+    obj.dataMode = kDataModeBytes;
+    obj.data = [NSData dataWithBytes:[@"Hello World" UTF8String] length:12];
+    obj.userRegularMeta = [NSMutableDictionary 
+                           dictionaryWithObjectsAndKeys:@"value1",@"key1", 
+                           @"value2",@"key2", nil];
+    
+    [atmosStore createObject:obj 
+                withCallback:^BOOL(UploadProgress *progress) {
+                    @try {
+                        [self checkResult:progress];
+                        
+                        if(progress.isComplete){
+                            GHAssertNotNil(progress.atmosObject,                                  
+                                           @"Expected New ID to be non-Nil");
+                            [self subTestListDirectoryWithMetadata1:progress.atmosObject withDirectory:dir];
+                        }
+                    }
+                    @catch (NSException *exception) {
+                        self.failure = exception;
+                        [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testListDirectoryWithMetadata)];
+                        return NO;
+                    }
+                    
+                    return YES;
+                } 
+                   withLabel:@"testListDirectoryWithMetadata"];
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [obj release];
+    [self checkFailure];
+    
+}
+
+- (void) subTestListDirectoryWithSomeMetadata1:(AtmosObject*)atmosObject
+                             withDirectory:(NSString *)dir
+{
+    // Queue object for cleanup
+    [cleanup addObject:atmosObject.atmosId];
+    
+    // Read back the directory
+    AtmosObject *dirObj = [[AtmosObject alloc] init];
+    dirObj.objectPath = dir;
+    
+    [atmosStore listDirectoryWithMetadata:dirObj systemMetadata:nil userMetadata:[NSArray arrayWithObject:@"key1"] withToken:nil withLimit:0 withCallback:^(ListDirectoryResult *result) {
+        @try {
+            [self checkResult:result];
+            
+            // Find our object
+            NSUInteger entIndex = [result.objects indexOfObject:atmosObject];
+            GHAssertFalse(entIndex == NSNotFound, @"Object %@ not found in directory %@", atmosObject.objectPath,
+                          dir);
+            AtmosObject *dirEnt = [result.objects objectAtIndex:entIndex];
+            GHAssertNotNil(dirEnt, @"Directory entry nil for index %@", entIndex);
+            GHAssertNil([dirEnt.systemMeta valueForKey:@"size"], @"Size should not have been set");
+            GHAssertEqualStrings([dirEnt.userRegularMeta valueForKey:@"key1"], @"value1", @"Value for key1 did not match");
+            GHAssertNil([dirEnt.userRegularMeta valueForKey:@"key2"], @"key2 should not be set");
+            
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testListDirectoryWithSomeMetadata)];
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testListDirectoryWithSomeMetadata)];
+        }
+    } withLabel:@"subTestListDirectoryWithSomeMetadata1"];
+    [dirObj release];
+}
+
+- (void) testListDirectoryWithSomeMetadata
+{
+    [self prepare];
+    
+    // Create an object with metadata
+    NSString *dir = [NSString stringWithFormat:@"/%@/", [self generateFilename:8 includeExtension:NO]];
+    
+    AtmosObject *obj = [[AtmosObject alloc] init];
+    obj.objectPath = [NSString stringWithFormat:@"%@%@", dir, [self generateFilename:8 includeExtension:YES]];
+    obj.dataMode = kDataModeBytes;
+    obj.data = [NSData dataWithBytes:[@"Hello World" UTF8String] length:12];
+    obj.userRegularMeta = [NSMutableDictionary 
+                           dictionaryWithObjectsAndKeys:@"value1",@"key1", 
+                           @"value2",@"key2", nil];
+    
+    [atmosStore createObject:obj 
+                withCallback:^BOOL(UploadProgress *progress) {
+                    @try {
+                        [self checkResult:progress];
+                        
+                        if(progress.isComplete){
+                            GHAssertNotNil(progress.atmosObject,                                  
+                                           @"Expected New ID to be non-Nil");
+                            [self subTestListDirectoryWithSomeMetadata1:progress.atmosObject withDirectory:dir];
+                        }
+                    }
+                    @catch (NSException *exception) {
+                        self.failure = exception;
+                        [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testListDirectoryWithSomeMetadata)];
+                        return NO;
+                    }
+                    
+                    return YES;
+                } 
+                   withLabel:@"testListDirectoryWithSomeMetadata"];
     [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
     [obj release];
     [self checkFailure];

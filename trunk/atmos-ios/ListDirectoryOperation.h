@@ -46,7 +46,14 @@
 	NSString *emcToken;
 	NSInteger emcLimit;
     void(^callback)(ListDirectoryResult *result);
-
+    BOOL includeMetadata;
+    NSArray *includeUserTags;
+    NSArray *includeSystemTags;
+    NSMutableDictionary *currentMetadata;
+    NSMutableDictionary *currentListableMetadata;
+    NSString *currentMetaName;
+    NSString *currentMetaValue;
+    BOOL currentMetaListable;
 }
 
 @property (nonatomic,retain) AtmosObject *atmosObj;
@@ -57,5 +64,13 @@
 @property (nonatomic,retain) NSString *currentElement;
 @property (nonatomic,retain) AtmosObject *currentObject;
 @property (nonatomic,copy) void(^callback)(ListDirectoryResult *result);
+@property (nonatomic,assign) BOOL includeMetadata;
+@property (nonatomic,retain) NSArray *includeUserTags;
+@property (nonatomic,retain) NSArray *includeSystemTags;
+@property (nonatomic,retain) NSMutableDictionary *currentMetadata;
+@property (nonatomic,retain) NSMutableDictionary *currentListableMetadata;
+@property (nonatomic,retain) NSString *currentMetaName;
+@property (nonatomic,retain) NSString *currentMetaValue;
+@property (nonatomic,assign) BOOL currentMetaListable;
 
 @end

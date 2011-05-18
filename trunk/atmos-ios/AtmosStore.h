@@ -123,11 +123,25 @@
             withLabel:(NSString *)requestLabel;
 
 #pragma mark GetDirectoryContents
-- (void) getDirectoryContents:(AtmosObject *) directory 
-                    withToken:(NSString *) emcToken 
-                    withLimit:(NSInteger) limit 
-                 withCallback:(void(^)(ListDirectoryResult *result))callback
-                    withLabel:(NSString *)requestLabel;
+- (void) listDirectory:(AtmosObject *) directory 
+             withToken:(NSString *) emcToken 
+             withLimit:(NSInteger) limit 
+          withCallback:(void(^)(ListDirectoryResult *result))callback
+             withLabel:(NSString *)requestLabel;
+
+- (void) listDirectoryWithAllMetadata:(AtmosObject *) directory 
+                            withToken:(NSString *) emcToken 
+                            withLimit:(NSInteger) limit 
+                         withCallback:(void(^)(ListDirectoryResult *result))callback
+                            withLabel:(NSString *)requestLabel;
+
+- (void) listDirectoryWithMetadata:(AtmosObject *) directory 
+                    systemMetadata:(NSArray *) sdata 
+                      userMetadata:(NSArray *) udata 
+                         withToken:(NSString *) emcToken 
+                         withLimit:(NSInteger) limit
+                      withCallback:(void(^)(ListDirectoryResult *result))callback
+                         withLabel:(NSString *)requestLabel;
 
 #pragma mark GetListableTags 
 //get listable tags asynchronously
