@@ -39,6 +39,7 @@
 #import "AtmosObjectResult.h"
 #import "ListDirectoryResult.h"
 #import "GetServerOffsetResult.h"
+#import "ServiceInformation.h"
 
 #define ATMOS_DEFAULT_BUF_SIZE 4194304 //4MB is the buffer Atmos uses on the server
 
@@ -181,17 +182,40 @@
             withLabel:(NSString *)requestLabel ;
 
 #pragma mark GetTaggedObjects
-/*
- Methods to get tagged objects - object ids and object metadata - all or selected.
- x-emc-limit header not yet implemented
-*/
-//gets all objects tagged with a specific tag. only object ids are returned
-- (void) listObjects:(NSString *) tag 
+
+/*!
+ * @abstract List objects tagged with a listable tag.
+ * @param tag the listable tag to search for
+ * @param token if the previous result had a non-nil token,
+ * pass it here to retrieve more results. Continue until the
+ * token is nil to ensure you get all results.
+ * @param limit the maximum number of results to return. Set
+ * to zero to retrieve the server maximum (generally 5000).
+ * @param callback callback function to invoke when operation
+ * is complete.
+ * @param requestLabel the label to tag the request with.
+ */
+- (void) listObjects:(NSString *) tag
+           withToken:(NSString *) token
+           withLimit:(NSInteger) limit
         withCallback:(void(^)(ListObjectsResult *result))callback
            withLabel:(NSString *) requestLabel;
 
+
+/*!
+ * @deprecated use the versions withToken and withLimit to 
+ * ensure that you get all of the results in the list.  Atmos
+ * will only return about 5000 results before it requires
+ * iteration with a token.
+ */
+- (void) listObjects:(NSString *) tag
+        withCallback:(void(^)(ListObjectsResult *result))callback
+           withLabel:(NSString *) requestLabel __attribute__((deprecated));
+
 //gets all tagged objects and all metadata for each object
 - (void) listObjectsWithAllMetadata:(NSString *) tag 
+                          withToken:(NSString *) token
+                          withLimit:(NSInteger) limit
                        withCallback:(void(^)(ListObjectsResult *result))callback
                           withLabel:(NSString *) requestLabel;
 
@@ -199,6 +223,8 @@
 - (void) listObjectsWithMetadata:(NSString *) tag 
                   systemMetadata:(NSArray *) sdata 
                     userMetadata:(NSArray *) udata 
+                       withToken:(NSString *) token
+                       withLimit:(NSInteger) limit
                     withCallback:(void(^)(ListObjectsResult *result))callback
                        withLabel:(NSString *) requestLabel;
 
@@ -266,6 +292,11 @@
           force:(BOOL) force
    withCallback:(void(^)(AtmosResult *result)) callback
       withLabel:(NSString*) requestLabel;
+
+#pragma mark GetServiceInformation
+- (void) getServiceInformation:(void(^)(ServiceInformation *result)) callback
+                     withLabel:(NSString*) requestLabel;
+
 
 #pragma mark Properties
 @property (nonatomic,retain) AtmosCredentials *atmosCredentials;

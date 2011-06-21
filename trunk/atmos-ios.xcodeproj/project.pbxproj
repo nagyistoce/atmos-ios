@@ -7,10 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		750DA83513844B530078D0CC /* RenameObjectOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 750DA83313844B530078D0CC /* RenameObjectOperation.h */; };
+		750DA83513844B530078D0CC /* RenameObjectOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 750DA83313844B530078D0CC /* RenameObjectOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		750DA83613844B530078D0CC /* RenameObjectOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 750DA83413844B530078D0CC /* RenameObjectOperation.m */; };
 		75B4BEDD137B304100449FCC /* AtmosObjectResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 75B4BEDB137B304100449FCC /* AtmosObjectResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		75B4BEDE137B304100449FCC /* AtmosObjectResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 75B4BEDC137B304100449FCC /* AtmosObjectResult.m */; };
+		75F16D5E13B1098C004A96A3 /* ServiceInformation.h in Headers */ = {isa = PBXBuildFile; fileRef = 75F16D5C13B1098C004A96A3 /* ServiceInformation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		75F16D5F13B1098C004A96A3 /* ServiceInformation.m in Sources */ = {isa = PBXBuildFile; fileRef = 75F16D5D13B1098C004A96A3 /* ServiceInformation.m */; };
+		75F16D6313B130A8004A96A3 /* GetServiceInformationOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 75F16D6113B130A8004A96A3 /* GetServiceInformationOperation.h */; };
+		75F16D6413B130A8004A96A3 /* GetServiceInformationOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 75F16D6213B130A8004A96A3 /* GetServiceInformationOperation.m */; };
 		96213BDB1379C65300DA6CC6 /* GetServerOffsetOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 96213BD91379C65300DA6CC6 /* GetServerOffsetOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96213BDC1379C65300DA6CC6 /* GetServerOffsetOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 96213BDA1379C65300DA6CC6 /* GetServerOffsetOperation.m */; };
 		96213BE01379C6B900DA6CC6 /* GetServerOffsetResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 96213BDE1379C6B900DA6CC6 /* GetServerOffsetResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -67,6 +71,10 @@
 		750DA83413844B530078D0CC /* RenameObjectOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RenameObjectOperation.m; sourceTree = "<group>"; };
 		75B4BEDB137B304100449FCC /* AtmosObjectResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AtmosObjectResult.h; sourceTree = "<group>"; };
 		75B4BEDC137B304100449FCC /* AtmosObjectResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AtmosObjectResult.m; sourceTree = "<group>"; };
+		75F16D5C13B1098C004A96A3 /* ServiceInformation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServiceInformation.h; sourceTree = "<group>"; };
+		75F16D5D13B1098C004A96A3 /* ServiceInformation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServiceInformation.m; sourceTree = "<group>"; };
+		75F16D6113B130A8004A96A3 /* GetServiceInformationOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetServiceInformationOperation.h; sourceTree = "<group>"; };
+		75F16D6213B130A8004A96A3 /* GetServiceInformationOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetServiceInformationOperation.m; sourceTree = "<group>"; };
 		96213BD91379C65300DA6CC6 /* GetServerOffsetOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetServerOffsetOperation.h; sourceTree = "<group>"; };
 		96213BDA1379C65300DA6CC6 /* GetServerOffsetOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetServerOffsetOperation.m; sourceTree = "<group>"; };
 		96213BDE1379C6B900DA6CC6 /* GetServerOffsetResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetServerOffsetResult.h; sourceTree = "<group>"; };
@@ -219,6 +227,10 @@
 				96213BDF1379C6B900DA6CC6 /* GetServerOffsetResult.m */,
 				750DA83313844B530078D0CC /* RenameObjectOperation.h */,
 				750DA83413844B530078D0CC /* RenameObjectOperation.m */,
+				75F16D5C13B1098C004A96A3 /* ServiceInformation.h */,
+				75F16D5D13B1098C004A96A3 /* ServiceInformation.m */,
+				75F16D6113B130A8004A96A3 /* GetServiceInformationOperation.h */,
+				75F16D6213B130A8004A96A3 /* GetServiceInformationOperation.m */,
 			);
 			path = "atmos-ios";
 			sourceTree = "<group>";
@@ -261,9 +273,11 @@
 				967CB6C61371A13E003C9523 /* GetListableTagsResult.h in Headers */,
 				96213BDB1379C65300DA6CC6 /* GetServerOffsetOperation.h in Headers */,
 				96213BE01379C6B900DA6CC6 /* GetServerOffsetResult.h in Headers */,
+				750DA83513844B530078D0CC /* RenameObjectOperation.h in Headers */,
+				75F16D5E13B1098C004A96A3 /* ServiceInformation.h in Headers */,
 				75B4BEDD137B304100449FCC /* AtmosObjectResult.h in Headers */,
 				969903E913788D5A0063DE0F /* ListDirectoryResult.h in Headers */,
-				750DA83513844B530078D0CC /* RenameObjectOperation.h in Headers */,
+				75F16D6313B130A8004A96A3 /* GetServiceInformationOperation.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -340,6 +354,8 @@
 				96213BE11379C6B900DA6CC6 /* GetServerOffsetResult.m in Sources */,
 				75B4BEDE137B304100449FCC /* AtmosObjectResult.m in Sources */,
 				750DA83613844B530078D0CC /* RenameObjectOperation.m in Sources */,
+				75F16D5F13B1098C004A96A3 /* ServiceInformation.m in Sources */,
+				75F16D6413B130A8004A96A3 /* GetServiceInformationOperation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

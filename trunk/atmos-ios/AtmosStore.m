@@ -41,6 +41,7 @@
 #import "DeleteMetadataOperation.h"
 #import "GetServerOffsetOperation.h"
 #import "RenameObjectOperation.h"
+#import "GetServiceInformationOperation.h"
 
 @interface AtmosStore (Private)
 
@@ -51,11 +52,13 @@
 - (void) scheduleOperation:(id)operation;
 
 - (void) listObjectsInternal:(NSString *) tag 
-                     loadMetadata:(BOOL) loadMeta 
-                   systemMetadata:(NSArray *) sdata 
-                     userMetadata:(NSArray *) udata 
-                     withCallback:(void(^)(ListObjectsResult*)) callback 
-                        withLabel:(NSString *) requestLabel;
+                loadMetadata:(BOOL) loadMeta 
+              systemMetadata:(NSArray *) sdata 
+                userMetadata:(NSArray *) udata 
+                   withToken:(NSString *) token
+                   withLimit:(NSInteger) limit
+                withCallback:(void(^)(ListObjectsResult*)) callback 
+                   withLabel:(NSString *) requestLabel;
 
 - (void) getObjectMetadataInternal:(NSString *) atmosId 
                               path:(NSString *)objectPath 
@@ -340,30 +343,55 @@
 #pragma mark ListObjects
 //gets all objects tagged with a specific tag. only object ids are returned
 - (void) listObjects:(NSString *) tag 
+           withToken:(NSString *) token
+           withLimit:(NSInteger) limit
         withCallback:(void(^)(ListObjectsResult *result))callback
            withLabel:(NSString *) requestLabel {
 	
 	if(tag && tag.length > 0) {
 		[self listObjectsInternal:tag 
-                          loadMetadata:NO 
-                        systemMetadata:nil 
-                          userMetadata:nil 
-                          withCallback:callback 
-                             withLabel:requestLabel];
+                     loadMetadata:NO 
+                   systemMetadata:nil 
+                     userMetadata:nil 
+                        withToken:token
+                        withLimit:limit
+                     withCallback:callback 
+                        withLabel:requestLabel];
 	}
 }
 
-//gets all tagged objects and all metadata for each object
-- (void) listObjectsWithAllMetadata:(NSString *) tag 
-                            withCallback:(void(^)(ListObjectsResult *result))callback
-                               withLabel:(NSString *) requestLabel {
+- (void) listObjects:(NSString *) tag 
+        withCallback:(void(^)(ListObjectsResult *result))callback
+           withLabel:(NSString *) requestLabel {
+	
 	if(tag && tag.length > 0) {
 		[self listObjectsInternal:tag 
-                          loadMetadata:YES 
-                        systemMetadata:nil 
-                          userMetadata:nil 
-                          withCallback:callback 
-                             withLabel:requestLabel];
+                     loadMetadata:NO 
+                   systemMetadata:nil 
+                     userMetadata:nil 
+                        withToken:nil
+                        withLimit:0
+                     withCallback:callback 
+                        withLabel:requestLabel];
+	}
+}
+
+
+//gets all tagged objects and all metadata for each object
+- (void) listObjectsWithAllMetadata:(NSString *) tag 
+                          withToken:(NSString *) token
+                          withLimit:(NSInteger) limit
+                       withCallback:(void(^)(ListObjectsResult *result))callback
+                          withLabel:(NSString *) requestLabel {
+	if(tag && tag.length > 0) {
+		[self listObjectsInternal:tag 
+                     loadMetadata:YES 
+                   systemMetadata:nil 
+                     userMetadata:nil
+                        withToken:token
+                        withLimit:limit
+                     withCallback:callback 
+                        withLabel:requestLabel];
 		
 	}
 	
@@ -371,27 +399,33 @@
 
 //gets all tagged objects and the specified metadata for each object
 - (void) listObjectsWithMetadata:(NSString *) tag 
-                       systemMetadata:(NSArray *) sdata 
-                         userMetadata:(NSArray *) udata 
-                         withCallback:(void(^)(ListObjectsResult *result))callback
-                            withLabel:(NSString *) requestLabel {
+                  systemMetadata:(NSArray *) sdata 
+                    userMetadata:(NSArray *) udata 
+                       withToken:(NSString *) token
+                       withLimit:(NSInteger) limit
+                    withCallback:(void(^)(ListObjectsResult *result))callback
+                       withLabel:(NSString *) requestLabel {
 	if(tag && tag.length > 0) {
 		[self listObjectsInternal:tag 
-                          loadMetadata:NO 
-                        systemMetadata:sdata 
-                          userMetadata:udata 
-                          withCallback:callback
-                             withLabel:requestLabel];
+                     loadMetadata:NO 
+                   systemMetadata:sdata 
+                     userMetadata:udata 
+                        withToken:token
+                        withLimit:limit
+                     withCallback:callback
+                        withLabel:requestLabel];
 	}
 }
 
 
 - (void) listObjectsInternal:(NSString *) tag 
-                     loadMetadata:(BOOL) loadMeta 
-                   systemMetadata:(NSArray *) sdata 
-                     userMetadata:(NSArray *) udata 
-                     withCallback:(void(^)(ListObjectsResult *result))callback
-                        withLabel:(NSString *) requestLabel {
+                loadMetadata:(BOOL) loadMeta 
+              systemMetadata:(NSArray *) sdata 
+                userMetadata:(NSArray *) udata 
+                   withToken:(NSString *) token
+                   withLimit:(NSInteger) limit
+                withCallback:(void(^)(ListObjectsResult *result))callback
+                   withLabel:(NSString *) requestLabel {
 	
 	ListObjectsOperation *getObjs = [[ListObjectsOperation alloc] init];
 	getObjs.atmosCredentials = self.atmosCredentials;
@@ -402,6 +436,8 @@
 	getObjs.loadMetadata =  loadMeta;
 	getObjs.systemMetadata = sdata;
 	getObjs.userMetadata = udata;
+    getObjs.token = token;
+    getObjs.limit = limit;
 	
 	[self scheduleOperation:getObjs];
 	
@@ -557,6 +593,8 @@
 	[oper release];
 }
 
+
+#pragma mark GetServerOffset
 - (void) getServerOffset:(void(^)(GetServerOffsetResult *result))callback
                withLabel:(NSString *)requestLabel;
 {
@@ -590,6 +628,21 @@
     [self scheduleOperation:oper];
     [oper release];
 }
+
+#pragma mark GetServiceInformation
+- (void) getServiceInformation:(void(^)(ServiceInformation *result)) callback
+                     withLabel:(NSString*) requestLabel {
+    
+    GetServiceInformationOperation *oper = [[GetServiceInformationOperation alloc] init];
+    
+    oper.atmosStore = self;
+    oper.atmosCredentials = self.atmosCredentials;
+    oper.callback = callback;
+    
+    [self scheduleOperation:oper];
+    [oper release];
+}
+
 
 
 #pragma mark MemoryManagement

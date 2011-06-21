@@ -89,13 +89,8 @@ char innerChars[] = FN_CHARS " "; // No leading or trailing spaces
     
     AtmosCredentials *creds = [[AtmosCredentials alloc] init];
     
-    //    creds.tokenId = @"ab105326496a4228add95d20306030fd/CONNEAABCF7F31DDF0F7";
-    //    creds.sharedSecret = @"ra15Bu1Gk2AX5QV1K7iC9scG/OM=";
-    //    creds.accessPoint = @"192.168.246.152";
-    //    creds.httpProtocol = @"http";
-    //    creds.portNumber = 80;
     creds.tokenId=@"jason";
-    creds.sharedSecret=@"1/HpFFAEcbXGXnOaX4Ob3zyYXE8=";
+    creds.sharedSecret=@"1aBIGqS36OWaqC1SvFIWY6I5qwM=";
     creds.accessPoint=@"192.168.246.152";
     creds.httpProtocol=@"http";
     creds.portNumber=80;
@@ -211,6 +206,8 @@ char innerChars[] = FN_CHARS " "; // No leading or trailing spaces
     
     
     [atmosStore listObjects:@"listable" 
+                  withToken:nil
+                  withLimit:0
                withCallback:^(ListObjectsResult *result) {
                    @try {
                        [self checkResult:result];
@@ -233,7 +230,8 @@ char innerChars[] = FN_CHARS " "; // No leading or trailing spaces
                    // Notify async test complete.
                    [self notify:kGHUnitWaitStatusSuccess 
                     forSelector:@selector(testListObjects)];
-               } withLabel:@"subTestListObjects1"];
+               } 
+                  withLabel:@"subTestListObjects1"];
     
     
 }
@@ -261,6 +259,162 @@ char innerChars[] = FN_CHARS " "; // No leading or trailing spaces
         
         return YES;
     } withLabel:@"testCreateListableObject1"];
+    
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [obj release];
+    [self checkFailure];
+    
+}
+
+-(void) subTestListObjectsWithToken3:(AtmosObject*)atmosObject
+                            withObj2:(AtmosObject*)atmosObject2
+                         withResults:(NSMutableArray*)results
+                           withToken:(NSString*)token
+{
+    GHTestLog(@"subTestListObjectsWithToken3, token:%@", token);
+    
+    // Continue until token is nil
+    if(token == nil) {
+        
+        // Make sure array contains our IDs.
+        GHAssertTrue(
+                     [results containsObject:atmosObject],
+                     @"List objects result didn't include %@",
+                     atmosObject.atmosId);
+        GHAssertTrue(
+                     [results containsObject:atmosObject],
+                     @"List objects result didn't include %@",
+                     atmosObject2.atmosId);
+        
+        // Notify async test complete.
+        [self notify:kGHUnitWaitStatusSuccess 
+         forSelector:@selector(testListObjectsWithToken)];
+    } else {
+        [atmosStore listObjects:@"tokentest"
+                      withToken:token 
+                      withLimit:1
+                   withCallback:^(ListObjectsResult *result) {
+                       @try {
+                           [self checkResult:result];
+                           [results addObjectsFromArray:result.objects];
+                       }   @catch (NSException *exception) {
+                           self.failure = exception;
+                           [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testListObjectsWithToken)];
+                           return;
+                       }
+                       
+                       [self subTestListObjectsWithToken3:atmosObject
+                                                 withObj2:atmosObject2
+                                              withResults:results
+                                                withToken:result.token];
+                       
+                       
+                       
+                   } withLabel:@"subTestListObjectsWithToken3"];
+    }
+}
+
+- (void)subTestListObjectsWithToken2:(AtmosObject*)atmosObject
+                            withObj2:(AtmosObject*)atmosObject2
+{
+    // Check and make sure we can find the object
+    GHTestLog(@"Created AtmosObject %@", atmosObject2.atmosId);
+    [cleanup addObject:atmosObject2.atmosId];
+    NSMutableArray *results = [[NSMutableArray alloc] init];
+
+    
+    [atmosStore listObjects:@"tokentest" 
+                  withToken:nil
+                  withLimit:1
+               withCallback:^(ListObjectsResult *result) {
+                   @try {
+                       [self checkResult:result];
+                       
+                       // On the first pass, the token should be non-nil
+                       GHAssertNotNil(result.token, 
+                                      @"Token should be non-nil on first iteration");
+                       [results addObjectsFromArray:result.objects];
+
+                   }
+                   @catch (NSException *exception) {
+                       self.failure = exception;
+                       [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testListObjectsWithToken)];
+                       return;
+                   }
+                   
+                   [self subTestListObjectsWithToken3:atmosObject
+                                             withObj2:atmosObject2
+                                          withResults:results
+                                            withToken:result.token];
+
+               } 
+                  withLabel:@"subTestListObjectsWithToken2"];
+    
+    
+}
+
+-(void) subTestListObjectsWithToken1:(AtmosObject*)atmosObject
+{
+    // Check and make sure we can find the object
+    GHTestLog(@"Created AtmosObject %@", atmosObject.atmosId);
+    [cleanup addObject:atmosObject.atmosId];
+    
+    
+    AtmosObject *obj = [[AtmosObject alloc] init];
+    obj.userListableMeta = [[NSMutableDictionary alloc] 
+                            initWithObjectsAndKeys:@"",@"tokentest", nil];
+    [atmosStore createObject:obj withCallback:^BOOL(UploadProgress *progress) {
+        @try {
+            // Check
+            [self checkResult:progress];
+            
+            if(progress.isComplete) {
+                [self subTestListObjectsWithToken2:atmosObject
+                                          withObj2:progress.atmosObject];
+            }
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testListObjectsWithToken)];
+            return NO;
+        }
+        
+        return YES;
+    } withLabel:@"subTestListObjectsWithToken1"];
+    
+    [obj release];
+}
+
+
+/*@
+ * Create more than one object and list with a limit of one and make
+ * sure the token is set.  Iterate through the token and make sure all
+ * objects are returned.
+ */
+-(void) testListObjectsWithToken
+{
+    [self prepare];
+    
+    AtmosObject *obj = [[AtmosObject alloc] init];
+    obj.userListableMeta = [[NSMutableDictionary alloc] 
+                            initWithObjectsAndKeys:@"",@"tokentest", nil];
+    [atmosStore createObject:obj withCallback:^BOOL(UploadProgress *progress) {
+        @try {
+            // Check
+            [self checkResult:progress];
+            
+            if(progress.isComplete) {
+                [self subTestListObjectsWithToken1:progress.atmosObject];
+            }
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testListObjects)];
+            return NO;
+        }
+        
+        return YES;
+    } withLabel:@"testListObjectsWithToken"];
     
     [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
     [obj release];
@@ -576,13 +730,21 @@ char innerChars[] = FN_CHARS " "; // No leading or trailing spaces
     [self prepare];
     
     [atmosStore getServerOffset:^(GetServerOffsetResult *result) {
+        if(!result.wasSuccessful) {
+            NSLog(@"Failed to get server offset: %@", result.error);
+        } else {
+            NSLog(@"Server offset: %lf seconds", result.offset);
+            atmosStore.timeOffset = result.offset;            
+        }
+        
         @try {
             [self checkResult:result];
-            GHTestLog(@"Server offset: %lf seconds", result.offset);
+            NSLog(@"Server offset: %lf seconds", result.offset);
             atmosStore.timeOffset = result.offset;
             [self subTestGetServerOffset1];
         }
         @catch (NSException *exception) {
+            NSLog(@"Failed to get server offset: %@", exception.reason);
             self.failure = exception;
             [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testGetServerOffset)];
             return;
@@ -1662,6 +1824,30 @@ withDirectory:(NSString *)dir
     [obj release];
     [self checkFailure];
     
+}
+
+- (void) testGetServiceInformation
+{
+    [self prepare];
+    
+    [atmosStore getServiceInformation:^(ServiceInformation *result) {
+        @try {
+            [self checkResult:result];
+            
+            GHAssertNotNil(result.atmosVersion, @"Atmos Version should not be nil");
+            
+            GHTestLog(@"Atmos Version is %@", result.atmosVersion);
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testGetServiceInformation)];
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testGetServiceInformation)];
+            return;
+        }
+        
+    } withLabel:@"testGetServiceInformation"];
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [self checkFailure];
 }
 
 @end

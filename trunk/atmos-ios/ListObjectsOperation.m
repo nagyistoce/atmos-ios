@@ -41,6 +41,7 @@
 
 @synthesize currentId,currentElement,currentAtmosProp,currentValue,currentPropValue,listable, result;
 @synthesize loadMetadata, systemMetadata, userMetadata, callback;
+@synthesize token, limit;
 
 - (id)init
 {
@@ -71,6 +72,15 @@
 		NSString *userTagsStr = [self.userMetadata componentsJoinedByString:@","];
 		[req addValue:userTagsStr forHTTPHeaderField:@"x-emc-user-tags"];
 	}
+    
+    if(self.token != nil) {
+        [req addValue:self.token forHTTPHeaderField:@"x-emc-token"];
+    }
+    
+    if(self.limit != 0) {
+        NSString *limitValue = [NSString stringWithFormat:@"%d", self.limit];
+        [req addValue:limitValue forHTTPHeaderField:@"x-emc-limit"];
+    }
 	
 	[self setFilterTagsOnRequest:req];
 	[super signRequest:req];
@@ -133,7 +143,11 @@
         [errStr release];
 	} else {
         // Check for token
-        self.result.token = [self.httpResponse.allHeaderFields valueForKey:@"x-emc-token"];
+        NSDictionary *headers = self.httpResponse.allHeaderFields;
+        
+        NSLog(@"Response headers: %@", headers);
+        
+        self.result.token = [headers valueForKey:@"X-Emc-Token"];
         NSString *str = [[NSString alloc] initWithData:self.webData encoding:NSASCIIStringEncoding];
         NSLog(@"connectionFinishedLoading %@",str);
         [str release];
@@ -264,6 +278,7 @@
     self.result = nil;
     self.systemMetadata = nil;
     self.userMetadata = nil;
+    self.token = nil;
     
 	[super dealloc];
 }
