@@ -27,54 +27,21 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
  */
-
-
 #import <Foundation/Foundation.h>
-
 #import "AtmosBaseOperation.h"
-#import "AtmosObject.h"
-#import "AtmosStore.h"
+#import "ServiceInformation.h"
 
-@interface ListObjectsOperation : AtmosBaseOperation <NSXMLParserDelegate> {
-	@private
-	NSString *currentId;
-	BOOL isSystemMetadata;
-	BOOL isUserMetadata;
+
+@interface GetServiceInformationOperation : AtmosBaseOperation <NSXMLParserDelegate> {
+    
+    @private
 	NSXMLParser *xmlParser;
-	AtmosObject *currentObject;
 	NSString *currentElement;
 	NSMutableString *currentValue;
-	NSString *currentAtmosProp;
-	BOOL listable;
-	NSString *currentPropValue;
-    ListObjectsResult *result;
-	
-	@public
-	BOOL loadMetadata;
-	NSArray *systemMetadata;
-	NSArray *userMetadata;
-    void (^callback)(ListObjectsResult *result);
-    NSString *token;
-    NSInteger limit;
-
-	
+    NSString *atmosVersion;
+    void (^callback)(ServiceInformation *result);
 }
 
-@property (nonatomic,retain) NSString *currentId;
-@property (nonatomic,retain) NSString *currentElement;
-@property (nonatomic,retain) NSString *currentAtmosProp;
-@property (nonatomic,retain) NSString *currentPropValue;
-@property (nonatomic,assign) BOOL listable;
-@property (nonatomic,retain) NSMutableString *currentValue;
-//@property (nonatomic,retain) AtmosObject *currentObject;
-@property (nonatomic,retain) ListObjectsResult *result;
-
-
-@property (nonatomic,assign) BOOL loadMetadata;
-@property (nonatomic,retain) NSArray *systemMetadata;
-@property (nonatomic,retain) NSArray *userMetadata;
-@property (nonatomic,copy) void (^callback)(ListObjectsResult *result);
-@property (nonatomic,retain) NSString *token;
-@property (nonatomic,assign) NSInteger limit;
+@property (nonatomic,copy) void (^callback)(ServiceInformation *result);
 
 @end
