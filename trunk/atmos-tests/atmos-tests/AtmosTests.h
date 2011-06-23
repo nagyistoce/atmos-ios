@@ -37,11 +37,13 @@
     AtmosStore *atmosStore;
     NSMutableArray *cleanup;
     NSException *failure;
+    NSDictionary *settings;
 }
 
 @property(retain,readwrite) AtmosStore *atmosStore;
 @property(retain,readwrite) NSMutableArray *cleanup;
 @property(retain,readwrite) NSException *failure;
+@property(retain,readwrite) NSDictionary *settings;
 
 -(void) checkResult:(AtmosResult*)result;
 -(void) checkFailure;

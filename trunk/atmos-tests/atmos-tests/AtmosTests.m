@@ -39,7 +39,7 @@
 
 @implementation AtmosTests
 
-@synthesize atmosStore,cleanup,failure;
+@synthesize atmosStore,cleanup,failure,settings;
 
 #define FN_CHARS "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_=+*,!#%$&()"
 
@@ -87,13 +87,21 @@ char innerChars[] = FN_CHARS " "; // No leading or trailing spaces
 {
     [super setUp];
     
+    // Read the Credentials and other settings from 
+    // settings.plist
+    NSString* plistPath = [[NSBundle mainBundle] pathForResource:@"settings" ofType:@"plist"];
+    if(!plistPath) {
+        [NSException raise:@"SettingsNotFound" format:@"Could not find settings.plist in application bundle.  Copy settings.plist.template to settings.plist and configure for your test environment."];
+    }
+    self.settings = [NSDictionary dictionaryWithContentsOfFile:plistPath];
+    //NSLog(@"Settings loaded: %@", self.settings);
     AtmosCredentials *creds = [[AtmosCredentials alloc] init];
     
-    creds.tokenId=@"jason";
-    creds.sharedSecret=@"1aBIGqS36OWaqC1SvFIWY6I5qwM=";
-    creds.accessPoint=@"192.168.246.152";
-    creds.httpProtocol=@"http";
-    creds.portNumber=80;
+    creds.tokenId=[self.settings valueForKey:@"UID"];
+    creds.sharedSecret=[self.settings valueForKey:@"secret"];
+    creds.accessPoint=[self.settings valueForKey:@"host"];
+    creds.portNumber=[[self.settings valueForKey:@"port"] integerValue];
+    creds.httpProtocol= creds.portNumber == 443?@"https":@"http";
     
     // Set-up code here.
     atmosStore = [[AtmosStore alloc] init];
@@ -1848,6 +1856,84 @@ withDirectory:(NSString *)dir
     } withLabel:@"testGetServiceInformation"];
     [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
     [self checkFailure];
+}
+
+- (void) subTestGetObjectInformation1:(AtmosObject*) atmosObject
+{
+    // Read back the object information
+    [atmosStore getObjectInformation:atmosObject withCallback:^(ObjectInformation *result) {
+        
+        @try {
+            [self checkResult:result];
+            
+            
+            GHAssertNotNil(result.replicas, @"Replicas should be non-nil");
+            GHAssertNotNil(result.rawXml, @"rawXml should be non-nil");
+            GHAssertNotNil(result.selection, @"selection should be non-nil");
+            GHAssertEqualStrings(atmosObject.atmosId, result.objectId, @"ObjectIDs should be equal");
+            
+            GHAssertGreaterThan((int)result.replicas.count, 0, @"There should be at least 1 replica");
+            Replica *r = [result.replicas objectAtIndex:0];
+            GHAssertNotNil(r.replicaId, @"replicaId should be non-nil");
+            GHAssertNotNil(r.replicaType, @"replicaType should be non-nil");
+            GHAssertNotNil(r.location, @"location should be non-nil");
+            GHAssertNotNil(r.storageType, @"storageType should be non-nil");
+            
+            GHAssertNotNil(result.retentionEnd, @"Retention not enabled.  See settings.plist.template and create the required policies and selectors to run this test.");
+            GHAssertTrue(result.expirationEnabled, @"Expiration not enabled.  See settings.plist.template and create the required policies and selectors to run this test.");
+            
+            NSDate *now = [NSDate date];
+            NSTimeInterval untilRetentionEnds = [result.retentionEnd timeIntervalSinceDate:now];
+            NSTimeInterval untilExpiration = [result.expirationEnd timeIntervalSinceDate:now];
+            
+            GHAssertGreaterThan((long)untilRetentionEnds, 0L, @"Expected retention to end after 'now'");
+            GHAssertGreaterThan((long)untilExpiration, 0L, @"Expected expiration to be after 'now'");
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testGetObjectInformation)];
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testGetObjectInformation)];
+        }
+        
+    } withLabel:@"subTestGetObjectInformation1"];
+}
+
+/*!
+ * Test getting object replica/retention/expiration information.
+ * Note that you must create a policy and selector for this
+ * to work properly.  See settings.plist.template.
+ */
+- (void) testGetObjectInformation
+{
+    [self prepare];
+    
+    // Update the object and change some stuff
+    AtmosObject *obj = [[AtmosObject alloc] init];
+    obj.dataMode = kDataModeBytes;
+    obj.data = [NSData dataWithBytes:[@"Hello Me!" UTF8String] length:10];
+    obj.userRegularMeta = [NSMutableDictionary 
+                            dictionaryWithObjectsAndKeys:[self.settings valueForKey:@"retain_policy_value"],[self.settings valueForKey:@"retain_policy_key"], nil];
+
+    [atmosStore createObject:obj withCallback:^BOOL(UploadProgress *progress) {
+        @try {
+            [self checkResult:progress];
+            
+            if ([progress isComplete]) {
+                [self subTestGetObjectInformation1:progress.atmosObject];
+            }
+            
+            return YES;
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testGetObjectInformation)];
+            return NO;
+        }
+    } withLabel:@"testGetObjectInformation"];
+    
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [self checkFailure];    
+    
 }
 
 @end

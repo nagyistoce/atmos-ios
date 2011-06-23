@@ -28,13 +28,25 @@
  
  */
 #import <Foundation/Foundation.h>
-#import "AtmosBaseOperation.h"
-#import "GetServerOffsetResult.h"
 
-@interface GetServerOffsetOperation : AtmosBaseOperation {
-    void (^callback)(GetServerOffsetResult *result);
+
+@interface Replica : NSObject {
+    @private
+    NSString *replicaId;
+    NSString *replicaType;
+    BOOL current;
+    NSString *location;
+    NSString *storageType;
+    
 }
 
-@property (nonatomic,copy) void (^callback)(GetServerOffsetResult *result);
+@property (nonatomic,retain) NSString *replicaId;
+@property (nonatomic,retain) NSString *replicaType;
+@property (nonatomic,assign) BOOL current;
+@property (nonatomic,retain) NSString *location;
+@property (nonatomic,retain) NSString *storageType;
+
++(id) replica;
+
 
 @end

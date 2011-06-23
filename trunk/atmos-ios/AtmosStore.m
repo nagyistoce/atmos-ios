@@ -42,6 +42,7 @@
 #import "GetServerOffsetOperation.h"
 #import "RenameObjectOperation.h"
 #import "GetServiceInformationOperation.h"
+#import "GetObjectInformationOperation.h"
 
 @interface AtmosStore (Private)
 
@@ -638,6 +639,21 @@
     oper.atmosStore = self;
     oper.atmosCredentials = self.atmosCredentials;
     oper.callback = callback;
+    
+    [self scheduleOperation:oper];
+    [oper release];
+}
+
+#pragma mark GetObjectInformation
+- (void) getObjectInformation:(AtmosObject*) atmosObject
+                 withCallback:(void(^)(ObjectInformation *result)) callback
+                    withLabel:(NSString*) requestLabel {
+    GetObjectInformationOperation *oper = [[GetObjectInformationOperation alloc] init];
+    
+    oper.atmosStore = self;
+    oper.atmosCredentials = self.atmosCredentials;
+    oper.callback = callback;
+    oper.atmosObject = atmosObject;
     
     [self scheduleOperation:oper];
     [oper release];

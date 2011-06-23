@@ -27,14 +27,26 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
  */
-#import <Foundation/Foundation.h>
-#import "AtmosBaseOperation.h"
-#import "GetServerOffsetResult.h"
+#import "Replica.h"
 
-@interface GetServerOffsetOperation : AtmosBaseOperation {
-    void (^callback)(GetServerOffsetResult *result);
+
+@implementation Replica
+
+@synthesize replicaId, replicaType, current, location, storageType;
+
+#pragma mark Memory Management
+- (void) dealloc {
+    self.replicaType = nil;
+    self.replicaId = nil;
+    self.location = nil;
+    self.storageType = nil;
+    
+    [super dealloc];
 }
 
-@property (nonatomic,copy) void (^callback)(GetServerOffsetResult *result);
+#pragma mark convienience methods
++ (id) replica {
+    return [[[Replica alloc] init] autorelease];
+}
 
 @end

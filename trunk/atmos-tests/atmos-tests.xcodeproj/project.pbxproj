@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		750CEE6313B2853400794500 /* settings.plist.template in Resources */ = {isa = PBXBuildFile; fileRef = 750CEE6213B2853400794500 /* settings.plist.template */; };
+		750CEE6613B288D500794500 /* settings.plist in Resources */ = {isa = PBXBuildFile; fileRef = 750CEE6513B288D500794500 /* settings.plist */; };
 		963C12D51371DCCD008AB91F /* AtmosTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 963C12D41371DCCD008AB91F /* AtmosTests.m */; };
 		967248E61371D0AE00013901 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 967248E51371D0AE00013901 /* UIKit.framework */; };
 		967248E81371D0AE00013901 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 967248E71371D0AE00013901 /* Foundation.framework */; };
@@ -23,6 +25,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		750CEE6213B2853400794500 /* settings.plist.template */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = settings.plist.template; sourceTree = "<group>"; };
+		750CEE6513B288D500794500 /* settings.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = settings.plist; sourceTree = "<group>"; };
 		963C12D31371DCCD008AB91F /* AtmosTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AtmosTests.h; sourceTree = "<group>"; };
 		963C12D41371DCCD008AB91F /* AtmosTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AtmosTests.m; sourceTree = "<group>"; };
 		967248E11371D0AD00013901 /* atmos-tests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "atmos-tests.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -64,6 +68,8 @@
 		967248D61371D0AD00013901 = {
 			isa = PBXGroup;
 			children = (
+				750CEE6513B288D500794500 /* settings.plist */,
+				750CEE6213B2853400794500 /* settings.plist.template */,
 				96DFDFA0137486AA00EDDD3C /* libatmos.a */,
 				967248EB1371D0AE00013901 /* atmos-tests */,
 				967248E41371D0AE00013901 /* Frameworks */,
@@ -185,6 +191,8 @@
 				967248F01371D0AE00013901 /* InfoPlist.strings in Resources */,
 				967248FD1371D0AE00013901 /* MainWindow_iPhone.xib in Resources */,
 				967249041371D0AE00013901 /* MainWindow_iPad.xib in Resources */,
+				750CEE6313B2853400794500 /* settings.plist.template in Resources */,
+				750CEE6613B288D500794500 /* settings.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -29,12 +29,30 @@
  */
 #import <Foundation/Foundation.h>
 #import "AtmosBaseOperation.h"
-#import "GetServerOffsetResult.h"
+#import "ObjectInformation.h"
+#import "Replica.h"
 
-@interface GetServerOffsetOperation : AtmosBaseOperation {
-    void (^callback)(GetServerOffsetResult *result);
+enum {
+    kModeNone = 0,
+    kModeReplica,
+    kModeRetention,
+    kModeExpiration,
+};
+
+@interface GetObjectInformationOperation : AtmosBaseOperation <NSXMLParserDelegate> {
+
+    @private
+	NSXMLParser *xmlParser;
+	NSString *currentElement;
+	NSMutableString *currentValue;
+    void (^callback)(ObjectInformation *result);
+    ObjectInformation *info;
+    Replica *currentReplica;
+    NSInteger parseMode;
+    AtmosObject *atmosObject;
 }
 
-@property (nonatomic,copy) void (^callback)(GetServerOffsetResult *result);
+@property (nonatomic,copy) void (^callback)(ObjectInformation *result);
+@property (nonatomic,retain) AtmosObject *atmosObject;
 
 @end
