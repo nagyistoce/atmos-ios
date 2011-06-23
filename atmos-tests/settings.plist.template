@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    
+<!-- This file contains your credentials and other settings
+  -- to run the test cases.
+  --
+  -- Copy settings.plist.template to settings.plist and then
+  -- change the settings to match your configuration
+  -->
+<dict>
+	<key>UID</key>
+	<string>your_uid_here</string>
+	<key>secret</key>
+	<string>your_shared_secret</string>
+	<key>host</key>
+	<string>your_host, e.g. accesspoint.atmosonline.com</string>
+	<key>port</key>
+	<integer>80</integer>
+    
+    <!-- retain_policy_key and retain_policy_value are used
+      -- for testing replica information with retention &
+      -- deletion turned on.  To use this, create a policy
+      -- that has both retention and deletion enabled and
+      -- create a selector that uses metadata ON_CREATE.
+      -- put the umd key/value in the settings below or
+      -- use the default "Data Policy" = "7_year_retain".
+      -->
+	<key>retain_policy_key</key>
+	<string>Data Policy</string>
+	<key>retain_policy_value</key>
+	<string>7_year_retain</string>
+</dict>
+</plist>

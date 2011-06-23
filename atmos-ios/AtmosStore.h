@@ -40,6 +40,7 @@
 #import "ListDirectoryResult.h"
 #import "GetServerOffsetResult.h"
 #import "ServiceInformation.h"
+#import "ObjectInformation.h"
 
 #define ATMOS_DEFAULT_BUF_SIZE 4194304 //4MB is the buffer Atmos uses on the server
 
@@ -296,6 +297,19 @@
 #pragma mark GetServiceInformation
 - (void) getServiceInformation:(void(^)(ServiceInformation *result)) callback
                      withLabel:(NSString*) requestLabel;
+
+#pragma mark GetObjectInformation
+/*!
+ * @abstract Gets replica, retention, and expiration information
+ * about an object.
+ * @param atmosObject the AtmosObject to query information for
+ * @param callback the block to execute when the operation is
+ * complete.
+ * @param requestLabel the label for the request.
+ */
+- (void) getObjectInformation:(AtmosObject*) atmosObject
+                 withCallback:(void(^)(ObjectInformation *result)) callback
+                    withLabel:(NSString*) requestLabel;
 
 
 #pragma mark Properties

@@ -27,14 +27,37 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
  */
-#import <Foundation/Foundation.h>
-#import "AtmosBaseOperation.h"
-#import "GetServerOffsetResult.h"
+#import "ObjectInformation.h"
 
-@interface GetServerOffsetOperation : AtmosBaseOperation {
-    void (^callback)(GetServerOffsetResult *result);
+@implementation ObjectInformation
+
+@synthesize rawXml, replicas, retentionEnabled, retentionEnd, expirationEnabled, expirationEnd, selection, objectId, current;
+
+#pragma mark Memory Management
+- (void) dealloc {
+    self.rawXml = nil;
+    self.replicas = nil;
+    self.retentionEnd = nil;
+    self.expirationEnd = nil;
+    self.selection = nil;
+    self.objectId = nil;
+    
+    [super dealloc];
 }
 
-@property (nonatomic,copy) void (^callback)(GetServerOffsetResult *result);
+-(id) init {
+    self = [super init];
+    
+    if(self) {
+        self.replicas = [NSMutableArray array];
+    }
+    
+    return self;
+}
+
+#pragma mark Convienence Methods
++ (id) objectInformation {
+    return [[[ObjectInformation alloc] init] autorelease];
+}
 
 @end
