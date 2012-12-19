@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		750CEE6313B2853400794500 /* settings.plist.template in Resources */ = {isa = PBXBuildFile; fileRef = 750CEE6213B2853400794500 /* settings.plist.template */; };
 		750CEE6613B288D500794500 /* settings.plist in Resources */ = {isa = PBXBuildFile; fileRef = 750CEE6513B288D500794500 /* settings.plist */; };
+		75F43E291682751000A55704 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 75F43E281682751000A55704 /* libxml2.dylib */; };
+		75F43E2F1682783D00A55704 /* GHUnitIOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 75F43E2E1682783D00A55704 /* GHUnitIOS.framework */; };
 		963C12D51371DCCD008AB91F /* AtmosTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 963C12D41371DCCD008AB91F /* AtmosTests.m */; };
 		967248E61371D0AE00013901 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 967248E51371D0AE00013901 /* UIKit.framework */; };
 		967248E81371D0AE00013901 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 967248E71371D0AE00013901 /* Foundation.framework */; };
@@ -20,13 +22,14 @@
 		967248FD1371D0AE00013901 /* MainWindow_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 967248FB1371D0AE00013901 /* MainWindow_iPhone.xib */; };
 		967249011371D0AE00013901 /* atmos_testsAppDelegate_iPad.m in Sources */ = {isa = PBXBuildFile; fileRef = 967249001371D0AE00013901 /* atmos_testsAppDelegate_iPad.m */; };
 		967249041371D0AE00013901 /* MainWindow_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 967249021371D0AE00013901 /* MainWindow_iPad.xib */; };
-		9672490F1371D0EE00013901 /* GHUnitIOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9672490E1371D0EE00013901 /* GHUnitIOS.framework */; };
 		96DFDFA1137486AA00EDDD3C /* libatmos.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96DFDFA0137486AA00EDDD3C /* libatmos.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		750CEE6213B2853400794500 /* settings.plist.template */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = settings.plist.template; sourceTree = "<group>"; };
 		750CEE6513B288D500794500 /* settings.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = settings.plist; sourceTree = "<group>"; };
+		75F43E281682751000A55704 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
+		75F43E2E1682783D00A55704 /* GHUnitIOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GHUnitIOS.framework; sourceTree = "<group>"; };
 		963C12D31371DCCD008AB91F /* AtmosTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AtmosTests.h; sourceTree = "<group>"; };
 		963C12D41371DCCD008AB91F /* AtmosTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AtmosTests.m; sourceTree = "<group>"; };
 		967248E11371D0AD00013901 /* atmos-tests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "atmos-tests.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -45,7 +48,6 @@
 		967248FF1371D0AE00013901 /* atmos_testsAppDelegate_iPad.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = atmos_testsAppDelegate_iPad.h; path = iPad/atmos_testsAppDelegate_iPad.h; sourceTree = "<group>"; };
 		967249001371D0AE00013901 /* atmos_testsAppDelegate_iPad.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = atmos_testsAppDelegate_iPad.m; path = iPad/atmos_testsAppDelegate_iPad.m; sourceTree = "<group>"; };
 		967249031371D0AE00013901 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = iPad/en.lproj/MainWindow_iPad.xib; sourceTree = "<group>"; };
-		9672490E1371D0EE00013901 /* GHUnitIOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GHUnitIOS.framework; sourceTree = "<group>"; };
 		96DFDFA0137486AA00EDDD3C /* libatmos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libatmos.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -54,11 +56,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				75F43E2F1682783D00A55704 /* GHUnitIOS.framework in Frameworks */,
+				75F43E291682751000A55704 /* libxml2.dylib in Frameworks */,
 				96DFDFA1137486AA00EDDD3C /* libatmos.a in Frameworks */,
 				967248E61371D0AE00013901 /* UIKit.framework in Frameworks */,
 				967248E81371D0AE00013901 /* Foundation.framework in Frameworks */,
 				967248EA1371D0AE00013901 /* CoreGraphics.framework in Frameworks */,
-				9672490F1371D0EE00013901 /* GHUnitIOS.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -68,6 +71,8 @@
 		967248D61371D0AD00013901 = {
 			isa = PBXGroup;
 			children = (
+				75F43E2E1682783D00A55704 /* GHUnitIOS.framework */,
+				75F43E281682751000A55704 /* libxml2.dylib */,
 				750CEE6513B288D500794500 /* settings.plist */,
 				750CEE6213B2853400794500 /* settings.plist.template */,
 				96DFDFA0137486AA00EDDD3C /* libatmos.a */,
@@ -88,7 +93,6 @@
 		967248E41371D0AE00013901 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				9672490E1371D0EE00013901 /* GHUnitIOS.framework */,
 				967248E51371D0AE00013901 /* UIKit.framework */,
 				967248E71371D0AE00013901 /* Foundation.framework */,
 				967248E91371D0AE00013901 /* CoreGraphics.framework */,
@@ -166,6 +170,9 @@
 /* Begin PBXProject section */
 		967248D81371D0AD00013901 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0450;
+			};
 			buildConfigurationList = 967248DB1371D0AD00013901 /* Build configuration list for PBXProject "atmos-tests" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
@@ -287,6 +294,7 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "atmos-tests/atmos-tests-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = "$(BUILT_PRODUCTS_DIR)/usr/local/include";
 				INFOPLIST_FILE = "atmos-tests/atmos-tests-Info.plist";
 				OTHER_LDFLAGS = (
@@ -309,6 +317,7 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "atmos-tests/atmos-tests-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = "$(BUILT_PRODUCTS_DIR)/usr/local/include";
 				INFOPLIST_FILE = "atmos-tests/atmos-tests-Info.plist";
 				OTHER_LDFLAGS = (
