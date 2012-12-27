@@ -65,7 +65,7 @@
 		NSLog(@"req %@",req);
 		NSLog(@"all headers %@",[req allHTTPHeaderFields]);
 		
-		[NSURLConnection connectionWithRequest:req delegate:self];
+		self.connection = [NSURLConnection connectionWithRequest:req delegate:self];
 	}
 }
 

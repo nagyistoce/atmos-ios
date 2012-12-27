@@ -41,7 +41,7 @@
 
 @synthesize currentId,currentElement,currentAtmosProp,currentValue,currentPropValue,listable, result;
 @synthesize loadMetadata, systemMetadata, userMetadata, callback;
-@synthesize token, limit;
+@synthesize token, limit, currentObject;
 
 - (id)init
 {
@@ -85,7 +85,9 @@
 	[self setFilterTagsOnRequest:req];
 	[super signRequest:req];
 	
-	self.connection = [[NSURLConnection alloc] initWithRequest:req delegate:self startImmediately:YES];
+    NSURLConnection *con = [[NSURLConnection alloc] initWithRequest:req delegate:self startImmediately:YES];
+	self.connection = con;
+    [con release];
 }
 
 - (void) parseXMLData {
@@ -173,8 +175,10 @@
 	
 	//NSLog(@"didstartelement %@",elementName);
 	//begin processing new atmos object
-	if([elementName isEqualToString:@"Object"]) { 
-		currentObject = [[AtmosObject alloc] init];
+	if([elementName isEqualToString:@"Object"]) {
+        AtmosObject *obj = [[AtmosObject alloc] init];
+		self.currentObject = obj;
+        [obj release];
 		NSLog(@"started new object");
 	} else if([elementName isEqualToString:@"SystemMetadataList"]) {
 		isSystemMetadata = YES;
@@ -196,18 +200,17 @@
     }
 	
 	if([elementName isEqualToString:@"Object"]) {
-		if(currentObject != nil) {
+		if(self.currentObject != nil) {
 			[result.objects 
-             addObject:currentObject];
+             addObject:self.currentObject];
 			//NSLog(@"Just added items %@",self.currentObject);
             
-            [currentObject release];
-            currentObject = nil;
+            self.currentObject = nil;
 		}
 	}
 	else if([elementName isEqualToString:@"ObjectID"]) {
 		//NSLog(@"Got object id %@",self.currentValue);
-		currentObject.atmosId = [self.currentValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+		self.currentObject.atmosId = [self.currentValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 	}
 	else if([elementName isEqualToString:@"SystemMetadataList"]) {
 		isSystemMetadata = NO;
@@ -227,11 +230,11 @@
 		self.listable = [[self.currentValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] boolValue];
 	} else if([elementName isEqualToString:@"Metadata"]) {
 		if(self.listable && isUserMetadata) {
-			[currentObject.userListableMeta setObject:self.currentPropValue forKey:self.currentAtmosProp];
+			[self.currentObject.userListableMeta setObject:self.currentPropValue forKey:self.currentAtmosProp];
 		} else if(!self.listable && isUserMetadata) {
-			[currentObject.userRegularMeta setObject:self.currentPropValue forKey:self.currentAtmosProp];
+			[self.currentObject.userRegularMeta setObject:self.currentPropValue forKey:self.currentAtmosProp];
 		} else if(isSystemMetadata) {
-			[currentObject.systemMeta setObject:self.currentPropValue forKey:self.currentAtmosProp];
+			[self.currentObject.systemMeta setObject:self.currentPropValue forKey:self.currentAtmosProp];
 		}
 	}
 	
@@ -279,7 +282,9 @@
     self.systemMetadata = nil;
     self.userMetadata = nil;
     self.token = nil;
-    
+    self.callback = nil;
+    self.token = nil;
+    self.currentObject = nil;
 	[super dealloc];
 }
 

@@ -36,6 +36,11 @@
 
 @synthesize callback;
 
+- (void) dealloc {
+    self.callback = nil;
+    [super dealloc];
+}
+
 - (void) startAtmosOperation {
 	
 	NSString *strResource = [NSString stringWithFormat:@"/rest/objects?listableTags"];

@@ -1,6 +1,6 @@
 /*
  
- Copyright (c) 2011, EMC Corporation
+ Copyright (c) 2012, EMC Corporation
  
  All rights reserved.
  
@@ -27,44 +27,36 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
  */
+#import "DeleteAccessTokenOperation.h"
+#import "AtmosConstants.h"
 
+@implementation DeleteAccessTokenOperation
 
-#import "DeleteObjectOperation.h"
-#import "AtmosResult.h"
-
-@implementation DeleteObjectOperation
-
-@synthesize atmosObj, callback;
+@synthesize accessTokenId, callback;
 
 - (void) dealloc {
-    self.atmosObj = nil;
+    self.accessTokenId = nil;
     self.callback = nil;
+    
     [super dealloc];
 }
 
-
 - (void) startAtmosOperation {
-	if(self.atmosObj) {
-		if(self.atmosObj.atmosId && self.atmosObj.atmosId.length == ATMOS_ID_LENGTH) {
-			self.atmosResource = [NSString stringWithFormat:@"/rest/objects/%@",self.atmosObj.atmosId];
-		} else if (self.atmosObj.objectPath) {
-			self.atmosResource = [NSString stringWithFormat:@"/rest/namespace%@",self.atmosObj.objectPath];
-		} else {
-			return; //no atmos resource to delete
-		}
-
-		NSMutableURLRequest *req = [self setupBaseRequestForResource:self.atmosResource];
-		[req setHTTPMethod:@"DELETE"];
-		[self signRequest:req];
-		
-		self.connection = [NSURLConnection connectionWithRequest:req delegate:self];
-	}
-	
+    self.atmosResource = [NSString stringWithFormat:@"%@%@",
+                          ATMOS_ACCESS_TOKEN_LOCATION_PREFIX,
+                          self.accessTokenId];
+    
+    NSMutableURLRequest *req = [self
+                                setupBaseRequestForResource:self.atmosResource];
+    [req setHTTPMethod:@"DELETE"];
+    [self signRequest:req];
+    
+    self.connection = [NSURLConnection connectionWithRequest:req delegate:self];
 }
 
 #pragma mark NSURLConnection delegate
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
-{	
+{
 	NSLog(@"didReceiveResponse %@",response);
 	self.httpResponse = (NSHTTPURLResponse *) response;
 	[self.webData setLength:0];
@@ -84,10 +76,8 @@
 	AtmosError *err = [[AtmosError alloc] initWithCode:-1 message:[error localizedDescription]];
     self.callback([AtmosResult failureWithError:err withLabel:self.operationLabel]);
 	[err release];
-	//[connection release];
 	
 	[self.atmosStore operationFinishedInternal:self];
-	
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)con
@@ -104,7 +94,6 @@
 	}
 	[self.atmosStore operationFinishedInternal:self];
 }
-
 
 
 @end

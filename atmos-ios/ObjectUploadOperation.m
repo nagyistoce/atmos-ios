@@ -187,7 +187,7 @@
             sendData = self.atmosObj.data;
         }
 		[req setHTTPBody:sendData];
-		NSString *clen = [NSString stringWithFormat:@"%d",nlen];
+		NSString *clen = [NSString stringWithFormat:@"%lld",nlen];
 		[req setValue:clen forHTTPHeaderField:@"Content-Length"];
 	}
     
@@ -282,7 +282,6 @@
         
         [event release];
         [errStr release];
-		[self.atmosStore operationFinishedInternal:self];
 	} else {
 		//success
 		
@@ -310,10 +309,10 @@
             self->callback(event);
             
             [event release];
-			[self.atmosStore operationFinishedInternal:self];
 			[self.fileHandle closeFile];
 		}
 	}
+    [self.atmosStore operationFinishedInternal:self];
 	
 }
 

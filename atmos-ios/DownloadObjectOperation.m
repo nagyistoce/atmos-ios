@@ -36,6 +36,18 @@
 
 @synthesize atmosObj, fileHandle, startByte, endByte, fileOffset, callback;
 
+- (void) dealloc {
+    self.atmosObj = nil;
+    self.fileHandle = nil;
+    self.callback = nil;
+    if(webData) {
+        [webData release];
+        webData = nil;
+    }
+    
+    [super dealloc];
+}
+
 - (void) startAtmosOperation {
 	
 	bytesDownloaded = 0;
@@ -140,6 +152,9 @@
             
             // We didn't know the length before, re-init now with a valid
             // capacity.
+            if(webData) {
+                [webData release];
+            }
             webData = [[NSMutableData alloc] initWithCapacity:totalContentSize];
         }
     }
@@ -153,7 +168,7 @@
 - (void)connection:(NSURLConnection *)con didReceiveData:(NSData *)data
 {
 	if([self.httpResponse statusCode] >= 400) {
-		[self.webData appendData:data];
+		[webData appendData:data];
 	} else {
 		bytesDownloaded += data.length;
         if(atmosObj.dataMode == kDataModeFile) {
@@ -221,7 +236,6 @@
     [err release];
     [progress release];
 
-	[err release];
 	[self.fileHandle closeFile];
 	[self.atmosStore operationFinishedInternal:self];
 	
@@ -233,7 +247,7 @@
 	if([self.httpResponse statusCode] >= 400) {
 		//some atmos error
 		//some atmos error
-		NSString *errStr = [[NSString alloc] initWithData:self.webData encoding:NSASCIIStringEncoding];
+		NSString *errStr = [[NSString alloc] initWithData:webData encoding:NSASCIIStringEncoding];
 		AtmosError *aerr = [self extractAtmosError:errStr];
         DownloadProgress *progress = [[DownloadProgress alloc] init];
         progress.atmosObject = atmosObj;
@@ -245,6 +259,7 @@
         progress.requestLabel = self.operationLabel;
         self.callback(progress);
         [progress release];
+        [errStr release];
 	} else {
 		
 		[self extractEMCMetaFromResponse:self.httpResponse toObject:self.atmosObj];
@@ -265,8 +280,8 @@
 		self.callback(progress);
         [progress release];
 
-		[self.atmosStore operationFinishedInternal:self];
 	}
+    [self.atmosStore operationFinishedInternal:self];
 
 	
 }

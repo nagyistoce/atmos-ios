@@ -41,6 +41,11 @@
 #import "GetServerOffsetResult.h"
 #import "ServiceInformation.h"
 #import "ObjectInformation.h"
+#import "TNSAccessTokensListType.h"
+#import "TNSPolicyType.h"
+#import "CreateAccessTokenResult.h"
+#import "GetAccessTokenInfoResult.h"
+#import "ListAccessTokensResult.h"
 
 #define ATMOS_DEFAULT_BUF_SIZE 4194304 //4MB is the buffer Atmos uses on the server
 
@@ -311,6 +316,115 @@
                  withCallback:(void(^)(ObjectInformation *result)) callback
                     withLabel:(NSString*) requestLabel;
 
+#pragma mark Access Tokens
+
+/*!
+ * @abstract Creates a new, empty access token.  This token will be
+ * created with one upload.  You must capture the HTTP response to
+ * extract the HTTP "Location" header or put x-emc-redirect-url in an HTTP
+ * form to get the created ObjectId.  See the Atmos Programmer's Guide
+ * for more information on using tokens.
+ * @param callback the block to execute when the operation is
+ * complete.
+ * @param requestLabel the label for the request.
+ * @since Atmos 2.1.0
+ */
+- (void) createAccessToken:(void(^)(CreateAccessTokenResult *result)) callback
+                             withLabel:(NSString*) requestLabel;
+
+/*!
+ * @abstract Creates a new access token.  The supplied policy will be
+ * applied to the token.  If userMetadata, listableMetadata, or acl are non-nil,
+ * they will be applied to the created object.  You must capture the HTTP 
+ * response to extract the HTTP "Location" header or put x-emc-redirect-url in 
+ * an HTTP form to get the created ObjectId.  See the Atmos Programmer's Guide
+ * for more information on using tokens.
+ * @param policy if non-nil, the policy to apply to the token.  If nil, a
+ * default policy will be applied (1 upload, expires in 24 hours).
+ * @param userMetadata if non-nil, the User Metadata to apply to the object.
+ * @param listableMetadata if non-nil, the Listable Metadata tags to apply to
+ * the object.
+ * @param acl if non-nil, the ACL to apply to the new object.  If nil, the
+ * object will get the default ACL (uid=FULL_CONTROL,other=NONE).
+ * @param callback the block to execute when the operation is
+ * complete.
+ * @param requestLabel the label for the request.
+ * @since Atmos 2.1.0
+ */
+- (void) createAccessTokenWithPolicy:(TNSPolicyType*) policy
+                        withMetadata:(NSDictionary*) userMetadata
+                withListableMetadata:(NSDictionary*) listableMetadata
+                             withAcl:(NSArray*) acl
+                        withCallback:(void(^)(CreateAccessTokenResult *result)) callback
+                           withLabel:(NSString*) requestLabel;
+
+/*!
+ * @abstract Creates a new access token for the given Object.  The object
+ * parameter may contain an object ID, a namespace path, metadata, and an
+ * ACL.  These values will be applied to an object created with the token.
+ * If not using namespace, you must capture the HTTP response to extract the 
+ * HTTP "Location" header or put x-emc-redirect-url in an HTTP form to get the 
+ * created ObjectId.  See the Atmos Programmer's Guide for more information on 
+ * using tokens.
+ * @param object the AtmosObject containing parameters for the object associated
+ * with the token.  If objectId and path are nil in the object, a new
+ * objectId will be created when the token is uploaded to.  If a path is 
+ * specified for an upload token, the object will be created on that path.  For
+ * download tokens, you should specify either a path or objectId.  If both are
+ * specified, the path will take precedence.
+ * @param policy if non-nil, the policy to apply to the token.  If nil, a
+ * default policy will be applied (1 upload, expires in 24 hours).
+ * @param callback the block to execute when the operation is
+ * complete.
+ * @param requestLabel the label for the request.
+ * @since Atmos 2.1.0
+ */
+- (void) createAccessTokenForObject:(AtmosObject*)object
+                         withPolicy:(TNSPolicyType*) policy
+                       withCallback:(void(^)(CreateAccessTokenResult *result)) callback
+                          withLabel:(NSString*) requestLabel;
+
+/*!
+ * @abstract deletes an access token.
+ * @param accessTokenId the ID of the token to delete.
+ * @param callback the block to execute when the operation is
+ * complete.
+ * @param requestLabel the label for the request.
+ * @since Atmos 2.1.0
+ */ 
+- (void) deleteAccessToken:(NSString*)accessTokenId
+              withCallback:(void(^)(AtmosResult* result)) callback
+                 withLabel:(NSString*) requestLabel;
+
+/*!
+ * @abstract gets information about an access token.
+ * @param accessTokenId the ID of the access token to fetch information about.
+ * @param callback the block to execute when the operation is
+ * complete.
+ * @param requestLabel the label for the request.
+ * @since Atmos 2.1.0
+ */
+- (void) getAccessTokenInfo:(NSString*)accessTokenId
+               withCallback:(void(^)(GetAccessTokenInfoResult *result)) callback
+                  withLabel:(NSString*) requestLabel;
+
+/*!
+ * @abstract Lists access tokens for the current subtenant.  Be sure to check
+ * the result object for a pagination token.  If the token is non-nil, execute
+ * this method again with the token set to continue the listing.
+ * @param if nonzero, the maximum number of tokens to return in the listing.
+ * the default limit is 5000.
+ * @param token the pagination token to continue listing from.  Set to nil on
+ * your first request.
+ * @param callback the block to execute when the operation is
+ * complete.
+ * @param requestLabel the label for the request.
+ * @since Atmos 2.1.0
+ */
+- (void) listAccessTokensWithLimit:(int)limit
+                         withToken:(NSString*)token
+                      withCallback:(void(^)(ListAccessTokensResult *result)) callback
+                         withLabel:(NSString*) requestLabel;
 
 #pragma mark Properties
 @property (nonatomic,retain) AtmosCredentials *atmosCredentials;

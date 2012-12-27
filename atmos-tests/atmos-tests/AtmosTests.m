@@ -104,12 +104,14 @@ char innerChars[] = FN_CHARS " "; // No leading or trailing spaces
     creds.httpProtocol= creds.portNumber == 443?@"https":@"http";
     
     // Set-up code here.
-    atmosStore = [[AtmosStore alloc] init];
-    atmosStore.atmosCredentials = creds;
+    AtmosStore *atmos = [[AtmosStore alloc] init];
+    atmos.atmosCredentials = creds;
+    self.atmosStore = atmos;
     [creds release];
+    [atmos release];
     
     // Clear the cleanup
-    cleanup = [[NSMutableArray alloc] init];
+    self.cleanup = [NSMutableArray array];
     
     failure = nil;
     
@@ -133,10 +135,122 @@ char innerChars[] = FN_CHARS " "; // No leading or trailing spaces
         [obj release];
     }
     
-    [cleanup release];
-    [atmosStore release];
+    self.cleanup = nil;
+    self.atmosStore = nil;
     failure = nil;
     
+}
+
+NSString *xml_input = @"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"\
+"<policy>\n" \
+"    <expiration>2012-12-01T12:00:00.000Z</expiration>\n"\
+"    <max-uploads>1</max-uploads>\n"\
+"    <source>\n"\
+"        <allow>127.0.0.0/24</allow>\n"\
+"    </source>\n"\
+"    <content-length-range from=\"10\" to=\"11000\"/>\n"\
+"    <form-field name=\"x-emc-redirect-url\"></form-field>\n"\
+"    <form-field name=\"x-emc-meta\" optional=\"true\">\n"\
+"        <matches>^(\\w+=\\w+)|((\\w+=\\w+),(\\w+, \\w+))$</matches>\n"\
+"    </form-field>\n"\
+"</policy>\n";
+
+NSString *xml_output = @"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"\
+"<policy>\n"\
+"  <expiration>2012-12-01T12:00:00Z</expiration>\n"\
+"  <max-uploads>1</max-uploads>\n"\
+"  <source>\n"\
+"    <allow>127.0.0.0/24</allow>\n"\
+"  </source>\n"\
+"  <content-length-range from=\"10\" to=\"11000\"/>\n"\
+"  <form-field name=\"x-emc-redirect-url\"/>\n"\
+"  <form-field name=\"x-emc-meta\" optional=\"true\">\n"\
+"    <matches>^(\\w+=\\w+)|((\\w+=\\w+),(\\w+, \\w+))$</matches>\n"\
+"  </form-field>\n"\
+"</policy>\n";
+
+
+- (void)testXmlParse
+{
+    TNSPolicyType *policy;
+    
+    NSLog(@"XML: %@", xml_input);
+    const char *xml_bytes = [xml_input UTF8String];
+    
+    policy = [TNSPolicyType fromPolicy:[NSData dataWithBytes:xml_bytes length:strlen(xml_bytes)]];
+    
+    GHAssertNotNil(policy, @"Failed to parse policy");
+    GHAssertNotNil(policy.expiration, @"Expiration not set");
+    GHAssertEquals(1354363200.0, [policy.expiration timeIntervalSince1970], @"Expiration incorrect");
+    GHAssertNotNil(policy.maxUploads, @"Max uploads not set");
+    GHAssertEquals(1, [policy.maxUploads intValue], @"Max uploads incorrect");
+    GHAssertNil(policy.maxDownloads, @"Max downloads should not be set");
+    GHAssertNotNil(policy.source, @"Source no set");
+    GHAssertEquals(1, (int)policy.source.allow.count, @"Allow count incorrect");
+    GHAssertEquals(0, (int)policy.source.disallow.count, @"Disallow count incorrect");
+    GHAssertEqualStrings(@"127.0.0.0/24", (NSString*)policy.source.allow[0], @"Allow IP range incorrect");
+    GHAssertEquals(10, [policy.contentLengthRange.from intValue], @"Content length range from incorrect");
+    GHAssertEquals(11000, [policy.contentLengthRange.to intValue], @"Policy range to incorrect");
+    GHAssertEquals(2, (int)policy.formField.count, @"Incorrect form field count");
+    GHAssertEqualStrings(@"x-emc-redirect-url", ((TNSFormFieldType*)policy.formField[0]).name, @"First form field name incorrect");
+    GHAssertNil(((TNSFormFieldType*)policy.formField[0]).optional, @"First form field should not have optional set.");
+    GHAssertEquals(0, (int)((TNSFormFieldType*)policy.formField[0]).contains.count, @"First form field should not have any contains elements");
+    GHAssertEquals(0, (int)((TNSFormFieldType*)policy.formField[0]).matches.count, @"First form field should not have any contains elements");
+    GHAssertEquals(0, (int)((TNSFormFieldType*)policy.formField[0]).endsWith.count, @"First form field should not have any contains elements");
+    GHAssertEquals(0, (int)((TNSFormFieldType*)policy.formField[0]).eq.count, @"First form field should not have any contains elements");
+    GHAssertEqualStrings(@"x-emc-meta", ((TNSFormFieldType*)policy.formField[1]).name, @"Second form field name incorrect");
+    GHAssertNotNil(((TNSFormFieldType*)policy.formField[1]).optional, @"Second form field should have optional set");
+    GHAssertEquals(YES, [((TNSFormFieldType*)policy.formField[1]).optional boolValue], @"Second form field should be optional");
+    GHAssertEquals(0, (int)((TNSFormFieldType*)policy.formField[1]).contains.count, @"Second form field should not have any contains elements");
+    GHAssertEquals(1, (int)((TNSFormFieldType*)policy.formField[1]).matches.count, @"Second form field should have one contains elements");
+    GHAssertEquals(0, (int)((TNSFormFieldType*)policy.formField[1]).endsWith.count, @"Second form field should not have any contains elements");
+    GHAssertEquals(0, (int)((TNSFormFieldType*)policy.formField[1]).eq.count, @"Second form field should not have any contains elements");
+    GHAssertEqualStrings(@"^(\\w+=\\w+)|((\\w+=\\w+),(\\w+, \\w+))$", ((TNSFormFieldType*)policy.formField[1]).matches[0], @"Second form field matches expression incorrect");
+}
+
+- (void)testXmlSerialize
+{
+    TNSPolicyType *policy;
+    TNSFormFieldType *field;
+    
+    // Build a policy object and then serialize it to XML.
+    policy = [[TNSPolicyType alloc] init];
+    
+    policy.expiration = [NSDate dateWithTimeIntervalSince1970:1354363200.0];
+    policy.maxUploads = [NSNumber numberWithInt:1];
+    policy.source = [[[TNSSourceType alloc] init] autorelease];
+    policy.source.allow = [NSMutableArray arrayWithObject:@"127.0.0.0/24"];
+    TNSContentLengthRangeType *contentRange = [[TNSContentLengthRangeType alloc] init];
+    contentRange.from = [NSNumber numberWithLongLong:10];
+    contentRange.to = [NSNumber numberWithLongLong:11000];
+    policy.contentLengthRange = contentRange;
+    [contentRange release];
+    field = [[TNSFormFieldType alloc] init];
+    field.name = @"x-emc-redirect-url";
+    policy.formField = [NSMutableArray arrayWithObject:field];
+    [field release];
+    field = [[TNSFormFieldType alloc] init];
+    field.name = @"x-emc-meta";
+    field.optional = [NSNumber numberWithBool:YES];
+    field.matches = [NSMutableArray arrayWithObject:@"^(\\w+=\\w+)|((\\w+=\\w+),(\\w+, \\w+))$"];
+    [policy.formField addObject:field];
+    [field release];
+    
+    NSData *xml = [policy toPolicy];
+    [policy release];
+    
+    // Append a null terminator to make it a CString
+    char *xmlCStr = malloc([xml length] +1);
+    [xml getBytes:xmlCStr];
+    xmlCStr[[xml length]] = 0;
+    
+    // Back to a string so we can compare it.
+    NSString *xmlStr = [NSString stringWithCString:xmlCStr encoding:NSUTF8StringEncoding];
+    
+    free(xmlCStr);
+    
+    // Compare
+    GHAssertEqualStrings(xml_output, xmlStr, @"Serialized XML does not match");
 }
 
 - (void)testSignatureFailure
@@ -248,8 +362,10 @@ char innerChars[] = FN_CHARS " "; // No leading or trailing spaces
     [self prepare];
     
     AtmosObject *obj = [[AtmosObject alloc] init];
-    obj.userListableMeta = [[NSMutableDictionary alloc] 
-                            initWithObjectsAndKeys:@"",@"listable", nil];
+    NSMutableDictionary *userListableMeta = [[NSMutableDictionary alloc]
+                                             initWithObjectsAndKeys:@"",@"listable", nil];
+    obj.userListableMeta = userListableMeta;
+    [userListableMeta release];
     [atmosStore createObject:obj withCallback:^BOOL(UploadProgress *progress) {
         @try {
             // Check
@@ -293,6 +409,8 @@ char innerChars[] = FN_CHARS " "; // No leading or trailing spaces
                      [results containsObject:atmosObject],
                      @"List objects result didn't include %@",
                      atmosObject2.atmosId);
+        
+        [results release];
         
         // Notify async test complete.
         [self notify:kGHUnitWaitStatusSuccess 
@@ -346,6 +464,7 @@ char innerChars[] = FN_CHARS " "; // No leading or trailing spaces
                    }
                    @catch (NSException *exception) {
                        self.failure = exception;
+                       [results release];
                        [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testListObjectsWithToken)];
                        return;
                    }
@@ -369,8 +488,10 @@ char innerChars[] = FN_CHARS " "; // No leading or trailing spaces
     
     
     AtmosObject *obj = [[AtmosObject alloc] init];
-    obj.userListableMeta = [[NSMutableDictionary alloc] 
-                            initWithObjectsAndKeys:@"",@"tokentest", nil];
+    NSMutableDictionary *userListableMeta = [[NSMutableDictionary alloc]
+                                             initWithObjectsAndKeys:@"",@"tokentest", nil];
+    obj.userListableMeta = userListableMeta;
+    [userListableMeta release];
     [atmosStore createObject:obj withCallback:^BOOL(UploadProgress *progress) {
         @try {
             // Check
@@ -404,8 +525,10 @@ char innerChars[] = FN_CHARS " "; // No leading or trailing spaces
     [self prepare];
     
     AtmosObject *obj = [[AtmosObject alloc] init];
-    obj.userListableMeta = [[NSMutableDictionary alloc] 
-                            initWithObjectsAndKeys:@"",@"tokentest", nil];
+    NSMutableDictionary *userListableMeta = [[NSMutableDictionary alloc]
+                                             initWithObjectsAndKeys:@"",@"tokentest", nil];
+    obj.userListableMeta = userListableMeta;
+    [userListableMeta release];
     [atmosStore createObject:obj withCallback:^BOOL(UploadProgress *progress) {
         @try {
             // Check
@@ -1932,8 +2055,374 @@ withDirectory:(NSString *)dir
     } withLabel:@"testGetObjectInformation"];
     
     [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
-    [self checkFailure];    
+    [self checkFailure];
+    [obj release];
     
 }
+
+-(void) subTestCreateAccessToken1:(NSString*)accessTokenId {
+    GHAssertNotNil(accessTokenId, @"Access token ID was Nil");
+    NSLog(@"Created Access Token %@", accessTokenId);
+    
+    // Delete it.
+    [atmosStore deleteAccessToken:accessTokenId withCallback:^(AtmosResult *result) {
+        @try {
+            [self checkResult:result];
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testCreateAccessToken)];
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testCreateAccessToken)];
+        }
+        
+    } withLabel:@"subTestCreateAccessToken1"];
+}
+
+/*!
+ * Test creating and deleting an access token
+ */
+- (void) testCreateAccessToken
+{
+    [self prepare];
+    [atmosStore createAccessToken:^void(CreateAccessTokenResult *result) {
+        @try {
+            [self checkResult:result];
+            
+            GHAssertNotNil(result.accessTokenId, @"Access token ID should not be nil");
+            NSURL *url = [result getURLForToken];
+            GHAssertNotNil(url, @"URL for token should not be nil.");
+            NSLog(@"Token URL: %@", [url absoluteString]);
+            
+            [self subTestCreateAccessToken1:result.accessTokenId];
+            
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testCreateAccessToken)];
+        }
+    } withLabel:@"testCreateAccessToken"];
+    
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [self checkFailure];
+}
+
+- (void) subTestCreateAccessTokenWithPolicy2:(NSString*)tokenId {
+    // Delete the token.
+    [atmosStore deleteAccessToken:tokenId
+                     withCallback:^(AtmosResult *result) {
+                         @try {
+                             [self checkResult:result];
+                             [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testCreateAccessTokenWithPolicy)];
+                         }
+                         @catch (NSException *exception) {
+                             self.failure = exception;
+                             [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testCreateAccessTokenWithPolicy)];
+                         }
+                         
+                     }
+                        withLabel:@"subTestCreateAccessTokenWithPolicy2"];
+}
+
+
+- (void) subTestCreateAccessTokenWithPolicy1:(NSString*)tokenId withExpiration:(NSDate*)expiration {
+    // Read back the token and check the policy.
+    [atmosStore getAccessTokenInfo:tokenId
+                      withCallback:^(GetAccessTokenInfoResult *result) {
+                          @try {
+                              [self checkResult:result];
+                              
+                              TNSAccessTokenType *token = result.tokenInfo;
+                              GHAssertNotNil(token, @"Failed to parse token info");
+                              GHAssertEqualStrings(tokenId, token.accessTokenId, @"Access token ID incorrect");
+                              GHAssertNotNil(token.expiration, @"Expiration not set");
+                              GHAssertEquals([expiration timeIntervalSince1970], [token.expiration timeIntervalSince1970], @"Expiration incorrect");
+                              GHAssertNotNil(token.maxUploads, @"Max uploads not set");
+                              GHAssertEquals(1, [token.maxUploads intValue], @"Max uploads incorrect");
+                              GHAssertNotNil(token.maxDownloads, @"Max downloads should be set");
+                              GHAssertEquals(0, [token.maxDownloads intValue], @"Max downloads incorrect");
+                              GHAssertNotNil(token.source, @"Source no set");
+                              GHAssertEquals(1, (int)token.source.allow.count, @"Allow count incorrect");
+                              GHAssertEquals(0, (int)token.source.disallow.count, @"Disallow count incorrect");
+                              GHAssertEqualStrings(@"127.0.0.0/24", (NSString*)token.source.allow[0], @"Allow IP range incorrect");
+                              GHAssertEquals(10, [token.contentLengthRange.from intValue], @"Content length range from incorrect");
+                              GHAssertEquals(11000, [token.contentLengthRange.to intValue], @"Policy range to incorrect");
+
+                              [self subTestCreateAccessTokenWithPolicy2:tokenId];
+                              
+                          }
+                          @catch (NSException *exception) {
+                              self.failure = exception;
+                              [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testCreateAccessTokenWithPolicy)];
+                          }
+                          
+                      }
+                         withLabel:@"subTestCreateAccessTokenWithPolicy1"];
+}
+
+- (void) testCreateAccessTokenWithPolicy
+{
+    [self prepare];
+    
+    NSDate *expiration = [[NSDate alloc] initWithTimeIntervalSinceNow:3600.0];
+    
+    // Expirations are only accurate to the second.  Round to nearest second.
+    NSTimeInterval seconds = [expiration timeIntervalSince1970];
+    seconds = floor(seconds);
+    [expiration release];
+    expiration = [[NSDate alloc] initWithTimeIntervalSince1970:seconds];
+    
+    TNSPolicyType *policy = [[TNSPolicyType alloc] init];
+    TNSFormFieldType *field;
+    
+    policy.expiration = expiration;
+    policy.maxUploads = [NSNumber numberWithInt:1];
+    policy.source = [[[TNSSourceType alloc] init] autorelease];
+    policy.source.allow = [NSMutableArray arrayWithObject:@"127.0.0.0/24"];
+    TNSContentLengthRangeType *contentRange = [[TNSContentLengthRangeType alloc] init];
+    contentRange.from = [NSNumber numberWithLongLong:10];
+    contentRange.to = [NSNumber numberWithLongLong:11000];
+    policy.contentLengthRange = contentRange;
+    [contentRange release];
+    field = [[TNSFormFieldType alloc] init];
+    field.name = @"x-emc-redirect-url";
+    policy.formField = [NSMutableArray arrayWithObject:field];
+    [field release];
+    field = [[TNSFormFieldType alloc] init];
+    field.name = @"x-emc-meta";
+    field.optional = [NSNumber numberWithBool:YES];
+    field.matches = [NSMutableArray arrayWithObject:@"^(\\w+=\\w+)|((\\w+=\\w+),(\\w+, \\w+))$"];
+    [policy.formField addObject:field];
+    [field release];
+    
+    [atmosStore createAccessTokenWithPolicy:policy
+                               withMetadata:nil
+                       withListableMetadata:nil
+                                    withAcl:nil
+                               withCallback:^(CreateAccessTokenResult *result) {
+                                   @try {
+                                       [self checkResult:result];
+                                       
+                                       GHAssertNotNil(result.accessTokenId, @"Access token ID should not be nil");
+                                       NSURL *url = [result getURLForToken];
+                                       GHAssertNotNil(url, @"URL for token should not be nil.");
+                                       NSLog(@"Token URL: %@", [url absoluteString]);
+                                       
+                                       [self subTestCreateAccessTokenWithPolicy1:result.accessTokenId withExpiration:expiration];
+                                       
+                                   }
+                                   @catch (NSException *exception) {
+                                       self.failure = exception;
+                                       [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testCreateAccessTokenWithPolicy)];
+                                   }
+                                   
+                               }
+                                  withLabel:@"testCreateAccessTokenWithPolicy"];
+    
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [self checkFailure];
+    [policy release];
+    [expiration release];
+    
+}
+
+- (void) subTestDownloadToken2:(NSURL*)url {
+    NSURLRequest *req = [[NSURLRequest alloc] initWithURL:url];
+    NSHTTPURLResponse *res;
+    NSError *error;
+    
+    NSData *body = [NSURLConnection sendSynchronousRequest:req returningResponse:&res error:&error];
+    
+    GHAssertEquals(200, res.statusCode, @"Bad status code downloading URL");
+    GHAssertNotNil(body, @"Failed to load URL: %@", error);
+    GHAssertNotNil(res, @"Response body nil.");
+    GHAssertEqualStrings(@"text/plain; charset=UTF-8", [[res allHeaderFields] valueForKey:@"Content-Type"], @"Content type incorrect");
+    GHAssertEqualStrings(@"Hello World", [NSString stringWithUTF8String:[body bytes]], @"Body conntent incorrect");
+    [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testDownloadToken)];
+}
+    
+
+- (void) subTestDownloadToken1:(AtmosObject*)atmosObject {
+    TNSPolicyType *policy = [[TNSPolicyType alloc] init];
+    
+    policy.maxDownloads = [NSNumber numberWithInt:1];
+    
+    [atmosStore createAccessTokenForObject:atmosObject withPolicy:policy withCallback:^(CreateAccessTokenResult *result) {
+        @try {
+            [self checkResult:result];
+            
+            GHAssertNotNil(result.accessTokenId, @"Access token ID should not be nil");
+            NSURL *url = [result getURLForToken];
+            GHAssertNotNil(url, @"URL for token should not be nil.");
+            NSLog(@"Token URL: %@", [url absoluteString]);
+            
+            [self subTestDownloadToken2:url];
+            
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testDownloadToken)];
+        }
+
+    } withLabel:@"subTestDownloadToken1"];
+    
+    [policy release];
+}
+
+- (void) testDownloadToken {
+    [self prepare];
+    
+    AtmosObject *obj = [[AtmosObject alloc] init];
+    obj.dataMode = kDataModeBytes;
+    obj.data = [NSData dataWithBytes:[@"Hello World" UTF8String] length:12];
+    obj.contentType = @"text/plain; charset=UTF-8";
+    
+    [atmosStore createObject:obj
+                withCallback:^BOOL(UploadProgress *progress) {
+                    @try {
+                        [self checkResult:progress];
+                        
+                        if(progress.isComplete){
+                            GHAssertNotNil(progress.atmosObject,
+                                           @"Expected New ID to be non-Nil");
+                            GHAssertNotNil(progress.atmosObject.atmosId,
+                                           @"Expected New ID to be non-Nil");
+                            [self.cleanup addObject:progress.atmosObject.atmosId];
+                            [self subTestDownloadToken1:progress.atmosObject];
+                        }
+                    }
+                    @catch (NSException *exception) {
+                        self.failure = exception;
+                        [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testDownloadToken)];
+                        return NO;
+                    }
+                    
+                    return YES;
+                }
+                   withLabel:@"testCreateObjectWithContent"];
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [obj release];
+    [self checkFailure];
+    
+}
+
+- (void) subTestListAccessTokens1:(NSString*)accessTokenId
+                   withExpiration:(NSDate*)expiration
+                    withPageToken:(NSString*)token
+                       tokenFound:(BOOL)found
+                        withCount:(NSInteger)pageCount {
+    [atmosStore listAccessTokensWithLimit:1
+                                withToken:token
+                             withCallback:^(ListAccessTokensResult *result) {
+             BOOL localFind = found;
+             NSInteger localCount = pageCount;
+             @try {
+                 [self checkResult:result];
+                 localCount++;
+                 NSLog(@"Page %d", localCount);
+                 
+                 GHAssertNotNil(result.results, @"Results object should be non-nil");
+                 GHAssertNotNil(result.results.accessTokensList, @"Access token list should be non-nil");
+                 GHAssertNotNil(result.results.accessTokensList.accessToken, @"Access token array should be non-nil");
+                 NSMutableArray *tokenlist = result.results.accessTokensList.accessToken;
+                 for(TNSAccessTokenType *token in tokenlist) {
+                     if([token.accessTokenId isEqualToString:accessTokenId]) {
+                         localFind = YES;
+                         GHAssertEquals(1, [token.maxUploads intValue], @"Found token but maxUploads is wrong");
+                         GHAssertEquals([expiration timeIntervalSince1970], [token.expiration timeIntervalSince1970], @"Found token but expiration is wrong");
+                     }
+                 }
+                 
+                 // See if there is more results
+                 if(result.token != nil) {
+                     [self subTestListAccessTokens1:accessTokenId
+                                     withExpiration:expiration
+                                      withPageToken:result.token
+                                         tokenFound:localFind
+                                          withCount:localCount];
+                 } else {
+                     // Done.
+                     GHAssertTrue(localFind, @"Access token not found");
+                     [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testListAccessTokens)];                     
+                 }
+             }
+             @catch (NSException *exception) {
+                 self.failure = exception;
+                 [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testListAccessTokens)];
+             }
+        
+    } withLabel:@"subTestListAccessTokens1"];
+    
+}
+
+- (void) testListAccessTokens {
+    [self prepare];
+    
+    NSDate *expiration = [[NSDate alloc] initWithTimeIntervalSinceNow:3600.0];
+    
+    // Expirations are only accurate to the second.  Round to nearest second.
+    NSTimeInterval seconds = [expiration timeIntervalSince1970];
+    seconds = floor(seconds);
+    [expiration release];
+    expiration = [[NSDate alloc] initWithTimeIntervalSince1970:seconds];
+    
+    TNSPolicyType *policy = [[TNSPolicyType alloc] init];
+    TNSFormFieldType *field;
+    
+    policy.expiration = expiration;
+    policy.maxUploads = [NSNumber numberWithInt:1];
+    policy.source = [[[TNSSourceType alloc] init] autorelease];
+    policy.source.allow = [NSMutableArray arrayWithObject:@"127.0.0.0/24"];
+    TNSContentLengthRangeType *contentRange = [[TNSContentLengthRangeType alloc] init];
+    contentRange.from = [NSNumber numberWithLongLong:10];
+    contentRange.to = [NSNumber numberWithLongLong:11000];
+    policy.contentLengthRange = contentRange;
+    [contentRange release];
+    field = [[TNSFormFieldType alloc] init];
+    field.name = @"x-emc-redirect-url";
+    policy.formField = [NSMutableArray arrayWithObject:field];
+    [field release];
+    field = [[TNSFormFieldType alloc] init];
+    field.name = @"x-emc-meta";
+    field.optional = [NSNumber numberWithBool:YES];
+    field.matches = [NSMutableArray arrayWithObject:@"^(\\w+=\\w+)|((\\w+=\\w+),(\\w+, \\w+))$"];
+    [policy.formField addObject:field];
+    [field release];
+    
+    [atmosStore createAccessTokenWithPolicy:policy
+                               withMetadata:nil
+                       withListableMetadata:nil
+                                    withAcl:nil
+                               withCallback:^(CreateAccessTokenResult *result) {
+                                   @try {
+                                       [self checkResult:result];
+                                       
+                                       GHAssertNotNil(result.accessTokenId, @"Access token ID should not be nil");
+                                       NSURL *url = [result getURLForToken];
+                                       GHAssertNotNil(url, @"URL for token should not be nil.");
+                                       NSLog(@"Token URL: %@", [url absoluteString]);
+                                       
+                                       [self subTestListAccessTokens1:result.accessTokenId
+                                                       withExpiration:expiration
+                                                        withPageToken:nil
+                                                           tokenFound:NO
+                                                            withCount:0];
+                                       
+                                   }
+                                   @catch (NSException *exception) {
+                                       self.failure = exception;
+                                       [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testListAccessTokens)];
+                                   }
+                                   
+                               }
+                                  withLabel:@"testListAccessTokens"];
+    
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [self checkFailure];
+    [policy release];
+    [expiration release];
+    
+    
+}
+
 
 @end

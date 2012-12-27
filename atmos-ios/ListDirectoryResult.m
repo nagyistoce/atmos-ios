@@ -34,7 +34,7 @@
 @implementation ListDirectoryResult
 
 @synthesize parent;
-
+	
 -(void) dealloc
 {
     self.parent = nil;
