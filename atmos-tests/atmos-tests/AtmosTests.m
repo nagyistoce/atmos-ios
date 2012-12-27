@@ -41,7 +41,9 @@
 
 @synthesize atmosStore,cleanup,failure,settings;
 
-#define FN_CHARS "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_=+*,!#%$&()"
+NSString *const TEST_KEYPOOL = @"test_keypool_objc";
+
+#define FN_CHARS "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_=+*!#%$&()"
 
 char outerChars[] = FN_CHARS;
 char innerChars[] = FN_CHARS " "; // No leading or trailing spaces
@@ -60,8 +62,18 @@ char innerChars[] = FN_CHARS " "; // No leading or trailing spaces
     if(includeExtension) {
         [fname appendString:@"."];
         for(int j=0; j<3; j++) {
-            [fname appendFormat:@"%c", outerChars[rand()%strlen(outerChars)]];            
+            [fname appendFormat:@"%c", outerChars[rand()%strlen(outerChars)]];
         }
+    }
+    
+    return fname;
+}
+
+-(NSString*) generateKey:(int)length {
+    NSMutableString *fname = [[[NSMutableString alloc] init] autorelease];
+    
+    for(int i=0; i<length; i++) {
+        [fname appendFormat:@"%c", innerChars[random()%strlen(innerChars)]];
     }
     
     return fname;
@@ -1983,6 +1995,9 @@ withDirectory:(NSString *)dir
 
 - (void) subTestGetObjectInformation1:(AtmosObject*) atmosObject
 {
+    // Queue the object for cleanup
+    [self.cleanup addObject:atmosObject.atmosId];
+
     // Read back the object information
     [atmosStore getObjectInformation:atmosObject withCallback:^(ObjectInformation *result) {
         
@@ -2238,6 +2253,7 @@ withDirectory:(NSString *)dir
     GHAssertEqualStrings(@"text/plain; charset=UTF-8", [[res allHeaderFields] valueForKey:@"Content-Type"], @"Content type incorrect");
     GHAssertEqualStrings(@"Hello World", [NSString stringWithUTF8String:[body bytes]], @"Body conntent incorrect");
     [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testDownloadToken)];
+    [req release];
 }
     
 
@@ -2422,6 +2438,609 @@ withDirectory:(NSString *)dir
     [expiration release];
     
     
+}
+
+
+- (void)subTestCreateObjectWithContentKeypool1:(AtmosObject*)atmosObject
+{
+    // Add new object to cleanup list
+    [cleanup addObject:atmosObject.atmosId];
+    
+    // Clear the atmosId to ensure we load by key.
+    atmosObject.atmosId = nil;
+    
+    // Read the object back and check contents.
+    atmosObject.data = nil;
+    atmosObject.dataMode = kDataModeBytes;
+    atmosObject.contentType = nil;
+    [atmosStore readObject:atmosObject
+              withCallback:^BOOL(DownloadProgress *progress) {
+                  @try {
+                      [self checkResult:progress];
+                      if(progress.isComplete){
+                          GHAssertNotNil(progress.atmosObject.data,
+                                         @"Expected data to be non-Nil");
+                          GHAssertEqualStrings(@"Hello World",
+                                               [NSString stringWithUTF8String:[progress.atmosObject.data bytes]],
+                                               @"Expected strings to match");
+                          GHAssertEqualStrings(@"text/foo",
+                                               progress.atmosObject.contentType,
+                                               @"Expected MIME types to match");
+                      }
+                  }
+                  @catch (NSException *exception) {
+                      self.failure = exception;
+                      [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testCreateObjectWithContentKeypool)];
+                      return NO;
+                  }
+                  // Notify async test complete.
+                  [self notify:kGHUnitWaitStatusSuccess
+                   forSelector:@selector(testCreateObjectWithContentKeypool)];
+                  return YES;
+                  
+              }
+                 withLabel:@"subTestCreateObjectWithContentKeypool1"];
+}
+
+- (void)testCreateObjectWithContentKeypool
+{
+    [self prepare];
+    
+    AtmosObject *obj = [[AtmosObject alloc] initWithKeypool:TEST_KEYPOOL withKey:[self generateKey:32]];
+    obj.dataMode = kDataModeBytes;
+    obj.data = [NSData dataWithBytes:[@"Hello World" UTF8String] length:12];
+    obj.contentType = @"text/foo";
+    
+    NSLog(@"Creating key %@ in pool %@", obj.objectPath, obj.keypool);
+    
+    [atmosStore createObject:obj
+                withCallback:^BOOL(UploadProgress *progress) {
+                    @try {
+                        [self checkResult:progress];
+                        
+                        if(progress.isComplete){
+                            GHAssertNotNil(progress.atmosObject,
+                                           @"Expected New ID to be non-Nil");
+                            [self subTestCreateObjectWithContentKeypool1:obj];
+                        }
+                    }
+                    @catch (NSException *exception) {
+                        self.failure = exception;
+                        [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testCreateObjectWithContentKeypool)];
+                        return NO;
+                    }
+                    
+                    return YES;
+                }
+                   withLabel:@"testCreateObjectWithContentKeypool"];
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [obj release];
+    [self checkFailure];
+    
+}
+
+- (void)subTestGetSystemMetadataKeypool1:(AtmosObject*)obj
+{
+    // Add new object to cleanup list
+    [cleanup addObject:obj.atmosId];
+    
+    // Clear the atmosId to force loading by keypool
+    obj.atmosId = nil;
+    
+    // Read the object back and check contents.
+    [atmosStore getAllSytemMetadataForKeypool:TEST_KEYPOOL withKey:obj.objectPath
+                                withCallback:^(AtmosObjectResult *result) {
+                                @try {
+                                    [self checkResult:result];
+                                    
+                                    GHAssertEquals(12,
+                                                   [[result.atmosObject.systemMeta objectForKey:@"size"] integerValue],
+                                                   @"Size should be 12");
+                                }
+                                @catch (NSException *exception) {
+                                    self.failure = exception;
+                                    [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testGetSystemMetadataKeypool)];
+                                    return;
+                                }
+                                // Notify async test complete.
+                                [self notify:kGHUnitWaitStatusSuccess
+                                 forSelector:@selector(testGetSystemMetadataKeypool)];
+                                
+                            }
+                               withLabel:@"subTestGetSystemMetadataKeypool1"];
+}
+
+- (void)testGetSystemMetadataKeypool
+{
+    [self prepare];
+    
+    // Create an object with content, verify size
+    AtmosObject *obj = [[AtmosObject alloc] initWithKeypool:TEST_KEYPOOL withKey:[self generateKey:32]];
+    obj.dataMode = kDataModeBytes;
+    obj.data = [NSData dataWithBytes:[@"Hello World" UTF8String] length:12];
+    
+    [atmosStore createObject:obj
+                withCallback:^BOOL(UploadProgress *progress) {
+                    @try {
+                        [self checkResult:progress];
+                        
+                        if(progress.isComplete){
+                            GHAssertNotNil(progress.atmosObject,
+                                           @"Expected New ID to be non-Nil");
+                            [self subTestGetSystemMetadataKeypool1:obj];
+                        }
+                    }
+                    @catch (NSException *exception) {
+                        self.failure = exception;
+                        [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testGetSystemMetadataKeypool)];
+                        return NO;
+                    }
+                    
+                    return YES;
+                }
+                   withLabel:@"testGetSystemMetadataKeypool"];
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [obj release];
+    [self checkFailure];
+}
+
+- (void) subTestSetUserMetadataKeypool2:(AtmosObject*)atmosObject
+{
+    // Read the object back and check metadata
+    [atmosStore getAllMetadataForKeypool:TEST_KEYPOOL
+                                 withKey:atmosObject.objectPath
+                       withCallback:^(AtmosObjectResult *result) {
+                           @try {
+                               [self checkResult:result];
+                               GHAssertEqualStrings(@"newvalue",
+                                                    [result.atmosObject.userRegularMeta
+                                                     objectForKey:@"listable"],
+                                                    @"Metadata value was not correct");
+                               
+                               GHAssertNil([result.atmosObject.userListableMeta objectForKey:@"listable"], @"metadata with name listable should not be in listable dictionary");
+                           }
+                           @catch (NSException *exception) {
+                               self.failure = exception;
+                               [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testSetUserMetadataKeypool)];
+                               return;
+                           }
+                           
+                           
+                           // Notify async test complete.
+                           [self notify:kGHUnitWaitStatusSuccess
+                            forSelector:@selector(testSetUserMetadataKeypool)];
+                       } withLabel:@"subTestSetUserMetadataKeypool2"];
+    
+}
+
+- (void) subTestSetUserMetadataKeypool1:(AtmosObject*)atmosObject
+{
+    // Add to cleanup
+    [cleanup addObject:atmosObject.atmosId];
+    
+    // Unset atmosId to force loading by keypool
+    atmosObject.atmosId = nil;
+    
+    // Update the metadata, change the value and make it non-listable.
+    atmosObject.userListableMeta = [NSMutableDictionary dictionary];
+    atmosObject.userRegularMeta = [NSMutableDictionary dictionaryWithObjectsAndKeys:@"newvalue",@"listable", nil];
+    [atmosStore setObjectMetadata:atmosObject withCallback:^(AtmosResult *result) {
+        @try {
+            [self checkResult:result];
+            
+            [self subTestSetUserMetadataKeypool2:atmosObject];
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testSetUserMetadataKeypool)];
+            return;
+        }
+    } withLabel:@"subTestSetUserMetadataKeypool1"];
+    
+}
+
+- (void) testSetUserMetadataKeypool
+{
+    [self prepare];
+    
+    // Create an object with some metadata
+    AtmosObject *obj = [[AtmosObject alloc] initWithKeypool:TEST_KEYPOOL withKey:[self generateKey:32]];
+    obj.userListableMeta = [NSMutableDictionary
+                            dictionaryWithObjectsAndKeys:@"",@"listable", nil];
+    [atmosStore createObject:obj withCallback:^BOOL(UploadProgress *progress) {
+        @try {
+            // Check
+            [self checkResult:progress];
+            
+            if(progress.isComplete) {
+                [self subTestSetUserMetadataKeypool1:progress.atmosObject];
+            }
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testSetUserMetadataKeypool)];
+            return NO;
+        }
+        
+        return YES;
+    } withLabel:@"testSetUserMetadataKeypool"];
+    
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [obj release];
+    [self checkFailure];
+    
+}
+
+- (void) subTestDeleteObjectMetadataKeypool2:(AtmosObject*)atmosObject
+{
+    // Read back the metadata and verify that key1 is gone.
+    [atmosStore getAllMetadataForKeypool:TEST_KEYPOOL withKey:atmosObject.objectPath
+                            withCallback:^(AtmosObjectResult *result) {
+        @try {
+            [self checkResult:result];
+            
+            GHAssertNil([result.atmosObject.userRegularMeta objectForKey:@"key1"], @"Key1 should have been nil");
+            GHAssertEqualStrings([result.atmosObject.userRegularMeta objectForKey:@"key2"], @"value2" , @"key2 should have been value2");
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testDeleteObjectMetadataKeypool)];
+            return;
+        }
+        
+        // Notify async test complete.
+        [self notify:kGHUnitWaitStatusSuccess
+         forSelector:@selector(testDeleteObjectMetadataKeypool)];
+        
+    } withLabel:@"subTestDeleteObjectMetadataKeypool2"];
+}
+
+- (void) subTestDeleteObjectMetadataKeypool1:(AtmosObject*)atmosObject
+{
+    // Add the ID to cleanup
+    [cleanup addObject:atmosObject.atmosId];
+    
+    // Clear the atmosId to force loading by keypool
+    atmosObject.atmosId = nil;
+    
+    // Delete one of the metadata values
+    AtmosObject *delObj = [[AtmosObject alloc]
+                           initWithKeypool:TEST_KEYPOOL
+                           withKey:atmosObject.objectPath];
+    delObj.atmosId = atmosObject.atmosId;
+    delObj.requestTags = [NSMutableSet setWithObject:@"key1"];
+    [atmosStore deleteObjectMetadata:delObj withCallback:^(AtmosResult *result) {
+        @try {
+            [self checkResult:result];
+            [self subTestDeleteObjectMetadataKeypool2:atmosObject];
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testDeleteObjectMetadataKeypool)];
+            return;
+        }
+    } withLabel:@"subTestDeleteObjectMetadataKeypool1"];
+    [delObj release];
+}
+
+- (void) testDeleteObjectMetadataKeypool
+{
+    [self prepare];
+    
+    // Create an object with some metadata
+    AtmosObject *obj = [[AtmosObject alloc] initWithKeypool:TEST_KEYPOOL withKey:[self generateKey:32]];
+    obj.userRegularMeta = [NSMutableDictionary
+                           dictionaryWithObjectsAndKeys:@"value1",@"key1",
+                           @"value2",@"key2", nil];
+    [atmosStore createObject:obj withCallback:^BOOL(UploadProgress *progress) {
+        @try {
+            // Check
+            [self checkResult:progress];
+            
+            if(progress.isComplete) {
+                [self subTestDeleteObjectMetadataKeypool1:progress.atmosObject];
+            }
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testDeleteObjectMetadataKeypool)];
+            return NO;
+        }
+        
+        return YES;
+    } withLabel:@"testDeleteObjectMetadataKeypool"];
+    
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [obj release];
+    [self checkFailure];
+    
+}
+
+- (void) subTestDeleteObjectKeypool2:(AtmosObject*)atmosObject
+{
+    // Try to get object metadata... it should fail.
+    [atmosStore getUserMetadataForKeypool:TEST_KEYPOOL
+                                  withKey:atmosObject.objectPath
+                                 metadata:nil
+                             withCallback:^(AtmosObjectResult *result) {
+        @try {
+            GHAssertFalse(result.wasSuccessful, @"Expected load after delete to fail!");
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testDeleteObjectKeypool)];
+        }
+        // Notify async test complete
+        [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testDeleteObjectKeypool)];
+    } withLabel:@"subTestDeleteObjectKeypool2"];
+}
+
+- (void) subTestDeleteObjectKeypool1:(AtmosObject*)atmosObject
+{
+    // Delete the object
+    AtmosObject *obj2 = [[AtmosObject alloc]
+                         initWithKeypool:TEST_KEYPOOL
+                         withKey:atmosObject.objectPath];
+
+    [atmosStore deleteObject:obj2 withCallback:^(AtmosResult *result) {
+        @try {
+            [self checkResult:result];
+            
+            [self subTestDeleteObjectKeypool2:atmosObject];
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testDeleteObjectKeypool)];
+        }
+        
+    } withLabel:@"subTestDeleteObjectKeypool"];
+    
+    [obj2 release];
+}
+
+- (void) testDeleteObjectKeypool
+{
+    [self prepare];
+    
+    AtmosObject *obj = [[AtmosObject alloc] initWithKeypool:TEST_KEYPOOL withKey:[self generateKey:32]];
+    obj.dataMode = kDataModeBytes;
+    obj.data = [NSData dataWithBytes:[@"Hello World" UTF8String] length:12];
+    obj.contentType = @"text/foo";
+    [atmosStore createObject:obj
+                withCallback:^BOOL(UploadProgress *progress) {
+                    @try {
+                        [self checkResult:progress];
+                        
+                        if(progress.isComplete){
+                            GHAssertNotNil(progress.atmosObject,
+                                           @"Expected New ID to be non-Nil");
+                            [self subTestDeleteObjectKeypool1:obj];
+                        }
+                    }
+                    @catch (NSException *exception) {
+                        self.failure = exception;
+                        [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testDeleteObjectKeypool)];
+                        return NO;
+                    }
+                    
+                    return YES;
+                }
+                   withLabel:@"testDeleteObjectKeypool"];
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [obj release];
+    [self checkFailure];
+    
+}
+
+- (void) subTestGetObjectInformationKeypool1:(AtmosObject*) atmosObject
+{
+    // Queue the object for cleanup
+    [self.cleanup addObject:atmosObject.atmosId];
+    
+    AtmosObject *loadObject = [[AtmosObject alloc]
+                               initWithKeypool:TEST_KEYPOOL
+                               withKey:atmosObject.objectPath];
+    
+    // Read back the object information
+    [atmosStore getObjectInformation:loadObject withCallback:^(ObjectInformation *result) {
+        
+        @try {
+            [self checkResult:result];
+            
+            
+            GHAssertNotNil(result.replicas, @"Replicas should be non-nil");
+            GHAssertNotNil(result.rawXml, @"rawXml should be non-nil");
+            GHAssertNotNil(result.selection, @"selection should be non-nil");
+            GHAssertEqualStrings(atmosObject.atmosId, result.objectId, @"ObjectIDs should be equal");
+            
+            GHAssertGreaterThan((int)result.replicas.count, 0, @"There should be at least 1 replica");
+            Replica *r = [result.replicas objectAtIndex:0];
+            GHAssertNotNil(r.replicaId, @"replicaId should be non-nil");
+            GHAssertNotNil(r.replicaType, @"replicaType should be non-nil");
+            GHAssertNotNil(r.location, @"location should be non-nil");
+            GHAssertNotNil(r.storageType, @"storageType should be non-nil");
+            
+            GHAssertNotNil(result.retentionEnd, @"Retention not enabled.  See settings.plist.template and create the required policies and selectors to run this test.");
+            GHAssertTrue(result.expirationEnabled, @"Expiration not enabled.  See settings.plist.template and create the required policies and selectors to run this test.");
+            
+            NSDate *now = [NSDate date];
+            NSTimeInterval untilRetentionEnds = [result.retentionEnd timeIntervalSinceDate:now];
+            NSTimeInterval untilExpiration = [result.expirationEnd timeIntervalSinceDate:now];
+            
+            GHAssertGreaterThan((long)untilRetentionEnds, 0L, @"Expected retention to end after 'now'");
+            GHAssertGreaterThan((long)untilExpiration, 0L, @"Expected expiration to be after 'now'");
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testGetObjectInformationKeypool)];
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testGetObjectInformationKeypool)];
+        }
+        
+    } withLabel:@"subTestGetObjectInformationKeypool1"];
+    
+    [loadObject release];
+}
+
+/*!
+ * Test getting object replica/retention/expiration information.
+ * Note that you must create a policy and selector for this
+ * to work properly.  See settings.plist.template.
+ */
+- (void) testGetObjectInformationKeypool
+{
+    [self prepare];
+    
+    // Update the object and change some stuff
+    AtmosObject *obj = [[AtmosObject alloc] initWithKeypool:TEST_KEYPOOL withKey:[self generateKey:32]];
+    obj.dataMode = kDataModeBytes;
+    obj.data = [NSData dataWithBytes:[@"Hello Me!" UTF8String] length:10];
+    obj.userRegularMeta = [NSMutableDictionary
+                           dictionaryWithObjectsAndKeys:[self.settings valueForKey:@"retain_policy_value"],[self.settings valueForKey:@"retain_policy_key"], nil];
+    
+    [atmosStore createObject:obj withCallback:^BOOL(UploadProgress *progress) {
+        @try {
+            [self checkResult:progress];
+            
+            if ([progress isComplete]) {
+                [self subTestGetObjectInformationKeypool1:progress.atmosObject];
+            }
+            
+            return YES;
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testGetObjectInformationKeypool)];
+            return NO;
+        }
+    } withLabel:@"testGetObjectInformationKeypool"];
+    
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [self checkFailure];
+    [obj release];
+    
+}
+
+- (void) subTestUpdateObjectKeypool3:(AtmosObject*)atmosObject
+{
+    // Check results
+    GHAssertNotNil(atmosObject.data,
+                   @"Expected data to be non-Nil");
+    GHAssertEqualStrings(@"Hello Me!",
+                         [NSString stringWithUTF8String:[atmosObject.data bytes]],
+                         @"Expected strings to match");
+    GHAssertEqualStrings([atmosObject.userRegularMeta objectForKey:@"key1"],
+                         @"newvalue", @"Expected key1 to be updated");
+    GHAssertEqualStrings([atmosObject.userRegularMeta objectForKey:@"key2"],
+                         @"value2", @"Expected key2 to be unmodified");
+    
+    // Notify async test complete.
+    [self notify:kGHUnitWaitStatusSuccess
+     forSelector:@selector(testUpdateObjectKeypool)];
+}
+
+- (void) subTestUpdateObjectKeypool2:(AtmosObject*)atmosObject
+{
+    AtmosObject *obj3 = [[AtmosObject alloc]
+                         initWithKeypool:TEST_KEYPOOL
+                         withKey:atmosObject.objectPath];
+    obj3.dataMode = kDataModeBytes;
+    [obj3 retain];
+    [atmosStore readObject:obj3 withCallback:^BOOL(DownloadProgress *progress) {
+        @try {
+            [self checkResult:progress];
+            if(progress.isComplete){
+                [obj3 release];
+                [self subTestUpdateObjectKeypool3:progress.atmosObject];
+            }
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testUpdateObjectKeypool)];
+            return NO;
+        }
+        
+        
+        return YES;
+    } withLabel:@"subTestUpdateObjectKeypool2"];
+    
+    [obj3 release];
+}
+
+- (void) subTestUpdateObjectKeypool1:(AtmosObject*)atmosObject
+{
+    // Queue object for cleanup
+    [cleanup addObject:atmosObject.atmosId];
+    
+    // Update the object and change some stuff
+    AtmosObject *obj2 = [[AtmosObject alloc]
+                         initWithKeypool:TEST_KEYPOOL
+                         withKey:atmosObject.objectPath];
+    obj2.dataMode = kDataModeBytes;
+    obj2.data = [NSData dataWithBytes:[@"Hello Me!" UTF8String] length:10];
+    obj2.userRegularMeta = [NSMutableDictionary
+                            dictionaryWithObjectsAndKeys:@"newvalue",@"key1", nil];
+    [obj2 retain];
+    
+    [atmosStore updateObject:obj2 withCallback:^BOOL(UploadProgress *progress) {
+        @try {
+            [self checkResult:progress];
+            if(progress.isComplete){
+                if(progress.wasSuccessful) {
+                    [obj2 release];
+                    // Check results
+                    [self subTestUpdateObjectKeypool2:progress.atmosObject];
+                }
+            }
+        }
+        @catch (NSException *exception) {
+            self.failure = exception;
+            [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testUpdateObjectKeypool)];
+            return NO;
+        }
+        return YES;
+        
+    } withLabel:@"subTestUpdateObjectKeypool1"];
+    
+    [obj2 release];
+}
+
+- (void) testUpdateObjectKeypool
+{
+    [self prepare];
+    
+    // Create an object with content
+    AtmosObject *obj = [[AtmosObject alloc]
+                        initWithKeypool:TEST_KEYPOOL
+                        withKey:[self generateKey:32]];
+    obj.dataMode = kDataModeBytes;
+    obj.data = [NSData dataWithBytes:[@"Hello World" UTF8String] length:12];
+    obj.userRegularMeta = [NSMutableDictionary
+                           dictionaryWithObjectsAndKeys:@"value1",@"key1",
+                           @"value2",@"key2", nil];
+    
+    [atmosStore createObject:obj
+                withCallback:^BOOL(UploadProgress *progress) {
+                    @try {
+                        [self checkResult:progress];
+                        
+                        if(progress.isComplete){
+                            GHAssertNotNil(progress.atmosObject,
+                                           @"Expected New ID to be non-Nil");
+                            [self subTestUpdateObjectKeypool1:progress.atmosObject];
+                        }
+                    }
+                    @catch (NSException *exception) {
+                        self.failure = exception;
+                        [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testUpdateObjectKeypool)];
+                        return NO;
+                    }
+                    
+                    return YES;
+                }
+                   withLabel:@"testUpdateObjectKeypool"];
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [obj release];
+    [self checkFailure];
 }
 
 

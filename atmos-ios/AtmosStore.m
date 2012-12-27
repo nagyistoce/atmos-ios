@@ -68,7 +68,8 @@
                    withLabel:(NSString *) requestLabel;
 
 - (void) getObjectMetadataInternal:(NSString *) atmosId 
-                              path:(NSString *)objectPath 
+                              path:(NSString *)objectPath
+                           keypool:(NSString *)pool
                               mode:(MetadataLoadType)mode
                           metaTags:(NSArray *) meta 
                       withCallback:(void(^)(AtmosObjectResult*)) callback 
@@ -462,7 +463,7 @@
                 withCallback:(void(^)(AtmosObjectResult *result))callback
                    withLabel:(NSString *) requestLabel {
 	if(atmosId && atmosId.length == ATMOS_ID_LENGTH) {
-		[self getObjectMetadataInternal:atmosId path:nil mode:kMetaLoadAll metaTags:nil withCallback:callback withLabel:requestLabel];
+		[self getObjectMetadataInternal:atmosId path:nil keypool:nil mode:kMetaLoadAll metaTags:nil withCallback:callback withLabel:requestLabel];
 	}	
 }
 
@@ -470,10 +471,21 @@
                   withCallback:(void(^)(AtmosObjectResult *result))callback
                      withLabel:(NSString *) requestLabel {
 	if(objectPath && objectPath.length > 0) {
-		[self getObjectMetadataInternal:nil path:objectPath mode:kMetaLoadAll metaTags:nil withCallback:callback withLabel:requestLabel];
+		[self getObjectMetadataInternal:nil path:objectPath keypool:nil mode:kMetaLoadAll metaTags:nil withCallback:callback withLabel:requestLabel];
 	}
 	
 }
+
+- (void) getAllMetadataForKeypool:(NSString *)pool
+                          withKey:(NSString*)key
+                     withCallback:(void(^)(AtmosObjectResult *result))callback
+                        withLabel:(NSString *) requestLabel {
+	if(key && key.length > 0 && pool && pool.length > 0) {
+		[self getObjectMetadataInternal:nil path:key keypool:pool mode:kMetaLoadAll metaTags:nil withCallback:callback withLabel:requestLabel];
+	}
+	
+}
+
 
 
 //gets the system metadata for the specified id / path. To retrieve only specific metadata, specify the metadata names as a NSString array
@@ -481,15 +493,24 @@
                      withCallback:(void(^)(AtmosObjectResult *result))callback
                         withLabel:(NSString *) requestLabel {
 	if(atmosId && (atmosId.length == ATMOS_ID_LENGTH)) {
-		[self getObjectMetadataInternal:atmosId path:nil mode:kMetaLoadSystem metaTags:nil withCallback:callback withLabel:requestLabel];
+		[self getObjectMetadataInternal:atmosId path:nil keypool:nil mode:kMetaLoadSystem metaTags:nil withCallback:callback withLabel:requestLabel];
 	}
 }
 
-- (void) getAllSytemMetadataForPath:(NSString *) objectPath 
+- (void) getAllSytemMetadataForPath:(NSString *) objectPath
                        withCallback:(void(^)(AtmosObjectResult *result))callback
                           withLabel:(NSString *) requestLabel {
 	if(objectPath && objectPath.length > 0) {
-		[self getObjectMetadataInternal:nil path:objectPath mode:kMetaLoadSystem metaTags:nil withCallback:callback withLabel:requestLabel];
+		[self getObjectMetadataInternal:nil path:objectPath keypool:nil mode:kMetaLoadSystem metaTags:nil withCallback:callback withLabel:requestLabel];
+	}
+}
+
+- (void) getAllSytemMetadataForKeypool:(NSString *) pool
+                               withKey:(NSString *) key
+                       withCallback:(void(^)(AtmosObjectResult *result))callback
+                          withLabel:(NSString *) requestLabel {
+	if(key && key.length > 0 && pool && pool.length > 0) {
+		[self getObjectMetadataInternal:nil path:key keypool:pool mode:kMetaLoadSystem metaTags:nil withCallback:callback withLabel:requestLabel];
 	}
 }
 
@@ -499,16 +520,26 @@
                    withCallback:(void(^)(AtmosObjectResult *result))callback
                       withLabel:(NSString *) requestLabel {
 	if(atmosId && (atmosId.length == ATMOS_ID_LENGTH)) {
-		[self getObjectMetadataInternal:atmosId path:nil mode:kMetaLoadSystem metaTags:mdata withCallback:callback withLabel:requestLabel];
+		[self getObjectMetadataInternal:atmosId path:nil keypool:nil mode:kMetaLoadSystem metaTags:mdata withCallback:callback withLabel:requestLabel];
 	}
 }
 
-- (void) getSystemMetadataForPath:(NSString *) objectPath 
-                         metadata:(NSArray *) mdata 
+- (void) getSystemMetadataForPath:(NSString *) objectPath
+                         metadata:(NSArray *) mdata
                      withCallback:(void(^)(AtmosObjectResult *result))callback
                         withLabel:(NSString *) requestLabel {
 	if(objectPath && objectPath.length > 0) {
-		[self getObjectMetadataInternal:nil path:objectPath mode:kMetaLoadSystem metaTags:mdata withCallback:callback withLabel:requestLabel];
+		[self getObjectMetadataInternal:nil path:objectPath keypool:nil mode:kMetaLoadSystem metaTags:mdata withCallback:callback withLabel:requestLabel];
+	}
+}
+
+- (void) getSystemMetadataForKeypool:(NSString *) pool
+                             withKey:(NSString *) key
+                         metadata:(NSArray *) mdata
+                     withCallback:(void(^)(AtmosObjectResult *result))callback
+                        withLabel:(NSString *) requestLabel {
+	if(key && key.length > 0 && pool && pool.length > 0) {
+		[self getObjectMetadataInternal:nil path:key keypool:pool mode:kMetaLoadSystem metaTags:mdata withCallback:callback withLabel:requestLabel];
 	}
 }
 
@@ -517,15 +548,25 @@
                     withCallback:(void(^)(AtmosObjectResult *result))callback
                        withLabel:(NSString *) requestLabel {
 	if(atmosId && (atmosId.length == ATMOS_ID_LENGTH)) {
-		[self getObjectMetadataInternal:atmosId path:nil mode:kMetaLoadUser metaTags:nil withCallback:callback withLabel:requestLabel];
+		[self getObjectMetadataInternal:atmosId path:nil keypool:nil mode:kMetaLoadUser metaTags:nil withCallback:callback withLabel:requestLabel];
 
 	}
 }
-- (void) getAllUserMetadataForPath:(NSString *) objectPath 
+
+- (void) getAllUserMetadataForPath:(NSString *) objectPath
                       withCallback:(void(^)(AtmosObjectResult *result))callback
                          withLabel:(NSString *) requestLabel {
 	if(objectPath && (objectPath.length > 0)) {
-		[self getObjectMetadataInternal:nil path:objectPath mode:kMetaLoadUser metaTags:nil withCallback:callback withLabel:requestLabel];
+		[self getObjectMetadataInternal:nil path:objectPath keypool:nil mode:kMetaLoadUser metaTags:nil withCallback:callback withLabel:requestLabel];
+	}
+}
+
+- (void) getAllUserMetadataForKeypool:(NSString *) pool
+                              withKey:(NSString *) key
+                      withCallback:(void(^)(AtmosObjectResult *result))callback
+                         withLabel:(NSString *) requestLabel {
+	if(key && key.length > 0 && pool && pool.length > 0) {
+		[self getObjectMetadataInternal:nil path:key keypool:pool mode:kMetaLoadUser metaTags:nil withCallback:callback withLabel:requestLabel];
 	}
 }
 
@@ -535,22 +576,33 @@
                  withCallback:(void(^)(AtmosObjectResult *result))callback
                     withLabel:(NSString *) requestLabel {
 	if(atmosId && (atmosId.length == ATMOS_ID_LENGTH)) {
-		[self getObjectMetadataInternal:atmosId path:nil mode:kMetaLoadUser metaTags:mdata withCallback:callback withLabel:requestLabel];
+		[self getObjectMetadataInternal:atmosId path:nil keypool:nil mode:kMetaLoadUser metaTags:mdata withCallback:callback withLabel:requestLabel];
 	}
 }
 
-- (void) getUserMetadataForPath:(NSString *) objectPath 
-                       metadata:(NSArray *) mdata 
+- (void) getUserMetadataForPath:(NSString *) objectPath
+                       metadata:(NSArray *) mdata
                    withCallback:(void(^)(AtmosObjectResult *result))callback
                       withLabel:(NSString *) requestLabel {
 	if(objectPath && objectPath.length > 0) {
-		[self getObjectMetadataInternal:nil path:objectPath mode:kMetaLoadUser metaTags:mdata withCallback:callback withLabel:requestLabel];
+		[self getObjectMetadataInternal:nil path:objectPath keypool:nil mode:kMetaLoadUser metaTags:mdata withCallback:callback withLabel:requestLabel];
+	}
+}
+
+- (void) getUserMetadataForKeypool:(NSString *) pool
+                           withKey:(NSString *) key
+                       metadata:(NSArray *) mdata
+                   withCallback:(void(^)(AtmosObjectResult *result))callback
+                      withLabel:(NSString *) requestLabel {
+	if(key && key.length > 0 && pool && pool.length > 0) {
+		[self getObjectMetadataInternal:nil path:key keypool:pool mode:kMetaLoadUser metaTags:mdata withCallback:callback withLabel:requestLabel];
 	}
 }
 
 
 - (void) getObjectMetadataInternal:(NSString *) atmosId 
-                              path:(NSString *)objectPath 
+                              path:(NSString *) objectPath
+                           keypool:(NSString *) pool
                               mode:(MetadataLoadType)mode
                           metaTags:(NSArray*)meta
                       withCallback:(void(^)(AtmosObjectResult *result))callback
@@ -565,6 +617,7 @@
 	oper.requestTags = [NSMutableArray arrayWithArray:meta];
 	oper.callback = callback;
 	oper.operationLabel = requestLabel;
+    oper.keypool = pool;
 	
 	[self scheduleOperation:oper];
 	

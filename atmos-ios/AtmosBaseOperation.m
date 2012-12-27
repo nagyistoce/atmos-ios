@@ -34,7 +34,8 @@
 
 @implementation AtmosBaseOperation
 
-@synthesize baseUrl, webData, listableMeta, regularMeta, responseHeaders, operExecuting, operFinished, operationLabel;
+@synthesize baseUrl, webData, listableMeta, regularMeta, responseHeaders,
+operExecuting, operFinished, operationLabel;
 
 @synthesize atmosCredentials = _atmosCredentials;
 @synthesize atmosResource = _atmosResource;
@@ -46,7 +47,10 @@
 
 - (NSString *) baseUrl {
 	if(baseUrl == nil) {
-		self.baseUrl = [NSString stringWithFormat:@"%@://%@:%d",self.atmosCredentials.httpProtocol,self.atmosCredentials.accessPoint,self.atmosCredentials.portNumber];
+		self.baseUrl = [NSString stringWithFormat:@"%@://%@:%d",
+                        self.atmosCredentials.httpProtocol,
+                        self.atmosCredentials.accessPoint,
+                        self.atmosCredentials.portNumber];
 	}
 	return baseUrl;
 }
@@ -122,7 +126,7 @@
 	}
 	[signStr appendString:@"\n"];
 	
-	//Range 
+	//Range
 	NSString *rangeVal = [headers objectForKey:@"Range"];
 	if(rangeVal != nil) {
 		[signStr appendString:rangeVal];
@@ -255,7 +259,7 @@
 	} else {
 		[req addValue:@"" forHTTPHeaderField:@"x-emc-tags"];
 	}
-
+    
 }
 
 - (NSString *) extractLocation:(NSHTTPURLResponse *) resp {
@@ -280,7 +284,7 @@
 	} else {
 		return nil;
 	}
-
+    
 }
 
 - (AtmosError *) extractAtmosError:(NSString *) errorString {
@@ -324,10 +328,10 @@
 		for(int i=0;i < arr.count;i++) {
 			NSString *str = [arr objectAtIndex:i];
 			NSArray *comps = [str componentsSeparatedByString:@"="];
-			if([AtmosObject isSystemMetadata:[comps objectAtIndex:0]])  
+			if([AtmosObject isSystemMetadata:[comps objectAtIndex:0]])
 				[object.systemMeta setObject:[comps objectAtIndex:1] forKey:[comps objectAtIndex:0]];
 			else {
-				[object.userRegularMeta	setObject:[comps objectAtIndex:1] forKey:[comps objectAtIndex:0]]; 
+				[object.userRegularMeta	setObject:[comps objectAtIndex:1] forKey:[comps objectAtIndex:0]];
 			}
 			
 		}
@@ -345,7 +349,7 @@
 		for(int i=0;i < arr.count;i++) {
 			NSString *str = [arr objectAtIndex:i];
 			NSArray *comps = [str componentsSeparatedByString:@"="];
-			[object.userListableMeta setObject:[comps objectAtIndex:1] forKey:[comps objectAtIndex:0]];				
+			[object.userListableMeta setObject:[comps objectAtIndex:1] forKey:[comps objectAtIndex:0]];
 		}
 	}
 	
@@ -377,7 +381,7 @@
     self.connection = nil;
     self.httpResponse = nil;
     self.atmosCredentials = nil;
-
+    
 	[super dealloc];
 }
 

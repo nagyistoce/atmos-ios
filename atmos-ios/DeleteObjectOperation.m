@@ -33,6 +33,7 @@
 
 #import "DeleteObjectOperation.h"
 #import "AtmosResult.h"
+#import "AtmosConstants.h"
 
 @implementation DeleteObjectOperation
 
@@ -49,6 +50,8 @@
 	if(self.atmosObj) {
 		if(self.atmosObj.atmosId && self.atmosObj.atmosId.length == ATMOS_ID_LENGTH) {
 			self.atmosResource = [NSString stringWithFormat:@"/rest/objects/%@",self.atmosObj.atmosId];
+        } else if (self.atmosObj.keypool) {
+			self.atmosResource = [NSString stringWithFormat:@"/rest/namespace/%@",self.atmosObj.objectPath];
 		} else if (self.atmosObj.objectPath) {
 			self.atmosResource = [NSString stringWithFormat:@"/rest/namespace%@",self.atmosObj.objectPath];
 		} else {
@@ -57,6 +60,12 @@
 
 		NSMutableURLRequest *req = [self setupBaseRequestForResource:self.atmosResource];
 		[req setHTTPMethod:@"DELETE"];
+        
+        if(self.atmosObj.keypool) {
+            [req addValue:self.atmosObj.keypool
+       forHTTPHeaderField:ATMOS_HEADER_POOL];
+        }
+        
 		[self signRequest:req];
 		
 		self.connection = [NSURLConnection connectionWithRequest:req delegate:self];

@@ -62,6 +62,11 @@
         [NSException raise:@"Invalid Parameter" 
                     format:@"The parameter 'destination' must have an objectPath set for RenameObjectOperation"];        
     }
+    
+    if(source.keypool || destination.keypool) {
+        [NSException raise:@"Unsupported operation"
+                    format:@"Renaming a keypool object is not supported"];
+    }
 	
 	NSString *strResource = [NSString stringWithFormat:@"/rest/namespace%@?rename", source.objectPath];
 	self.atmosResource = strResource;

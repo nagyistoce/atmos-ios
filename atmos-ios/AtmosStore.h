@@ -78,7 +78,8 @@
  * - filepath specifies the local file to be uploaded. If no filepath is specified a contentless object is created
  * - objectpath (optional): The Atmos object path at which to create the object
  * - User and User listable metadata: The metadata to set on the object.
- * @return The AtmosObject is returned alongwith the new objectid of the created object
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel user-defined label for the request.
  */
 - (void) createObject:(AtmosObject *) atmosObj 
          withCallback:(BOOL(^)(UploadProgress *progress))callback 
@@ -86,6 +87,10 @@
 
 /*!
  * Updates the content of the specified AtmosObject in the cloud.
+ * @param atmosObject an AtmosObject containing the atmosId/objectPath/keypool,
+ * user metadata, and/or content to apply to the object in Atmos.
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel user-defined label for the request.
  */
 - (void) updateObject:(AtmosObject *) atmosObj          
          withCallback:(BOOL(^)(UploadProgress *progress))callback 
@@ -95,6 +100,8 @@
  * Same as updateObject except this updates a specified range of the cloud 
  * object from the same range in the local file or with the contents of 
  * the AtmosObject's data buffer.
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
  */
 - (void) updateObjectRange:(AtmosObject *)atmosObj 
                      range:(AtmosRange *)objRange          
@@ -108,6 +115,8 @@
  * the object's content will be stored in the object's data property.  If the
  * dataMode property is set to kDataModeFile, the contents of the object will
  * be written to the local path provided.
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
  */
 - (void) readObject:(AtmosObject *) atmosObj 
        withCallback:(BOOL(^)(DownloadProgress *progress))callback 
@@ -121,6 +130,8 @@
  *
  * If using kDataModeFile, you might be more interested in 
  * readObjectRange:range:fileOffset:withCallback:withLabel 
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
  */
 - (void) readObjectRange:(AtmosObject *)atmosObj 
                    range:(AtmosRange *)objRange 
@@ -136,6 +147,8 @@
  *
  * If using kDataModeBytes, you might be more interested in 
  * readObjectRange:range:withCallback:withLabel 
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
  */
 - (void) readObjectRange:(AtmosObject *)atmosObj 
                    range:(AtmosRange *)objRange 
@@ -146,6 +159,9 @@
 #pragma mark DeleteObject
 /*!
  * Deletes an object from Atmos.
+ * @param atmosObj the Atmos object to delete.
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
  */
 - (void) deleteObject:(AtmosObject *) atmosObj 
          withCallback:(void(^)(AtmosResult *result))callback
@@ -154,6 +170,8 @@
 #pragma mark ListDirectory
 /*!
  * Lists the contents of a directory
+ * Be sure to check the pagination token from the ListDirectoryResult after
+ * every call to check and see if there are additional results pending.
  * @param directory the directory to list.  The objectPath property must be set
  * on the object.
  * @param emcToken when listing a large directory, check the 
@@ -162,6 +180,8 @@
  * @param limit the maximum number of results to return. Set to 0 to request
  * all results. Note that Atmos may enforce a limit (generally 5000) even if 
  * this is set to zero.
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
  */
 - (void) listDirectory:(AtmosObject *) directory 
              withToken:(NSString *) emcToken 
@@ -169,13 +189,42 @@
           withCallback:(void(^)(ListDirectoryResult *result))callback
              withLabel:(NSString *)requestLabel;
 
+/*!
+ * Lists the contents of a directory, including all metadata for the objects.
+ * Be sure to check the pagination token from the ListDirectoryResult after
+ * every call to check and see if there are additional results pending.
+ * @param directory an AtmosObject whose objectPath is set to the directory to
+ * list.
+ * @param emcToken pagination token to continue an object listing.  Set to nil
+ * for the initial request.
+ * @param limit the number of objects to return per page.  Set to zero for the
+ * default (usually 500 with metadata).
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
+ */
 - (void) listDirectoryWithAllMetadata:(AtmosObject *) directory 
                             withToken:(NSString *) emcToken 
                             withLimit:(NSInteger) limit 
                          withCallback:(void(^)(ListDirectoryResult *result))callback
                             withLabel:(NSString *)requestLabel;
 
-- (void) listDirectoryWithMetadata:(AtmosObject *) directory 
+/*!
+ * Lists the contents of a directory, including all metadata for the objects.
+ * Be sure to check the pagination token from the ListDirectoryResult after
+ * every call to check and see if there are additional results pending.
+ * @param directory an AtmosObject whose objectPath is set to the directory to
+ * list.
+ * @param sdata an array of system metadata tags to fetch with the
+ * results.
+ * @param udata an array of user metadata tags to fetch with the results.
+ * @param emcToken pagination token to continue an object listing.  Set to nil
+ * for the initial request.
+ * @param limit the number of objects to return per page.  Set to zero for the
+ * default (usually 500 with metadata).
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
+ */
+- (void) listDirectoryWithMetadata:(AtmosObject *) directory
                     systemMetadata:(NSArray *) sdata 
                       userMetadata:(NSArray *) udata 
                          withToken:(NSString *) emcToken 
@@ -184,7 +233,13 @@
                          withLabel:(NSString *)requestLabel;
 
 #pragma mark GetListableTags 
-//get listable tags asynchronously
+
+/*!
+ * Gets the set of listable tags for the given parent tag.
+ * @param parentTag the parent tag to list.  Set to nil to fetch toplevel tags.
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
+ */
 - (void) getListableTags:(NSString *)parentTag 
             withCallback:(void(^)(GetListableTagsResult *tags))callback 
             withLabel:(NSString *)requestLabel ;
@@ -199,9 +254,8 @@
  * token is nil to ensure you get all results.
  * @param limit the maximum number of results to return. Set
  * to zero to retrieve the server maximum (generally 5000).
- * @param callback callback function to invoke when operation
- * is complete.
- * @param requestLabel the label to tag the request with.
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
  */
 - (void) listObjects:(NSString *) tag
            withToken:(NSString *) token
@@ -220,15 +274,39 @@
         withCallback:(void(^)(ListObjectsResult *result))callback
            withLabel:(NSString *) requestLabel __attribute__((deprecated));
 
-//gets all tagged objects and all metadata for each object
-- (void) listObjectsWithAllMetadata:(NSString *) tag 
+/*!
+ * Lists objects indexed by a listable tag.  This version will include all
+ * object metadata.  Always check the pagination token in the ListObjectsResult
+ * object to see if there are more results pending.
+ * @param tag the listable tag to search
+ * @param token the pagination token for the request.  Set to nil to fetch the
+ * first page of results.
+ * @param limit the number of items to fetch per page.  Set to zero to get the
+ * default limit (generally 500 with metadata).
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
+ */
+- (void) listObjectsWithAllMetadata:(NSString *) tag
                           withToken:(NSString *) token
                           withLimit:(NSInteger) limit
                        withCallback:(void(^)(ListObjectsResult *result))callback
                           withLabel:(NSString *) requestLabel;
 
-//gets all tagged objects and the specified metadata for each object
-- (void) listObjectsWithMetadata:(NSString *) tag 
+/*!
+ * Lists objects indexed by a listable tag.  This version will include all
+ * object metadata.  Always check the pagination token in the ListObjectsResult
+ * object to see if there are more results pending.
+ * @param tag the listable tag to search
+ * @param sdata an array containing the system metadata tags to fetch.
+ * @param udata an array containing the user metadata tags to fetch.
+ * @param token the pagination token for the request.  Set to nil to fetch the
+ * first page of results.
+ * @param limit the number of items to fetch per page.  Set to zero to get the
+ * default limit (generally 500 with metadata).
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
+ */
+- (void) listObjectsWithMetadata:(NSString *) tag
                   systemMetadata:(NSArray *) sdata 
                     userMetadata:(NSArray *) udata 
                        withToken:(NSString *) token
@@ -237,64 +315,234 @@
                        withLabel:(NSString *) requestLabel;
 
 #pragma mark GetObjectMetadata
-//gets all the metadata for the specified object id / object path
-- (void) getAllMetadataForId:(NSString *)atmosId 
+/*!
+ * Gets all of the metadata for the given Atmos Object ID.
+ * @param atmosId the Atmos Object ID to read the metadata of.
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
+ */
+- (void) getAllMetadataForId:(NSString *)atmosId
                 withCallback:(void(^)(AtmosObjectResult *result))callback
                    withLabel:(NSString *) requestLabel;
 
-- (void) getAllMetadataForPath:(NSString *)objectPath 
+/*!
+ * Gets all of the metadata for the given Atmos Object Path.
+ * @param objectPath the Atmos namespace path to read the metadata of.
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
+ */
+- (void) getAllMetadataForPath:(NSString *)objectPath
                   withCallback:(void(^)(AtmosObjectResult *result))callback
                      withLabel:(NSString *) requestLabel;
-
-//gets the system metadata for the specified id / path. To retrieve only specific metadata, specify the metadata names as a NSString array
-- (void) getAllSytemMetadataForId:(NSString *) atmosId 
+/*!
+ * Gets all of the metadata for the given Atmos keypool object.
+ * @param pool the Atmos keypool containing the object.
+ * @param key the object's key in the pool.
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
+ * @since Atmos 2.1.0
+ */
+- (void) getAllMetadataForKeypool:(NSString *)pool
+                          withKey:(NSString *)key
                      withCallback:(void(^)(AtmosObjectResult *result))callback
                         withLabel:(NSString *) requestLabel;
-- (void) getAllSytemMetadataForPath:(NSString *) objectPath               
+
+/*!
+ * Gets all system metadata for the given Atmos Object.
+ * @param atmosId the Atmos Object ID of the object to read.
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
+ */
+- (void) getAllSytemMetadataForId:(NSString *) atmosId
+                     withCallback:(void(^)(AtmosObjectResult *result))callback
+                        withLabel:(NSString *) requestLabel;
+/*!
+ * Gets all system metadata for the given Atmos Object.
+ * @param objectPath the Atmos namespace path of the object to read.
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
+ */
+- (void) getAllSytemMetadataForPath:(NSString *) objectPath
                        withCallback:(void(^)(AtmosObjectResult *result))callback
                           withLabel:(NSString *) requestLabel;
+/*!
+ * Gets all system metadata for the given Atmos Object.
+ * @param pool the Atmos keypool containing the object.
+ * @param key the object's key in the keypool.
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
+ * @since Atmos 2.1.0
+ */
+- (void) getAllSytemMetadataForKeypool:(NSString *) pool
+                               withKey:(NSString *) key
+                          withCallback:(void(^)(AtmosObjectResult *result))callback
+                             withLabel:(NSString *) requestLabel;
+
+/*!
+ * Gets selected system metadata for the given Atmos object.
+ * @param atmosId the Atmos Object ID of the object to read.
+ * @param mdata an array of system metadata tags to fetch (e.g. @"size")
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
+ */
 - (void) getSystemMetadataForId:(NSString *) atmosId 
                        metadata:(NSArray *) mdata 
                    withCallback:(void(^)(AtmosObjectResult *result))callback
                       withLabel:(NSString *) requestLabel;
-
-- (void) getSystemMetadataForPath:(NSString *) objectPath 
-                         metadata:(NSArray *) mdata 
+/*!
+ * Gets selected system metadata for the given Atmos Object.
+ * @param objectPath the Atmos namespace path of the object to read.
+ * @param mdata an array of system metadata tags to fetch (e.g. @"size")
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
+ */
+- (void) getSystemMetadataForPath:(NSString *) objectPath
+                         metadata:(NSArray *) mdata
                      withCallback:(void(^)(AtmosObjectResult *result))callback
                         withLabel:(NSString *) requestLabel;
+/*!
+ * Gets selected system metadata for the given Atmos Object.
+ * @param pool the Atmos keypool containing the object.
+ * @param key the object's key in the keypool.
+ * @param mdata an array of system metadata tags to fetch (e.g. @"size")
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
+ * @since Atmos 2.1.0
+ */
+- (void) getSystemMetadataForKeypool:(NSString *) pool
+                             withKey:(NSString *)key
+                            metadata:(NSArray *) mdata
+                        withCallback:(void(^)(AtmosObjectResult *result))callback
+                           withLabel:(NSString *) requestLabel;
 
-//gets the user metadata for the specified id / path. To retrieve only specific metadata, specify the metadata names as a NSString aray
-- (void) getAllUserMetadataForId:(NSString *) atmosId 
+/*!
+ * Gets all user metadata for the given Atmos Object.
+ * @param atmosId the Atmos Object ID of the object to read.
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
+ */
+- (void) getAllUserMetadataForId:(NSString *) atmosId
                     withCallback:(void(^)(AtmosObjectResult *result))callback
                        withLabel:(NSString *) requestLabel;
-- (void) getAllUserMetadataForPath:(NSString *) objectPath 
+/*!
+ * Gets all user metadata for the given Atmos Object.
+ * @param objectPath the Atmos namespace path of the object to read.
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
+ */
+- (void) getAllUserMetadataForPath:(NSString *) objectPath
                       withCallback:(void(^)(AtmosObjectResult *result))callback
                          withLabel:(NSString *) requestLabel;
-- (void) getUserMetadataForId:(NSString *) atmosId 
+/*!
+ * Gets all user metadata for the given Atmos Object.
+ * @param pool the Atmos keypool containing the object.
+ * @param key the object's key in the keypool.
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
+ * @since Atmos 2.1.0
+ */
+- (void) getAllUserMetadataForKeypool:(NSString *) pool
+                              withKey:(NSString *) key
+                         withCallback:(void(^)(AtmosObjectResult *result))callback
+                            withLabel:(NSString *) requestLabel;
+
+
+/*!
+ * Gets selected user metadata for the given Atmos Object.
+ * @param atmosId the Atmos Object ID of the object to read.
+ * @param mdata an array of user metadata tags to fetch
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
+ */
+- (void) getUserMetadataForId:(NSString *) atmosId
                      metadata:(NSArray *) mdata 
                  withCallback:(void(^)(AtmosObjectResult *result))callback
                     withLabel:(NSString *) requestLabel;
-- (void) getUserMetadataForPath:(NSString *) objectPath 
-                       metadata:(NSArray *) mdata 
+/*!
+ * Gets selected user metadata for the given Atmos Object.
+ * @param objectPath the Atmos namespace path of the object to read.
+ * @param mdata an array of user metadata tags to fetch
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
+ */
+- (void) getUserMetadataForPath:(NSString *) objectPath
+                       metadata:(NSArray *) mdata
                    withCallback:(void(^)(AtmosObjectResult *result))callback
                       withLabel:(NSString *) requestLabel;
+/*!
+ * Gets selected user metadata for the given Atmos Object.
+ * @param pool the Atmos keypool containing the object.
+ * @param key the object's key in the keypool.
+ * @param mdata an array of user metadata tags to fetch
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
+ * @since Atmos 2.1.0
+ */
+- (void) getUserMetadataForKeypool:(NSString *) pool
+                           withKey:(NSString *) key
+                          metadata:(NSArray *) mdata
+                      withCallback:(void(^)(AtmosObjectResult *result))callback
+                         withLabel:(NSString *) requestLabel;
 
 #pragma mark SetObjectMetadata
-//All user metadata in the atmos object is persisted to Atmos
-- (void) setObjectMetadata:(AtmosObject *) atmosObject 
+/*!
+ * Updates the metadata on an Atmos object.  The user metadata values from the
+ * supplied object will be persisted on the object in Atmos.  Note that this
+ * will only create and/or update existing values.  If you wish to remove
+ * metadata from an object you need to use deleteObjectMetadata:withCallback:withLabel.
+ * @param atmosObject the AtmosObject containing the ID/Path/Keypool and the
+ * metadata to apply to the object.
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
+ */
+- (void) setObjectMetadata:(AtmosObject *) atmosObject
               withCallback:(void(^)(AtmosResult *result))callback
                  withLabel:(NSString *) requestLabel;
 
 #pragma mark DeleteMetadata
-//Deletes the metadata specified in AtmosObject#requestTags
-- (void) deleteObjectMetadata:(AtmosObject *) atmosObject 
+/*!
+ * Deletes metadata from an object in Atmos.
+ * @param atmosObject the AtmosObject containing the ID/Path/Keypool of the
+ * object to update and requestTags containg the list of user metadata tags
+ * to remove from the object.
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
+ */
+- (void) deleteObjectMetadata:(AtmosObject *) atmosObject
                  withCallback:(void(^)(AtmosResult *result))callback
                     withLabel:(NSString *) requestLabel;
 
+#pragma mark GetServerOffset
+/*!
+ * Determines the clock skew between the local device and the Atmos server.
+ * This is especially important for iPod Touch and iPad devices without
+ * cellular service since they do not automatically set their clocks.  After
+ * calling this method, apply the offset from the result to the AtmosStore
+ * object.  The AtmosStore object will then use the supplied offset to sign
+ * requests.  If you're getting timestamp errors from your requests, this is
+ * usually the problem.
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
+ */
 - (void) getServerOffset:(void(^)(GetServerOffsetResult *result))callback
                withLabel:(NSString *)requestLabel;
 
 #pragma mark RenameObject
+/*!
+ * Renames (moves) an object in Atmos.  Note that Atmos internally contains
+ * a namespace lookup cache with a lifetime of 5 seconds.  Therefore, within
+ * 5 seconds of renaming an object it may still be accessible at the old path
+ * and/or with 'force' the old object may be visible on nodes that have not
+ * flushed their caches yet.
+ * @param source an AtmosObject containing the objectPath of the existing 
+ * object.
+ * @param destination an AtmosObject containing the objectPath to move the 
+ * source to.
+ * @param force if YES, if an object exists at the destination, it will be
+ * overwritten with the source object.
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
+ */
 - (void) rename:(AtmosObject*) source 
              to:(AtmosObject*) destination 
           force:(BOOL) force
@@ -302,6 +550,15 @@
       withLabel:(NSString*) requestLabel;
 
 #pragma mark GetServiceInformation
+/*!
+ * Gets the version of Atmos running on the server.  Note that this method is
+ * also good for checking a user's credentials since it is fast and does not
+ * have any side effects on the server's content (i.e. it does not modify any
+ * content on the server).  It is highly recommended to call this operation
+ * before any others (except maybe getServerOffset:withLabel).
+ * @param callback the callback block to invoke when operation is complete.
+ * @param requestLabel a user-defined label to tag the request with.
+ */
 - (void) getServiceInformation:(void(^)(ServiceInformation *result)) callback
                      withLabel:(NSString*) requestLabel;
 
@@ -429,10 +686,26 @@
                          withLabel:(NSString*) requestLabel;
 
 #pragma mark Properties
+/*!
+ * Credentials to use for making requests with this object.
+ */
 @property (nonatomic,retain) AtmosCredentials *atmosCredentials;
+/*!
+ * Operations currently executing
+ */
 @property (nonatomic,retain) NSMutableSet *currentOperations;
+/*!
+ * Operations currently waiting in queue to execute.
+ */
 @property (nonatomic,retain) NSMutableArray *pendingOperations;
+/*!
+ * Maximum concurrent operations to execute.  Default limit is 10.
+ */
 @property (nonatomic,assign) NSInteger maxConcurrentOperations;
+/*!
+ * Time offset between the local device and the server.  See 
+ * getServerOffset:withLabel for more information.
+ */
 @property (nonatomic) NSTimeInterval timeOffset;
 
 @end

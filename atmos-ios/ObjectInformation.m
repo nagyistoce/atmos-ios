@@ -33,7 +33,8 @@
 
 @implementation ObjectInformation
 
-@synthesize rawXml, replicas, retentionEnabled, retentionEnd, expirationEnabled, expirationEnd, selection, objectId, current;
+@synthesize rawXml, replicas, retentionEnabled, retentionEnd, expirationEnabled,
+    expirationEnd, selection, objectId, current;
 
 #pragma mark Memory Management
 - (void) dealloc {

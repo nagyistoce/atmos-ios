@@ -58,6 +58,10 @@
         
         if(self.object.atmosId) {
             [req addValue:self.object.atmosId forHTTPHeaderField:ATMOS_HEADER_OBJECTID];
+        } else if(self.object.keypool) {
+            [NSException
+             raise:@"Unsupported Operation"
+             format:@"Creating an access token for a keypool key is not currently supported."];
         } else if(self.object.objectPath) {
             [req addValue:self.object.objectPath forHTTPHeaderField:ATMOS_HEADER_PATH];
         }

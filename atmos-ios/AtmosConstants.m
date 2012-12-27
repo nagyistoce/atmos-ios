@@ -37,3 +37,4 @@ NSString *const ATMOS_HEADER_OBJECTID = @"X-Emc-Objectid";
 NSString *const ATMOS_HEADER_PATH = @"X-Emc-Path";
 NSString *const ATMOS_HEADER_TOKEN = @"X-Emc-Token";
 NSString *const ATMOS_HEADER_LIMIT = @"X-Emc-Limit";
+NSString *const ATMOS_HEADER_POOL = @"X-Emc-Pool";

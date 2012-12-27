@@ -50,12 +50,16 @@ typedef enum {
 	@public
 	NSString *atmosId;
 	NSString *objectPath;
+    NSString *keypool;
+    
 	MetadataLoadType metaLoadType;
     void (^callback)(AtmosObjectResult *result);
 }
 
 @property (nonatomic,retain) NSString *atmosId;
 @property (nonatomic,retain) NSString *objectPath;
+@property (nonatomic,retain) NSString *keypool;
+
 @property (nonatomic,assign) MetadataLoadType metaLoadType;
 
 @property (nonatomic,retain) AtmosObject *atmosObj;
