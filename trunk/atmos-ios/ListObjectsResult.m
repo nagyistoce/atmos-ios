@@ -41,7 +41,10 @@
     self = [super init];
     
     if(self) {
-        objects = [[NSMutableArray alloc] init];
+        NSMutableArray *a = [[NSMutableArray alloc] init];
+        self.objects = a;
+        [a release];
+        
         token = nil;
     }
     
@@ -51,10 +54,7 @@
 
 - (void) dealloc
 {
-    if( objects ) {
-        [objects release];
-    }
-    
+    self.objects = nil;
     self.token = nil;
     
     [super dealloc];

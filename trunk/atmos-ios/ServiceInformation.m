@@ -34,4 +34,10 @@
 
 @synthesize atmosVersion;
 
+- (void) dealloc {
+    self.atmosVersion = nil;
+    
+    [super dealloc];
+}
+
 @end

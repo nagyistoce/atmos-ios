@@ -41,6 +41,10 @@
 
 @implementation GetObjectInformationOperation
 
+
+@synthesize callback, atmosObject;
+@synthesize xmlParser, currentValue, currentElement, info, currentReplica;
+
 #pragma mark Memory Management
 -(void) dealloc {
     self.xmlParser = nil;
@@ -49,12 +53,10 @@
     self.callback = nil;
     self.info = nil;
     self.currentReplica = nil;
+    self.atmosObject = nil;
     
     [super dealloc];
 }
-
-@synthesize callback, atmosObject;
-@synthesize xmlParser, currentValue, currentElement, info, currentReplica;
 
 #pragma mark Implementation
 - (void) startAtmosOperation {
@@ -70,23 +72,22 @@
     [req setHTTPMethod:@"GET"];
     [self signRequest:req];
     
-    [NSURLConnection connectionWithRequest:req delegate:self];
+    self.connection = [NSURLConnection connectionWithRequest:req delegate:self];
 }
 
 - (void) parseXMLData {
 	if(self.xmlParser != nil) {
         self.xmlParser = nil;
 	} 
-	
-	self.xmlParser = [[NSXMLParser alloc] initWithData:self.webData];
-	[xmlParser setDelegate:self];
-    [xmlParser setShouldProcessNamespaces:NO];
-    [xmlParser setShouldReportNamespacePrefixes:NO];
-    [xmlParser setShouldResolveExternalEntities:NO];
+	NSXMLParser *p = [[NSXMLParser alloc] initWithData:self.webData];
+	self.xmlParser = p;
+	[p setDelegate:self];
+    [p setShouldProcessNamespaces:NO];
+    [p setShouldReportNamespacePrefixes:NO];
+    [p setShouldResolveExternalEntities:NO];
+    [p parse];
     
-    [xmlParser parse];
-    
-	[xmlParser release];
+	[p release];
 }
 
 
@@ -224,6 +225,7 @@
                     [NSException raise:@"Unexpected element parsing XML" format:@"Unexpected element %@ with value %@ encountered in parse mode %d", elementName,
                      self.currentValue, parseMode];
             }
+            [fmt release];
         }
     }
 }

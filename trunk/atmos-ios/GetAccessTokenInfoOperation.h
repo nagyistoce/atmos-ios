@@ -1,6 +1,6 @@
 /*
  
- Copyright (c) 2011, EMC Corporation
+ Copyright (c) 2012, EMC Corporation
  
  All rights reserved.
  
@@ -27,36 +27,17 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
  */
+#import "AtmosBaseOperation.h"
 
-#import "AtmosCredentials.h"
-
-
-@implementation AtmosCredentials
-
-@synthesize accessPoint = _accessPoint;
-@synthesize tokenId = _tokenId;
-@synthesize sharedSecret = _sharedSecret;
-@synthesize httpProtocol = _httpProtocol;
-@synthesize portNumber = _portNumber;
-
-- (id)init {
-    self = [super init];
-    if (self) {
-        self.portNumber = 443;
-		self.httpProtocol = @"https";
-	}
-    return self;
+@interface GetAccessTokenInfoOperation : AtmosBaseOperation {
+    NSString *accessTokenId;
+    void (^callback)(GetAccessTokenInfoResult *result);
 }
 
-- (void) dealloc {
-    self.accessPoint = nil;
-    self.tokenId = nil;
-    self.sharedSecret = nil;
-    self.httpProtocol = nil;
-    self.portNumber = 0;
-    
-    [super dealloc];
-}
+- (id) initWithAccessTokenId:(NSString *)token
+                withCallback:(void(^)(GetAccessTokenInfoResult *result)) callback;
 
+@property (retain,nonatomic) NSString *accessTokenId;
+@property (copy) void (^callback)(GetAccessTokenInfoResult *result);
 
 @end

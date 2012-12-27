@@ -66,7 +66,7 @@
 @property (nonatomic,retain) NSString *currentPropValue;
 @property (nonatomic,assign) BOOL listable;
 @property (nonatomic,retain) NSMutableString *currentValue;
-//@property (nonatomic,retain) AtmosObject *currentObject;
+@property (nonatomic,retain) AtmosObject *currentObject;
 @property (nonatomic,retain) ListObjectsResult *result;
 
 

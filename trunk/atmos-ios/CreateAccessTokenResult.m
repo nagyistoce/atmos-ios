@@ -1,6 +1,6 @@
 /*
  
- Copyright (c) 2011, EMC Corporation
+ Copyright (c) 2012, EMC Corporation
  
  All rights reserved.
  
@@ -27,35 +27,61 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
  */
+#import "CreateAccessTokenResult.h"
+#import "AtmosConstants.h"
 
-#import "AtmosCredentials.h"
+@implementation CreateAccessTokenResult
 
+@synthesize accessTokenId, credentials;
 
-@implementation AtmosCredentials
+#pragma mark Memory Management
+- (void) dealloc {
+    self.accessTokenId = nil;
+    self.credentials = nil;
+    
+    [super dealloc];
+}
 
-@synthesize accessPoint = _accessPoint;
-@synthesize tokenId = _tokenId;
-@synthesize sharedSecret = _sharedSecret;
-@synthesize httpProtocol = _httpProtocol;
-@synthesize portNumber = _portNumber;
-
-- (id)init {
+-(id) init {
     self = [super init];
-    if (self) {
-        self.portNumber = 443;
-		self.httpProtocol = @"https";
-	}
+
     return self;
 }
 
-- (void) dealloc {
-    self.accessPoint = nil;
-    self.tokenId = nil;
-    self.sharedSecret = nil;
-    self.httpProtocol = nil;
-    self.portNumber = 0;
+- (id)initWithResult:(BOOL)success
+           withError:(AtmosError *)err
+           withLabel:(NSString *)label {
+    self = [super initWithResult:success withError:err withLabel:label];
+        
+    return self;
+}
+
+- (NSURL*) getURLForToken {
+    NSString *baseUrl = [NSString stringWithFormat:@"%@://%@:%d",
+                         self.credentials.httpProtocol,
+                         self.credentials.accessPoint,
+                         self.credentials.portNumber];
+    NSURL *base = [NSURL URLWithString:baseUrl];
+    NSString *tokenPath = [NSString stringWithFormat:@"%@%@", ATMOS_ACCESS_TOKEN_LOCATION_PREFIX, self.accessTokenId];
+    NSURL *url = [NSURL URLWithString:tokenPath relativeToURL:base];
     
-    [super dealloc];
+    return url;
+}
+
+
+#pragma mark convienience constructors
++ (id)successWithLabel:(NSString *)label
+{
+    CreateAccessTokenResult *res = [[CreateAccessTokenResult alloc]initWithResult:YES withError:nil withLabel:label];
+    [res autorelease];
+    return res;
+}
+
++ (id)failureWithError:(AtmosError *)err withLabel:(NSString *)label
+{
+    CreateAccessTokenResult *res = [[CreateAccessTokenResult alloc]initWithResult:NO withError:err withLabel:label];
+    [res autorelease];
+    return res;
 }
 
 

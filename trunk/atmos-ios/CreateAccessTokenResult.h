@@ -1,6 +1,6 @@
 /*
  
- Copyright (c) 2011, EMC Corporation
+ Copyright (c) 2012, EMC Corporation
  
  All rights reserved.
  
@@ -27,36 +27,25 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
  */
-
+#import "AtmosResult.h"
 #import "AtmosCredentials.h"
 
-
-@implementation AtmosCredentials
-
-@synthesize accessPoint = _accessPoint;
-@synthesize tokenId = _tokenId;
-@synthesize sharedSecret = _sharedSecret;
-@synthesize httpProtocol = _httpProtocol;
-@synthesize portNumber = _portNumber;
-
-- (id)init {
-    self = [super init];
-    if (self) {
-        self.portNumber = 443;
-		self.httpProtocol = @"https";
-	}
-    return self;
+@interface CreateAccessTokenResult : AtmosResult {
+    NSString *accessTokenId;
+    AtmosCredentials *credentials;
 }
 
-- (void) dealloc {
-    self.accessPoint = nil;
-    self.tokenId = nil;
-    self.sharedSecret = nil;
-    self.httpProtocol = nil;
-    self.portNumber = 0;
-    
-    [super dealloc];
-}
+/*!
+ * Uses the current AtmosCredentials object to generate an absolute URL to
+ * access the token.
+ * @return an NSURL object, e.g. http://server:port/rest/accesstokens/tokkenid
+ */
+- (NSURL*) getURLForToken;
 
++ (id)successWithLabel:(NSString *)label;
++ (id)failureWithError:(AtmosError *)err withLabel:(NSString *)label;
+
+@property (nonatomic,retain) NSString *accessTokenId;
+@property (nonatomic,retain) AtmosCredentials *credentials;
 
 @end

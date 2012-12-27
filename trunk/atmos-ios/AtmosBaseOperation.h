@@ -76,6 +76,7 @@
 - (NSMutableURLRequest *) setupBaseRequestForResource:(NSString *) resource;
 - (NSString *) getSharedSecret;
 - (NSString	*) getMetaValue:(NSMutableDictionary *) metaVals;
+- (NSString *) extractLocation:(NSHTTPURLResponse *) resp;
 - (NSString *) extractObjectId:(NSHTTPURLResponse *) resp;
 - (void) setMetadataOnRequest:(NSMutableURLRequest *) req;
 - (void) setFilterTagsOnRequest:(NSMutableURLRequest *) req;

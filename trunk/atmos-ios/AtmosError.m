@@ -44,5 +44,11 @@
     return self;
 }
 
+- (void) dealloc {
+    self.errorMessage = nil;
+    
+    [super dealloc];
+}
+
 
 @end

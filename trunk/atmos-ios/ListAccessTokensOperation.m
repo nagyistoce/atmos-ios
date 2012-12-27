@@ -1,6 +1,6 @@
 /*
  
- Copyright (c) 2011, EMC Corporation
+ Copyright (c) 2012, EMC Corporation
  
  All rights reserved.
  
@@ -28,83 +28,116 @@
  
  */
 
+#import "ListAccessTokensOperation.h"
+#import "AtmosConstants.h"
 
-#import "DeleteObjectOperation.h"
-#import "AtmosResult.h"
+@implementation ListAccessTokensOperation
 
-@implementation DeleteObjectOperation
+@synthesize token, limit, callback;
 
-@synthesize atmosObj, callback;
+#pragma mark memory management
+
+- (id) init {
+    self = [super init];
+    if(self) {
+        token = nil;
+        limit = 0;
+    }
+    
+    return self;
+}
 
 - (void) dealloc {
-    self.atmosObj = nil;
+    self.token = nil;
     self.callback = nil;
+    
     [super dealloc];
 }
 
-
+#pragma mark implementation
 - (void) startAtmosOperation {
-	if(self.atmosObj) {
-		if(self.atmosObj.atmosId && self.atmosObj.atmosId.length == ATMOS_ID_LENGTH) {
-			self.atmosResource = [NSString stringWithFormat:@"/rest/objects/%@",self.atmosObj.atmosId];
-		} else if (self.atmosObj.objectPath) {
-			self.atmosResource = [NSString stringWithFormat:@"/rest/namespace%@",self.atmosObj.objectPath];
-		} else {
-			return; //no atmos resource to delete
-		}
-
-		NSMutableURLRequest *req = [self setupBaseRequestForResource:self.atmosResource];
-		[req setHTTPMethod:@"DELETE"];
-		[self signRequest:req];
-		
-		self.connection = [NSURLConnection connectionWithRequest:req delegate:self];
-	}
-	
+    self.atmosResource = ATMOS_ACCESS_TOKEN_LOCATION_PREFIX;
+    
+    NSMutableURLRequest *req = [self setupBaseRequestForResource:self.atmosResource];
+    [req setHTTPMethod:@"GET"];
+    
+    if(self.token) {
+        [req addValue:self.token forHTTPHeaderField:ATMOS_HEADER_TOKEN];
+    }
+    if(self.limit > 0) {
+        [req addValue:[NSString stringWithFormat:@"%d", self.limit] forHTTPHeaderField:ATMOS_HEADER_LIMIT];
+    }
+    
+    [self signRequest:req];
+    
+    self.connection = [NSURLConnection connectionWithRequest:req delegate:self];
 }
 
-#pragma mark NSURLConnection delegate
+#pragma mark NSURLRequest delegate
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
-{	
-	NSLog(@"didReceiveResponse %@",response);
+{
+	//NSLog(@"didReceiveResponse %@",response);
 	self.httpResponse = (NSHTTPURLResponse *) response;
 	[self.webData setLength:0];
-	
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
-	NSLog(@"didReceiveData %d",data.length);
 	[self.webData appendData:data];
 }
 
-- (void)connection:(NSURLConnection *)connection
+- (void)connection:(NSURLConnection *)con
   didFailWithError:(NSError *)error
 {
 	NSLog(@"didFailWithError %@",[error localizedDescription]);
 	AtmosError *err = [[AtmosError alloc] initWithCode:-1 message:[error localizedDescription]];
-    self.callback([AtmosResult failureWithError:err withLabel:self.operationLabel]);
+    
+    ListAccessTokensResult *result = [[ListAccessTokensResult alloc] init];
+    result.error = err;
+    result.wasSuccessful = NO;
+    
+    self.callback(result);
+    
 	[err release];
-	//[connection release];
-	
+    [result release];
 	[self.atmosStore operationFinishedInternal:self];
-	
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)con
 {
-	NSLog(@"connectionDidFinishLoading %@",con);
 	if([self.httpResponse statusCode] >= 400) {
-		//some atmos error
 		NSString *errStr = [[NSString alloc] initWithData:self.webData encoding:NSASCIIStringEncoding];
 		AtmosError *aerr = [self extractAtmosError:errStr];
-        self.callback([AtmosResult failureWithError:aerr withLabel:self.operationLabel]);
-		[errStr release];
+        ListAccessTokensResult *result = [[ListAccessTokensResult alloc]init];
+        result.wasSuccessful = NO;
+        result.error = aerr;
+        
+        self.callback(result);
+        
+        [result release];
+        [errStr release];
 	} else {
-        self.callback([AtmosResult successWithLabel:self.operationLabel]);
-	}
-	[self.atmosStore operationFinishedInternal:self];
+        NSString *str = [[NSString alloc] initWithData:self.webData encoding:NSASCIIStringEncoding];
+        NSLog(@"connectionFinishedLoading %@",str);
+        [str release];
+        ListAccessTokensResult *result = [[ListAccessTokensResult alloc]init];
+        result.wasSuccessful = YES;
+        result.results = [TNSListAccessTokenResultType fromListAccessTokensResult:self.webData];
+        if(!result.results) {
+            result.wasSuccessful = NO;
+            AtmosError *aerr = [[AtmosError alloc] initWithCode:0 message:@"Failed to parse response XML"];
+            result.error = aerr;
+            [aerr release];
+        }
+        self.responseHeaders = [self.httpResponse allHeaderFields];
+        result.token = [self.responseHeaders valueForKey:ATMOS_HEADER_TOKEN];
+        
+        self.callback(result);
+        
+        [result release];
+    }
+    [self.atmosStore operationFinishedInternal:self];
 }
-
 
 
 @end

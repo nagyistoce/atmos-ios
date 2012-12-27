@@ -39,7 +39,10 @@
 
 @implementation ListDirectoryOperation
 
-@synthesize atmosObj,currentValue, emcToken, emcLimit, atmosObjects, currentElement, currentObject, includeMetadata, includeUserTags, includeSystemTags, currentMetadata, currentMetaName, currentMetaValue, currentMetaListable, currentListableMetadata;
+@synthesize atmosObj, currentValue, emcToken, emcLimit, atmosObjects;
+@synthesize currentElement, currentObject, includeMetadata, includeUserTags;
+@synthesize includeSystemTags, currentMetadata, currentMetaName;
+@synthesize currentMetaValue, currentMetaListable, currentListableMetadata;
 @synthesize callback;
 
 - (void) dealloc
@@ -56,6 +59,8 @@
     self.currentMetadata = nil;
     self.currentMetaName = nil;
     self.currentMetaValue = nil;
+    self.currentListableMetadata = nil;
+    self.callback = nil;
     [super dealloc];
 }
 

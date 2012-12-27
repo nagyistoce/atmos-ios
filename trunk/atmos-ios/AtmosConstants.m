@@ -1,6 +1,6 @@
 /*
  
- Copyright (c) 2011, EMC Corporation
+ Copyright (c) 2012, EMC Corporation
  
  All rights reserved.
  
@@ -28,35 +28,10 @@
  
  */
 
-#import "AtmosCredentials.h"
+#import "AtmosConstants.h"
 
-
-@implementation AtmosCredentials
-
-@synthesize accessPoint = _accessPoint;
-@synthesize tokenId = _tokenId;
-@synthesize sharedSecret = _sharedSecret;
-@synthesize httpProtocol = _httpProtocol;
-@synthesize portNumber = _portNumber;
-
-- (id)init {
-    self = [super init];
-    if (self) {
-        self.portNumber = 443;
-		self.httpProtocol = @"https";
-	}
-    return self;
-}
-
-- (void) dealloc {
-    self.accessPoint = nil;
-    self.tokenId = nil;
-    self.sharedSecret = nil;
-    self.httpProtocol = nil;
-    self.portNumber = 0;
-    
-    [super dealloc];
-}
-
-
-@end
+NSString *const ATMOS_ACCESS_TOKEN_LOCATION_PREFIX = @"/rest/accesstokens/";
+NSString *const ATMOS_HEADER_OBJECTID = @"X-Emc-Objectid";
+NSString *const ATMOS_HEADER_PATH = @"X-Emc-Path";
+NSString *const ATMOS_HEADER_TOKEN = @"X-Emc-Token";
+NSString *const ATMOS_HEADER_LIMIT = @"X-Emc-Limit";

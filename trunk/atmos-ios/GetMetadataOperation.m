@@ -40,6 +40,14 @@
 
 @synthesize atmosId, objectPath, atmosObj, metaLoadType, callback;
 
+- (void) dealloc {
+    self.atmosId = nil;
+    self.objectPath = nil;
+    self.atmosObj = nil;
+    self.callback = nil;
+    [super dealloc];
+}
+
 - (void) startAtmosOperation {
 	
 	AtmosObject *aobj = [[AtmosObject alloc] init];
@@ -112,6 +120,21 @@
 	[self.webData appendData:data];
 }
 
+- (void)connection:(NSURLConnection *)con
+  didFailWithError:(NSError *)error
+{
+	NSLog(@"didFailWithError %@",[error localizedDescription]);
+	AtmosError *err = [[AtmosError alloc] initWithCode:-1 message:[error localizedDescription]];
+    
+    AtmosObjectResult *result = [AtmosObjectResult failureWithError:err withLabel:self.operationLabel];
+    
+    self->callback(result);
+    
+	[err release];
+	[self.atmosStore operationFinishedInternal:self];
+}
+
+
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)con
 {
@@ -158,8 +181,8 @@
         [result release];
 		
 			
-		[self.atmosStore operationFinishedInternal:self];
 	}
+    [self.atmosStore operationFinishedInternal:self];
 		
 }
 

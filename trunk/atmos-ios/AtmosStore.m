@@ -43,6 +43,10 @@
 #import "RenameObjectOperation.h"
 #import "GetServiceInformationOperation.h"
 #import "GetObjectInformationOperation.h"
+#import "CreateAccessTokenOperation.h"
+#import "DeleteAccessTokenOperation.h"
+#import "GetAccessTokenInfoOperation.h"
+#import "ListAccessTokensOperation.h"
 
 @interface AtmosStore (Private)
 
@@ -306,6 +310,8 @@
 	oper.emcLimit = limit;
 	
 	[self scheduleOperation:oper];
+    
+    [oper release];
 }
 
 - (void) listDirectoryWithAllMetadata:(AtmosObject *) directory 
@@ -338,7 +344,7 @@
     oper.includeSystemTags = sdata;
 	
 	[self scheduleOperation:oper];
-
+    [oper release];
 }
 
 #pragma mark ListObjects
@@ -639,6 +645,7 @@
     oper.atmosStore = self;
     oper.atmosCredentials = self.atmosCredentials;
     oper.callback = callback;
+    oper.operationLabel = requestLabel;
     
     [self scheduleOperation:oper];
     [oper release];
@@ -654,6 +661,115 @@
     oper.atmosCredentials = self.atmosCredentials;
     oper.callback = callback;
     oper.atmosObject = atmosObject;
+    oper.operationLabel = requestLabel;
+    
+    [self scheduleOperation:oper];
+    [oper release];
+}
+
+#pragma mark Access Tokens
+
+- (void) createAccessToken:(void(^)(CreateAccessTokenResult *result)) callback
+                 withLabel:(NSString*) requestLabel {
+    CreateAccessTokenOperation *oper = [[CreateAccessTokenOperation alloc] init];
+    
+    oper.atmosStore = self;
+    oper.atmosCredentials = self.atmosCredentials;
+    oper.callback = callback;
+    oper.operationLabel = requestLabel;
+    
+    [self scheduleOperation:oper];
+    [oper release];
+}
+
+- (void) createAccessTokenWithPolicy:(TNSPolicyType*) policy
+                        withMetadata:(NSDictionary*)userMetadata
+                withListableMetadata:(NSDictionary*)listableMetadata
+                             withAcl:(NSArray*)acl
+                        withCallback:(void(^)(CreateAccessTokenResult *result)) callback
+                           withLabel:(NSString*) requestLabel {
+    CreateAccessTokenOperation *oper = [[CreateAccessTokenOperation alloc] init];
+    
+    oper.atmosStore = self;
+    oper.atmosCredentials = self.atmosCredentials;
+    oper.callback = callback;
+    oper.operationLabel = requestLabel;
+    oper.policy = policy;
+    
+    AtmosObject *obj = [[AtmosObject alloc] init];
+    obj.userListableMeta = [NSMutableDictionary dictionaryWithDictionary:listableMetadata];
+    obj.userRegularMeta = [NSMutableDictionary dictionaryWithDictionary:userMetadata];
+    
+    oper.object = obj;
+    
+    [self scheduleOperation:oper];
+    
+    [obj release];
+    [oper release];
+}
+
+- (void) createAccessTokenForObject:(AtmosObject*)object
+                         withPolicy:(TNSPolicyType*) policy
+                       withCallback:(void(^)(CreateAccessTokenResult *result)) callback
+                          withLabel:(NSString*) requestLabel {
+    CreateAccessTokenOperation *oper = [[CreateAccessTokenOperation alloc] init];
+    
+    oper.atmosStore = self;
+    oper.atmosCredentials = self.atmosCredentials;
+    oper.callback = callback;
+    oper.operationLabel = requestLabel;
+    oper.policy = policy;
+    oper.object = object;
+    
+    [self scheduleOperation:oper];
+    
+    [oper release];    
+}
+
+
+- (void) deleteAccessToken:(NSString*)accessTokenId
+              withCallback:(void(^)(AtmosResult* result)) callback
+                 withLabel:(NSString*) requestLabel {
+    DeleteAccessTokenOperation *oper = [[DeleteAccessTokenOperation alloc] init];
+    
+    oper.atmosStore = self;
+    oper.atmosCredentials = self.atmosCredentials;
+    oper.callback = callback;
+    oper.operationLabel = requestLabel;
+    oper.accessTokenId = accessTokenId;
+    
+    [self scheduleOperation:oper];
+    [oper release];
+}
+
+
+- (void) getAccessTokenInfo:(NSString*)accessTokenId
+               withCallback:(void(^)(GetAccessTokenInfoResult *result)) callback
+                  withLabel:(NSString*) requestLabel {
+    
+    GetAccessTokenInfoOperation *oper = [[GetAccessTokenInfoOperation alloc]
+                                         initWithAccessTokenId:accessTokenId
+                                         withCallback:callback];
+    oper.operationLabel = requestLabel;
+    oper.atmosStore = self;
+    oper.atmosCredentials = self.atmosCredentials;
+    
+    [self scheduleOperation:oper];
+    [oper release];
+}
+
+- (void) listAccessTokensWithLimit:(int)limit
+                         withToken:(NSString*)token
+                      withCallback:(void(^)(ListAccessTokensResult *result)) callback
+                         withLabel:(NSString*) requestLabel {
+    ListAccessTokensOperation *oper = [[ListAccessTokensOperation alloc] init];
+    
+    oper.operationLabel = requestLabel;
+    oper.atmosStore = self;
+    oper.atmosCredentials = self.atmosCredentials;
+    oper.token = token;
+    oper.limit = limit;
+    oper.callback = callback;
     
     [self scheduleOperation:oper];
     [oper release];
@@ -664,10 +780,9 @@
 #pragma mark MemoryManagement
 
 - (void) dealloc {
-	[currentOperations release];
-	[pendingOperations release];
-    
     self.atmosCredentials = nil;
+    self.currentOperations = nil;
+    self.pendingOperations = nil;
     
 	[super dealloc];
 }

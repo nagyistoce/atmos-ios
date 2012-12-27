@@ -57,16 +57,14 @@
 
 + (id)successWithLabel:(NSString *)label
 {
-    AtmosResult *res = [AtmosResult alloc];
-    [res initWithResult:YES withError:nil withLabel:label];
+    AtmosResult *res = [[AtmosResult alloc]initWithResult:YES withError:nil withLabel:label];
     [res autorelease];
     return res;
 }
 
 + (id)failureWithError:(AtmosError *)err withLabel:(NSString *)label
 {
-    AtmosResult *res = [AtmosResult alloc];
-    [res initWithResult:NO withError:err withLabel:label];
+    AtmosResult *res = [[AtmosResult alloc]initWithResult:NO withError:err withLabel:label];
     [res autorelease];
     return res;
 }

@@ -176,21 +176,27 @@
 
 - (NSArray *) requestTags {
 	if(requestTags == nil) {
-		self.requestTags = [[NSMutableArray alloc] init];
+        NSMutableArray *rtags = [[NSMutableArray alloc] init];
+		self.requestTags = rtags;
+        [rtags release];
 	}
 	return requestTags;
 }
 
 - (NSMutableDictionary *) listableMeta {
 	if(listableMeta == nil) {
-		self.listableMeta = [[NSMutableDictionary alloc] init];
+        NSMutableDictionary *m = [[NSMutableDictionary alloc] init];
+		self.listableMeta = m;
+        [m release];
 	}
 	return listableMeta;
 }
 
 - (NSMutableDictionary *)regularMeta {
 	if(regularMeta == nil) {
-		self.regularMeta = [[NSMutableDictionary alloc] init];
+        NSMutableDictionary *m = [[NSMutableDictionary alloc] init];
+		self.regularMeta = m;
+        [m release];
 	}
 	return regularMeta;
 }
@@ -250,14 +256,21 @@
 
 }
 
-- (NSString *) extractObjectId:(NSHTTPURLResponse *) resp {
+- (NSString *) extractLocation:(NSHTTPURLResponse *) resp {
 	NSDictionary *hdrFields = [resp allHeaderFields];
 	NSString *locationVal = [hdrFields valueForKey:@"location"];
 	if(locationVal == nil || locationVal.length == 0)
 		locationVal = [hdrFields valueForKey:@"Location"];
-	if(locationVal == nil || locationVal.length == 0) 
+	if(locationVal == nil || locationVal.length == 0)
 		locationVal = [hdrFields valueForKey:@"LOCATION"];
-	
+    
+    return locationVal;
+}
+
+
+- (NSString *) extractObjectId:(NSHTTPURLResponse *) resp {
+	NSString *locationVal = [self extractLocation:resp];
+    
 	if(locationVal) {
 		NSArray *pcomps = [locationVal pathComponents];
 		NSString *atmosId = (NSString *) [pcomps lastObject];
@@ -347,7 +360,6 @@
 - (void) startAtmosOperation {}
 
 
-
 #pragma mark Memory mgmt
 - (void) dealloc {
     self.baseUrl = nil;
@@ -362,6 +374,7 @@
     self.operationLabel = nil;
     self.connection = nil;
     self.httpResponse = nil;
+    self.atmosCredentials = nil;
 
 	[super dealloc];
 }
