@@ -32,6 +32,7 @@
 
 
 #import "ObjectUploadOperation.h"
+#import "AtmosConstants.h"
 
 @interface ObjectUploadOperation (Private)
 
@@ -151,14 +152,18 @@
 	
 	NSString *hmethod;
 	if((self.currentBlock == 0) && (self.uploadMode == UPLOAD_MODE_CREATE)) {
-		if(self.atmosObj.objectPath) {
+		if(self.atmosObj.keypool) {
+			self.atmosResource = [NSString stringWithFormat:@"/rest/namespace/%@",self.atmosObj.objectPath];
+        } else if(self.atmosObj.objectPath) {
 			self.atmosResource = [NSString stringWithFormat:@"/rest/namespace%@",self.atmosObj.objectPath];
 		} else {
 			self.atmosResource = @"/rest/objects";
 		}
 		hmethod = @"POST";
 	} else {
-		if(self.atmosObj.objectPath) {
+		if(self.atmosObj.keypool) {
+			self.atmosResource = [NSString stringWithFormat:@"/rest/namespace/%@",self.atmosObj.objectPath];
+        } else if(self.atmosObj.objectPath) {
 			self.atmosResource = [NSString stringWithFormat:@"/rest/namespace%@",self.atmosObj.objectPath];
 		} else {
 			self.atmosResource = [NSString stringWithFormat:@"/rest/objects/%@",self.atmosObj.atmosId];
@@ -168,6 +173,11 @@
 	}
 	
 	NSMutableURLRequest *req = [self setupBaseRequestForResource:self.atmosResource];
+    
+    if(self.atmosObj.keypool) {
+        [req addValue:self.atmosObj.keypool
+   forHTTPHeaderField:ATMOS_HEADER_POOL];
+    }
 	
 	if(totalTransferSize > 0) {
 		NSLog(@"got new atmos resource %@",self.atmosResource);

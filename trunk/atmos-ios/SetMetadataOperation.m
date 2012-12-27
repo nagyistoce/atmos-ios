@@ -32,6 +32,7 @@
 
 
 #import "SetMetadataOperation.h"
+#import "AtmosConstants.h"
 
 
 @implementation SetMetadataOperation
@@ -50,6 +51,8 @@
 	if(self.curObj) {
 		if(self.curObj.atmosId) {
 			self.atmosResource = [NSString stringWithFormat:@"/rest/objects/%@?metadata/user",self.curObj.atmosId];
+        } else if(self.curObj.keypool) {
+			self.atmosResource = [NSString stringWithFormat:@"/rest/namespace/%@?metadata/user",self.curObj.objectPath];
 		} else if(self.curObj.objectPath) {
 			self.atmosResource = [NSString stringWithFormat:@"/rest/namespace%@?metadata/user",self.curObj.objectPath];
 		} else {
@@ -59,6 +62,12 @@
 		NSMutableURLRequest *req = [self setupBaseRequestForResource:self.atmosResource];
 		
 		[req setHTTPMethod:@"POST"];
+        
+        if(self.curObj.keypool) {
+            [req addValue:self.curObj.keypool
+       forHTTPHeaderField:ATMOS_HEADER_POOL];
+        }
+        
 		self.regularMeta = self.curObj.userRegularMeta;
 		self.listableMeta = self.curObj.userListableMeta;
 		[self setMetadataOnRequest:req];

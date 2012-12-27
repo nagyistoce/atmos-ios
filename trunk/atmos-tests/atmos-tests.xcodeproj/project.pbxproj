@@ -9,8 +9,10 @@
 /* Begin PBXBuildFile section */
 		750CEE6313B2853400794500 /* settings.plist.template in Resources */ = {isa = PBXBuildFile; fileRef = 750CEE6213B2853400794500 /* settings.plist.template */; };
 		750CEE6613B288D500794500 /* settings.plist in Resources */ = {isa = PBXBuildFile; fileRef = 750CEE6513B288D500794500 /* settings.plist */; };
+		75E5F9751687B356009B783D /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 75E5F9741687B356009B783D /* QuartzCore.framework */; };
 		75F43E291682751000A55704 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 75F43E281682751000A55704 /* libxml2.dylib */; };
 		75F43E2F1682783D00A55704 /* GHUnitIOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 75F43E2E1682783D00A55704 /* GHUnitIOS.framework */; };
+		75F43E311682792C00A55704 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 75F43E301682792C00A55704 /* Default-568h@2x.png */; };
 		963C12D51371DCCD008AB91F /* AtmosTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 963C12D41371DCCD008AB91F /* AtmosTests.m */; };
 		967248E61371D0AE00013901 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 967248E51371D0AE00013901 /* UIKit.framework */; };
 		967248E81371D0AE00013901 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 967248E71371D0AE00013901 /* Foundation.framework */; };
@@ -28,8 +30,10 @@
 /* Begin PBXFileReference section */
 		750CEE6213B2853400794500 /* settings.plist.template */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = settings.plist.template; sourceTree = "<group>"; };
 		750CEE6513B288D500794500 /* settings.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = settings.plist; sourceTree = "<group>"; };
+		75E5F9741687B356009B783D /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		75F43E281682751000A55704 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
 		75F43E2E1682783D00A55704 /* GHUnitIOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GHUnitIOS.framework; sourceTree = "<group>"; };
+		75F43E301682792C00A55704 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		963C12D31371DCCD008AB91F /* AtmosTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AtmosTests.h; sourceTree = "<group>"; };
 		963C12D41371DCCD008AB91F /* AtmosTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AtmosTests.m; sourceTree = "<group>"; };
 		967248E11371D0AD00013901 /* atmos-tests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "atmos-tests.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -56,6 +60,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				75E5F9751687B356009B783D /* QuartzCore.framework in Frameworks */,
 				75F43E2F1682783D00A55704 /* GHUnitIOS.framework in Frameworks */,
 				75F43E291682751000A55704 /* libxml2.dylib in Frameworks */,
 				96DFDFA1137486AA00EDDD3C /* libatmos.a in Frameworks */,
@@ -71,6 +76,8 @@
 		967248D61371D0AD00013901 = {
 			isa = PBXGroup;
 			children = (
+				75E5F9741687B356009B783D /* QuartzCore.framework */,
+				75F43E301682792C00A55704 /* Default-568h@2x.png */,
 				75F43E2E1682783D00A55704 /* GHUnitIOS.framework */,
 				75F43E281682751000A55704 /* libxml2.dylib */,
 				750CEE6513B288D500794500 /* settings.plist */,
@@ -200,6 +207,7 @@
 				967249041371D0AE00013901 /* MainWindow_iPad.xib in Resources */,
 				750CEE6313B2853400794500 /* settings.plist.template in Resources */,
 				750CEE6613B288D500794500 /* settings.plist in Resources */,
+				75F43E311682792C00A55704 /* Default-568h@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -260,6 +268,7 @@
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = /usr/include/libxml2;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -275,6 +284,7 @@
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = /usr/include/libxml2;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				SDKROOT = iphoneos;
@@ -295,7 +305,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "atmos-tests/atmos-tests-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				HEADER_SEARCH_PATHS = "$(BUILT_PRODUCTS_DIR)/usr/local/include";
+				HEADER_SEARCH_PATHS = (
+					"$(BUILT_PRODUCTS_DIR)/usr/local/include",
+					/usr/include/libxml2,
+				);
 				INFOPLIST_FILE = "atmos-tests/atmos-tests-Info.plist";
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -318,7 +331,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "atmos-tests/atmos-tests-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				HEADER_SEARCH_PATHS = "$(BUILT_PRODUCTS_DIR)/usr/local/include";
+				HEADER_SEARCH_PATHS = (
+					"$(BUILT_PRODUCTS_DIR)/usr/local/include",
+					/usr/include/libxml2,
+				);
 				INFOPLIST_FILE = "atmos-tests/atmos-tests-Info.plist";
 				OTHER_LDFLAGS = (
 					"-ObjC",

@@ -40,7 +40,7 @@ static NSSet *systemMetaNames = nil;
 @implementation AtmosObject
 
 @synthesize atmosId, objectPath, userRegularMeta, userListableMeta, systemMeta, requestTags, contentType;
-@synthesize filepath,data;
+@synthesize filepath, data, keypool;
 @synthesize dataMode = kDataModeFile;
 @synthesize directory;
 
@@ -74,9 +74,10 @@ static NSSet *systemMetaNames = nil;
 
 + (BOOL) isSystemMetadata:(NSString *) metaName {
 	if(systemMetaNames == nil) {
-		systemMetaNames = [NSSet setWithObjects:@"atime",@"ctime",@"gid",@"itime",@"mtime",@"nlink",@"objectid",@"objname",@"policyname",@"size",@"type",@"uid",nil];
-        // Increment ref count so it doesn't get autoreleased
-        [systemMetaNames retain];
+		systemMetaNames = [[NSSet alloc] initWithObjects:@"atime", @"ctime",
+                           @"gid", @"itime", @"mtime", @"nlink", @"objectid",
+                           @"objname", @"policyname", @"size", @"type",
+                           @"uid", nil];
 	}
 	return [systemMetaNames containsObject:metaName];
 }
@@ -85,8 +86,6 @@ static NSSet *systemMetaNames = nil;
 	if(tsFmter == nil) {
 		tsFmter = [[NSDateFormatter alloc] init];
 		[tsFmter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-        // Increment ref count so it doesn't get autorelased
-        [tsFmter retain];
 	}
 	
 	return [tsFmter dateFromString:tsStr];	
@@ -158,6 +157,27 @@ static NSSet *systemMetaNames = nil;
     return self;
 }
 
+-(id) initWithObjectPath:(NSString*)path {
+    self = [super init];
+    if(self) {
+        self.objectPath = path;
+    }
+    
+    return self;
+}
+
+-(id) initWithKeypool:(NSString*)pool withKey:(NSString*)key {
+    self = [super init];
+    if(self) {
+        self.keypool = pool;
+        self.objectPath = key;
+    }
+    
+    return self;    
+}
+
+
+
 - (BOOL) isEqual:(id)object 
 {
     return [((AtmosObject*)object).atmosId isEqualToString:self.atmosId] || [((AtmosObject*)object).objectPath isEqualToString:self.objectPath];
@@ -179,6 +199,7 @@ static NSSet *systemMetaNames = nil;
     // Release properties marked retain.
     self.atmosId = nil;
     self.objectPath = nil;
+    self.keypool = nil;
     self.systemMeta = nil;
     self.userListableMeta = nil;
     self.userRegularMeta = nil;

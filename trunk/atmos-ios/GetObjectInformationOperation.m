@@ -30,6 +30,7 @@
  POSSIBILITY OF SUCH DAMAGE.
  */
 #import "GetObjectInformationOperation.h"
+#import "AtmosConstants.h"
 
 @interface GetObjectInformationOperation ()
 #pragma mark Private Properties
@@ -64,6 +65,8 @@
 - (void) startAtmosOperation {
     if(self.atmosObject.atmosId) {
         self.atmosResource = [NSString stringWithFormat:@"/rest/objects/%@?info",self.atmosObject.atmosId];
+    } else if(self.atmosObject.keypool) {
+        self.atmosResource = [NSString stringWithFormat:@"/rest/namespace/%@?info",self.atmosObject.objectPath];
     } else if(self.atmosObject.objectPath) {
         self.atmosResource = [NSString stringWithFormat:@"/rest/namespace%@?info",self.atmosObject.objectPath];
     } else {
@@ -72,6 +75,12 @@
     
     NSMutableURLRequest *req = [self setupBaseRequestForResource:self.atmosResource];
     [req setHTTPMethod:@"GET"];
+    
+    if(self.atmosObject.keypool) {
+        [req addValue:self.atmosObject.keypool
+   forHTTPHeaderField:ATMOS_HEADER_POOL];
+    }
+    
     [self signRequest:req];
     
     self.connection = [NSURLConnection connectionWithRequest:req delegate:self];

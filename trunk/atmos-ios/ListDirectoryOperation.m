@@ -85,6 +85,10 @@
 		} else if (self.atmosObj.objectPath) {
 			self.atmosResource = [NSString stringWithFormat:@"/rest/namespace%@",self.atmosObj.objectPath];
 		}
+        
+        if(self.atmosObj.keypool) {
+            [NSException raise:@"Unsupported Operation" format:@"You cannot call listDirectory on a keypool object."];
+        }
 		
 		NSMutableURLRequest *req = [self setupBaseRequestForResource:self.atmosResource];
 		[req setHTTPMethod:@"GET"];

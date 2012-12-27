@@ -31,6 +31,7 @@
  */
 
 #import "DeleteMetadataOperation.h"
+#import "AtmosConstants.h"
 
 
 @implementation DeleteMetadataOperation
@@ -48,9 +49,17 @@
 	
 	if(self.atmosObj) {
 		if(self.atmosObj.atmosId) {
-			self.atmosResource = [NSString stringWithFormat:@"/rest/objects/%@?metadata/user",self.atmosObj.atmosId];
+			self.atmosResource =
+            [NSString stringWithFormat:@"/rest/objects/%@?metadata/user",
+             self.atmosObj.atmosId];
+        } else if(self.atmosObj.keypool) {
+			self.atmosResource =
+            [NSString stringWithFormat:@"/rest/namespace/%@?metadata/user",
+             self.atmosObj.objectPath];
 		} else if(self.atmosObj.objectPath) {
-			self.atmosResource = [NSString stringWithFormat:@"/rest/namespace%@?metadata/user",self.atmosObj.objectPath];
+			self.atmosResource =
+            [NSString stringWithFormat:@"/rest/namespace%@?metadata/user",
+             self.atmosObj.objectPath];
 		} else {
 			return;
 		}
@@ -58,6 +67,11 @@
 	
 	NSMutableURLRequest *req = [self setupBaseRequestForResource:self.atmosResource];
 	[req setHTTPMethod:@"DELETE"];
+    
+    if(self.atmosObj.keypool) {
+        [req addValue:self.atmosObj.keypool forHTTPHeaderField:ATMOS_HEADER_POOL];
+    }
+    
 	//self.requestTags = [self.atmosObj.requestTags allObjects];
     self.requestTags = [NSMutableArray arrayWithArray:[self.atmosObj.requestTags allObjects]];
 	[self setFilterTagsOnRequest:req];

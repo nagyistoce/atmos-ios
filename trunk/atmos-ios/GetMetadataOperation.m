@@ -31,6 +31,7 @@
  */
 
 #import "GetMetadataOperation.h"
+#import "AtmosConstants.h"
 
 @interface GetMetadataOperation (Private)
 
@@ -40,13 +41,14 @@
 
 @implementation GetMetadataOperation
 
-@synthesize atmosId, objectPath, atmosObj, metaLoadType, callback;
+@synthesize atmosId, objectPath, atmosObj, metaLoadType, callback, keypool;
 
 - (void) dealloc {
     self.atmosId = nil;
     self.objectPath = nil;
     self.atmosObj = nil;
     self.callback = nil;
+    self.keypool = nil;
     [super dealloc];
 }
 
@@ -58,39 +60,48 @@
     
     NSMutableURLRequest *req;
     
+    if(self.atmosId) {
+        self.atmosResource = [NSString
+                              stringWithFormat:@"/rest/objects/%@",
+                              self.atmosId];
+    } else if(self.keypool) {
+        self.atmosResource = [NSString
+                              stringWithFormat:@"/rest/namespace/%@",
+                              self.objectPath];
+    } else if(self.objectPath) {
+        self.atmosResource = [NSString
+                              stringWithFormat:@"/rest/namespace%@",
+                              self.objectPath];
+    }
     switch (metaLoadType) {
         case kMetaLoadAll:
             // All metadata is fetched via a HEAD call to the object
-            if(self.atmosId) {
-                self.atmosResource = [NSString stringWithFormat:@"/rest/objects/%@",self.atmosId];
-            } else if(self.objectPath) {
-                self.atmosResource = [NSString stringWithFormat:@"/rest/namespace%@",self.objectPath];
-            }
             req = [self setupBaseRequestForResource:self.atmosResource];
             [req setHTTPMethod:@"HEAD"];
             break;
             
         case kMetaLoadUser:
-            if(self.atmosId) {
-                self.atmosResource = [NSString stringWithFormat:@"/rest/objects/%@?metadata/user",self.atmosId];
-            } else if(self.objectPath) {
-                self.atmosResource = [NSString stringWithFormat:@"/rest/namespace%@?metadata/user",self.objectPath];
-            }
+            self.atmosResource = [NSString
+                                  stringWithFormat:@"%@?metadata/user",
+                                  self.atmosResource];
             
             req = [self setupBaseRequestForResource:self.atmosResource];
             break;
         case kMetaLoadSystem:
-            if(self.atmosId) {
-                self.atmosResource = [NSString stringWithFormat:@"/rest/objects/%@?metadata/system",self.atmosId];
-            } else if(self.objectPath) {
-                self.atmosResource = [NSString stringWithFormat:@"/rest/namespace%@?metadata/system",self.objectPath];
-            }
+            self.atmosResource = [NSString
+                                  stringWithFormat:@"%@?metadata/system",
+                                  self.atmosResource];
             
             req = [self setupBaseRequestForResource:self.atmosResource];
             break;
     }
     
     [self setFilterTagsOnRequest:req];
+    
+    if(self.keypool) {
+        [req addValue:self.keypool forHTTPHeaderField:ATMOS_HEADER_POOL];
+    }
+    
     [self signRequest:req];
     NSLog(@"setup request %@",req);
     self.connection = [NSURLConnection connectionWithRequest:req delegate:self];

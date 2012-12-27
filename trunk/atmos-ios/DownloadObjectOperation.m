@@ -32,6 +32,7 @@
 
 
 #import "DownloadObjectOperation.h"
+#import "AtmosConstants.h"
 
 
 @implementation DownloadObjectOperation
@@ -55,9 +56,14 @@
 	bytesDownloaded = 0;
 	
 	if(self.atmosObj.atmosId && self.atmosObj.atmosId.length == ATMOS_ID_LENGTH) {
-		self.atmosResource = [NSString stringWithFormat:@"/rest/objects/%@",self.atmosObj.atmosId];
+		self.atmosResource = [NSString stringWithFormat:@"/rest/objects/%@",
+                              self.atmosObj.atmosId];
+    } else if(self.atmosObj.keypool) {
+		self.atmosResource = [NSString stringWithFormat:@"/rest/namespace/%@",
+                              self.atmosObj.objectPath];
 	} else if(self.atmosObj.objectPath) {
-		self.atmosResource = [NSString stringWithFormat:@"/rest/namespace%@",self.atmosObj.objectPath];
+		self.atmosResource = [NSString stringWithFormat:@"/rest/namespace%@",
+                              self.atmosObj.objectPath];
 	} else {
 		return; //no resource - nothing to download
 	}
@@ -75,7 +81,8 @@
                 [str writeToFile:self.atmosObj.filepath atomically:NO encoding:NSUTF8StringEncoding error:NULL];
                 [str release];
             }
-            self.fileHandle = [NSFileHandle fileHandleForWritingAtPath:self.atmosObj.filepath];
+            self.fileHandle = [NSFileHandle
+                               fileHandleForWritingAtPath:self.atmosObj.filepath];
             
             if(self.fileOffset == -1) {
                 [self.fileHandle seekToEndOfFile];
@@ -113,6 +120,11 @@
 	
 	NSMutableURLRequest *req = [super setupBaseRequestForResource:self.atmosResource];
 	[req setHTTPMethod:@"GET"];
+    
+    if(self.atmosObj.keypool) {
+        [req addValue:self.atmosObj.keypool forHTTPHeaderField:ATMOS_HEADER_POOL];
+    }
+    
 	if(!(startByte == 0 && endByte == -1)) {
 		if(endByte < startByte) {
 			AtmosError *err = [[AtmosError alloc] initWithCode:-1 message:@"Invalid byte range specified"];
