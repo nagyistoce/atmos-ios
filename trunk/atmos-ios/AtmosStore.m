@@ -830,6 +830,108 @@
     [oper release];
 }
 
+#pragma mark Shareable URL
+- (NSURL*) getShareableUrlForObject:(AtmosObject*)obj
+                     withExpiration:(NSDate*)expires {
+    return [self getShareableUrlForObject:obj
+                           withExpiration:expires
+                          withDisposition:nil];
+}
+
+- (NSURL*) getShareableUrlForObject:(AtmosObject *)obj
+                     withExpiration:(NSDate *)expires
+                    withDisposition:(NSString*)disposition {
+    
+    NSString *resource;
+    NSNumber *expTs = [NSNumber numberWithDouble:[expires timeIntervalSince1970]];
+    
+    if(obj.objectPath) {
+        resource = [NSString stringWithFormat:@"/rest/namespace%@", obj.objectPath];
+    } else if(obj.atmosId) {
+        resource = [NSString stringWithFormat:@"/rest/objects/%@", obj.atmosId];
+    } else if(obj.keypool) {
+        [NSException
+         raise:@"Unsupported Operation"
+         format:@"Creating a shareable URL for a keypool key is not currently supported."];
+    } else {
+        [NSException
+         raise:@"Invalid Argument"
+         format:@"When creating a shareable URL, the AtmosObject must either have objectPath or atmosId set."];
+    }
+    
+    	
+	//HTTP Method
+	NSMutableString *signStr = [[NSMutableString alloc] init];
+	[signStr appendString:@"GET"];
+	[signStr appendString:@"\n"];
+    
+	//append resource
+	[signStr appendString:[resource lowercaseString]];
+	[signStr appendString:@"\n"];
+
+    // UID
+	[signStr appendString:self.atmosCredentials.tokenId];
+	[signStr appendString:@"\n"];	
+	
+	// Expires timestamp in unix format
+	[signStr appendFormat:@"%lld", [expTs longLongValue]];
+	
+	// If specified, the disposition.
+    if(disposition) {
+        [signStr appendString:@"\n"];
+        [signStr appendString:disposition];
+    }
+	
+	NSData *keyData = [NSData dataWithBase64EncodedString:self.atmosCredentials.sharedSecret];
+	NSData *clearTextData = [signStr dataUsingEncoding:NSUTF8StringEncoding];
+	
+	uint8_t digest[CC_SHA1_DIGEST_LENGTH] = {0};
+	
+	CCHmacContext hmacContext;
+	CCHmacInit(&hmacContext, kCCHmacAlgSHA1, keyData.bytes, keyData.length);
+	CCHmacUpdate(&hmacContext, clearTextData.bytes, clearTextData.length);
+	CCHmacFinal(&hmacContext, digest);
+	
+	NSData *out = [NSData dataWithBytes:digest length:CC_SHA1_DIGEST_LENGTH];
+	NSString *base64Enc = [out base64Encoding];
+	//NSLog(@"signStr from method %@",signStr);
+	//NSLog(@"Base 64 sig from method: %@",base64Enc);
+	
+	// Build the URL
+    NSString *escapedResource = [resource stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+
+    NSURL *url;
+    NSString *baseUrl = [NSString stringWithFormat:@"%@://%@:%d",
+               self.atmosCredentials.httpProtocol,
+               self.atmosCredentials.accessPoint,
+               self.atmosCredentials.portNumber];
+    if(disposition) {
+        NSString *escapedDisposition = [disposition stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        url = [NSURL URLWithString:[NSString
+                                    stringWithFormat:@"%@%@?uid=%@&expires=%lld&signature=%@&disposition=%@",
+                                    baseUrl,
+                                    escapedResource,
+                                    self.atmosCredentials.tokenId,
+                                    [expTs longLongValue],
+                                    base64Enc,
+                                    escapedDisposition]];
+        
+    } else {
+        url = [NSURL URLWithString:[NSString
+                                    stringWithFormat:@"%@%@?uid=%@&expires=%lld&signature=%@",
+                                    baseUrl,
+                                    escapedResource,
+                                    self.atmosCredentials.tokenId,
+                                    [expTs longLongValue],
+                                    base64Enc]];
+    }	
+    
+	[signStr release];
+
+    return url;
+}
+
+
 
 
 #pragma mark MemoryManagement

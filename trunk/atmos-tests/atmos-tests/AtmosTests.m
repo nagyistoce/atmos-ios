@@ -3043,5 +3043,221 @@ withDirectory:(NSString *)dir
     [self checkFailure];
 }
 
+- (void) subTestShareableUrl1:(NSURL*)url
+{
+    // Load the URL and check content.
+    NSURLRequest *req = [NSURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10.0];
+    NSError *err = nil;
+    @try {
+        NSURLResponse *resp = nil;
+        NSData *data = [NSURLConnection sendSynchronousRequest:req returningResponse:&resp error:&err];
+        if(err) {
+            NSLog(@"Error loading shareable URL: %@", err);
+        }
+        GHAssertNotNil(resp, @"Loading Shareable URL returned nil response");
+        GHAssertNotNil(data, @"Loading Shareable URL returned nil data");
+        GHAssertNil(err, @"Loading Shareable URL returned an error");
+        
+        // NSData to string
+        NSString *str = [NSString stringWithUTF8String:[data bytes]];
+        GHAssertEqualStrings(str, @"Hello World", @"Shareable URL Content wrong");
+    } @catch (NSException *exception) {
+        self.failure = exception;
+        [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testShareableUrl)];
+    }
+
+    [url release];
+    [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testShareableUrl)];
+}
+
+- (void) testShareableUrl
+{
+    [self prepare];
+    
+    AtmosObject *obj = [[AtmosObject alloc] init];
+    obj.dataMode = kDataModeBytes;
+    obj.data = [NSData dataWithBytes:[@"Hello World" UTF8String] length:12];
+    obj.contentType = @"text/foo";
+    
+    [atmosStore createObject:obj
+                withCallback:^BOOL(UploadProgress *progress) {
+                    @try {
+                        [self checkResult:progress];
+                        
+                        if(progress.isComplete){
+                            GHAssertNotNil(progress.atmosObject,
+                                           @"Expected New ID to be non-Nil");
+                            
+                            [self.cleanup addObject:progress.atmosObject.atmosId];
+                            
+                            NSDate *expires = [NSDate dateWithTimeIntervalSinceNow:3600.0];
+                            NSURL *url = [[atmosStore getShareableUrlForObject:obj withExpiration:expires] retain];
+                            NSLog(@"Shareable URL: %@", url);
+                            [self subTestShareableUrl1:url];
+                        }
+                    }
+                    @catch (NSException *exception) {
+                        self.failure = exception;
+                        [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testShareableUrl)];
+                        return NO;
+                    }
+                    
+                    return YES;
+                }
+                   withLabel:@"testShareableUrl"];
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [obj release];
+    [self checkFailure];
+
+}
+
+
+- (void) subTestShareableUrlNs1:(NSURL*)url
+{
+    // Load the URL and check content.
+    NSURLRequest *req = [NSURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10.0];
+    NSError *err = nil;
+    @try {
+        NSURLResponse *resp = nil;
+        NSData *data = [NSURLConnection sendSynchronousRequest:req returningResponse:&resp error:&err];
+        if(err) {
+            NSLog(@"Error loading shareable URL: %@", err);
+        }
+        GHAssertNotNil(resp, @"Loading Shareable URL returned nil response");
+        GHAssertNotNil(data, @"Loading Shareable URL returned nil data");
+        GHAssertNil(err, @"Loading Shareable URL returned an error");
+        
+        // NSData to string
+        NSString *str = [NSString stringWithUTF8String:[data bytes]];
+        GHAssertEqualStrings(str, @"Hello World", @"Shareable URL Content wrong");
+    } @catch (NSException *exception) {
+        self.failure = exception;
+        [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testShareableUrlNs)];
+    }
+    
+    [url release];
+    [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testShareableUrlNs)];
+}
+
+- (void) testShareableUrlNs
+{
+    [self prepare];
+    
+    AtmosObject *obj = [[AtmosObject alloc] init];
+    obj.dataMode = kDataModeBytes;
+    obj.data = [NSData dataWithBytes:[@"Hello World" UTF8String] length:12];
+    obj.contentType = @"text/foo";
+    obj.objectPath = [NSString stringWithFormat:@"/%@/%@",
+                      [self generateFilename:8 includeExtension:false],
+                      [self generateFilename:8 includeExtension:true]];
+    GHTestLog(@"Object Path: %@",obj.objectPath);
+    
+    [atmosStore createObject:obj
+                withCallback:^BOOL(UploadProgress *progress) {
+                    @try {
+                        [self checkResult:progress];
+                        
+                        if(progress.isComplete){
+                            GHAssertNotNil(progress.atmosObject,
+                                           @"Expected New ID to be non-Nil");
+                            
+                            [self.cleanup addObject:progress.atmosObject.atmosId];
+                            
+                            NSDate *expires = [NSDate dateWithTimeIntervalSinceNow:3600.0];
+                            NSURL *url = [[atmosStore getShareableUrlForObject:obj withExpiration:expires] retain];
+                            NSLog(@"Shareable URL: %@", url);
+                            [self subTestShareableUrlNs1:url];
+                        }
+                    }
+                    @catch (NSException *exception) {
+                        self.failure = exception;
+                        [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testShareableUrlNs)];
+                        return NO;
+                    }
+                    
+                    return YES;
+                }
+                   withLabel:@"testShareableUrlNs"];
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [obj release];
+    [self checkFailure];
+    
+}
+
+- (void) subTestShareableUrlWithDisposition:(NSURL*)url
+{
+    // Load the URL and check content.
+    NSURLRequest *req = [NSURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10.0];
+    NSError *err = nil;
+    @try {
+        NSURLResponse *resp = nil;
+        NSData *data = [NSURLConnection sendSynchronousRequest:req returningResponse:&resp error:&err];
+        if(err) {
+            NSLog(@"Error loading shareable URL: %@", err);
+        }
+        GHAssertNotNil(resp, @"Loading Shareable URL returned nil response");
+        GHAssertNotNil(data, @"Loading Shareable URL returned nil data");
+        GHAssertNil(err, @"Loading Shareable URL returned an error");
+        
+        NSHTTPURLResponse *hr = (NSHTTPURLResponse*)resp;
+        NSString *disposition = [hr.allHeaderFields objectForKey:@"Content-Disposition"];
+        GHAssertNotNil(disposition, @"Content-Disposition response header was nil");
+        GHAssertEqualStrings(disposition, @"attachment; filename=\"foobar.txt\"", @"Content-Disposition header value incorrect.");
+        
+        // NSData to string
+        NSString *str = [NSString stringWithUTF8String:[data bytes]];
+        GHAssertEqualStrings(str, @"Hello World", @"Shareable URL Content wrong");
+    } @catch (NSException *exception) {
+        self.failure = exception;
+        [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testShareableUrlWithDisposition)];
+    }
+    
+    [url release];
+    [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testShareableUrlWithDisposition)];
+}
+
+- (void) testShareableUrlWithDisposition
+{
+    [self prepare];
+    
+    AtmosObject *obj = [[AtmosObject alloc] init];
+    obj.dataMode = kDataModeBytes;
+    obj.data = [NSData dataWithBytes:[@"Hello World" UTF8String] length:12];
+    obj.contentType = @"text/foo";
+    
+    [atmosStore createObject:obj
+                withCallback:^BOOL(UploadProgress *progress) {
+                    @try {
+                        [self checkResult:progress];
+                        
+                        if(progress.isComplete){
+                            GHAssertNotNil(progress.atmosObject,
+                                           @"Expected New ID to be non-Nil");
+                            
+                            [self.cleanup addObject:progress.atmosObject.atmosId];
+                            
+                            NSDate *expires = [NSDate dateWithTimeIntervalSinceNow:3600.0];
+                            NSURL *url = [[atmosStore
+                                           getShareableUrlForObject:obj
+                                           withExpiration:expires
+                                           withDisposition:@"attachment; filename=\"foobar.txt\""] retain];
+                            NSLog(@"Shareable URL: %@", url);
+                            [self subTestShareableUrlWithDisposition:url];
+                        }
+                    }
+                    @catch (NSException *exception) {
+                        self.failure = exception;
+                        [self notify:kGHUnitWaitStatusSuccess forSelector:@selector(testShareableUrlWithDisposition)];
+                        return NO;
+                    }
+                    
+                    return YES;
+                }
+                   withLabel:@"testShareableUrl"];
+    [self waitForStatus:kGHUnitWaitStatusSuccess timeout:TIMEOUT];
+    [obj release];
+    [self checkFailure];
+    
+}
 
 @end
