@@ -685,6 +685,51 @@
                       withCallback:(void(^)(ListAccessTokensResult *result)) callback
                          withLabel:(NSString*) requestLabel;
 
+#pragma mark Shareable URL
+
+/*!
+ * @abstract Generates a presigned URL that can be used to download the 
+ * selected object multiple times until the expiration date passes.  Note that
+ * no other security is applied to the URL; anyone with access to the URL may
+ * download the object's content.
+ * @param obj the AtmosObject to download.  Must either have path or objectid;
+ * keypools are not supported.
+ * @param expires the NSDate that specifies the point in time (from the Atmos
+ * server's perspective) when the URL will no longer be valid.
+ * @return an NSURL object containing the URL to download the object.
+ */
+- (NSURL*) getShareableUrlForObject:(AtmosObject*)obj
+                    withExpiration:(NSDate*)expires;
+
+/*!
+ * @abstract Generates a presigned URL that can be used to download the
+ * selected object multiple times until the expiration date passes.  Note that
+ * no other security is applied to the URL; anyone with access to the URL may
+ * download the object's content.  This version has an extra parameter that
+ * allows you to set the HTTP Content-Disposition response header.  Setting this
+ * header allows you some control over how the browser will name the file and
+ * whether the browser will display the content inline or download it.  The 
+ * general use-case for this functionality is to download a file that would
+ * generally be displayed inline (e.g. an "image/jpeg"), and/or to set the 
+ * default filename to download the file as.  Note that this feature requires
+ * Atmos 2.1.0+.
+ * @since Atmos 2.1.0
+ * @param obj the AtmosObject to download.  Must either have path or objectid;
+ * keypools are not supported.
+ * @param expires the NSDate that specifies the point in time (from the Atmos
+ * server's perspective) when the URL will no longer be valid.
+ * @param disposition the value of the Content-Disposition header on the
+ * response, e.g. "attachment; filename=image.jpg" to force the download of
+ * a JPEG and have the browser suggest the filename is image.jpg.  Note that
+ * there are extensions to this protocol for supporting UTF-8 filenames, but
+ * support varies by browser.  See RFCs 2183 and 6266.
+ * @return an NSURL object containing the URL to download the object.
+ */
+- (NSURL*) getShareableUrlForObject:(AtmosObject *)obj
+                     withExpiration:(NSDate *)expires
+                    withDisposition:(NSString*)disposition;
+
+
 #pragma mark Properties
 /*!
  * Credentials to use for making requests with this object.
