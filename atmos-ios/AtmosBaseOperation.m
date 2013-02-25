@@ -80,11 +80,12 @@ operExecuting, operFinished, operationLabel;
 	[req addValue:@"application/octet-stream" forHTTPHeaderField:@"Content-Type"];
 	
 	NSTimeZone *tz = [NSTimeZone timeZoneWithName:@"GMT"];
+    NSLocale *enLocale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US"];
 	NSDateFormatter *fmter = [[NSDateFormatter alloc] init];
 	[fmter setDateFormat:@"EEE, d MMM yyyy HH:mm:ss z"];
 	fmter.timeZone = tz;
+    fmter.locale = enLocale;
 	NSDate *now = [[NSDate alloc] init];
-    
     NSDate *adjdate = [now dateByAddingTimeInterval:atmosStore.timeOffset];
     
 	NSString *fmtDate = [fmter stringFromDate:adjdate];
@@ -93,6 +94,7 @@ operExecuting, operFinished, operationLabel;
 	[req addValue:fmtDate forHTTPHeaderField:@"Date"];
 	[fmter release];
 	[now release];
+    [enLocale release];
 	
 	return req;
 	
